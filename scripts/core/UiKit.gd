@@ -49,8 +49,11 @@ static func panel(fill: Color = BG_PANEL, border: Color = Color(0, 0, 0, 0)) -> 
 	return node
 
 
+## Tek satırlık etiket. Satır kırma varsayılan olarak KAPALIDIR: autowrap açık
+## bir Label yatay kaplarda en küçük genişliğini 0 bildirdiği için başlıklar
+## harf harf alt alta dizilir. Çok satırlı metinler için paragraph() kullanılır.
 static func label(text: String, size: int = FONT_BODY, color: Color = INK,
-		align: int = HORIZONTAL_ALIGNMENT_LEFT) -> Label:
+		align: int = HORIZONTAL_ALIGNMENT_LEFT, wrap: bool = false) -> Label:
 	var node := Label.new()
 	node.text = text
 	node.add_theme_font_size_override("font_size", size)
@@ -58,12 +61,21 @@ static func label(text: String, size: int = FONT_BODY, color: Color = INK,
 	node.add_theme_color_override("font_outline_color", OUTLINE)
 	node.add_theme_constant_override("outline_size", 6)
 	node.horizontal_alignment = align
-	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Dar göstergelerde tek kelimelik etiketler bölünmesin diye kırma kapatılabilir.
+	node.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if wrap else TextServer.AUTOWRAP_OFF
 	return node
 
 
 static func title(text: String) -> Label:
 	return label(text, FONT_TITLE, GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+## Çok satırlı, kendi kendine satır kıran metin bloğu.
+static func paragraph(text: String, size: int = FONT_SMALL, color: Color = INK_SOFT,
+		align: int = HORIZONTAL_ALIGNMENT_LEFT) -> Label:
+	var node := label(text, size, color, align, true)
+	node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return node
 
 
 static func button(text: String, accent: Color = GOLD, size: int = FONT_BODY) -> Button:
@@ -156,7 +168,7 @@ static func progress_bar(color: Color, height: float = 26.0) -> ProgressBar:
 ## Ekranların ortak arka planı: dikey degrade + hafif vinyet.
 static func background(top: Color = Color("#241d38"), bottom: Color = BG) -> ColorRect:
 	var rect := ColorRect.new()
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var gradient := Gradient.new()
 	gradient.set_color(0, top)
@@ -170,7 +182,7 @@ static func background(top: Color = Color("#241d38"), bottom: Color = BG) -> Col
 	# ColorRect yerine TextureRect gerektiği için degrade dokusu ayrı düğümde verilir.
 	var texture_rect := TextureRect.new()
 	texture_rect.texture = texture
-	texture_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	texture_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	texture_rect.stretch_mode = TextureRect.STRETCH_SCALE
 	texture_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rect.add_child(texture_rect)

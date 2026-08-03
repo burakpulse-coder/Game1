@@ -105,7 +105,7 @@ static func draw_castle(canvas: CanvasItem, width: float, stone: Color, hp_ratio
 	# Yan kuleler
 	for side in [-1.0, 1.0]:
 		var tower_w := width * 0.24
-		var tower_x := side * (half - tower_w * 0.5) - tower_w * 0.5
+		var tower_x: float = side * (half - tower_w * 0.5) - tower_w * 0.5
 		rounded_rect(canvas, Rect2(tower_x, top + height * 0.12, tower_w, height * 0.88),
 			4.0, shade(stone, -0.08))
 		# Konik çatı
@@ -138,8 +138,11 @@ static func draw_castle(canvas: CanvasItem, width: float, stone: Color, hp_ratio
 
 ## Kule tipine ve seviyesine (1-3) göre çizim. Seviye arttıkça kule büyür,
 ## katman kazanır ve tepesi belirginleşir — görsel olarak ayırt edilebilir.
+## `stone` gövdenin (kozmetik) rengi, `accent` kule tipinin rengidir; ikisi ayrı
+## tutulur ki kozmetik seçimi kule tiplerini birbirine benzetmesin.
 static func draw_tower(canvas: CanvasItem, tower_type: String, level: int, radius: float,
-		tint: Color) -> void:
+		stone: Color, accent: Color) -> void:
+	var tint := stone
 	var scale := 1.0 + (level - 1) * 0.14
 	var base_w := radius * 1.5 * scale
 	var base_h := radius * 1.7 * scale
@@ -159,15 +162,19 @@ static func draw_tower(canvas: CanvasItem, tower_type: String, level: int, radiu
 		canvas.draw_line(Vector2(-base_w * 0.44, y), Vector2(base_w * 0.44, y),
 			shade(tint, -0.25), 2.5)
 
+	# Tip rengini taşıyan bir kuşak: küçük ekranda kule tipini anında ayırt ettirir.
+	canvas.draw_line(Vector2(-base_w * 0.46, -base_h * 0.5 + 6.0),
+		Vector2(base_w * 0.46, -base_h * 0.5 + 6.0), accent, 8.0, true)
+
 	match tower_type:
 		"okcu":
-			_draw_archer_top(canvas, base_w, base_h, tint, level)
+			_draw_archer_top(canvas, base_w, base_h, accent, level)
 		"buyu":
-			_draw_mage_top(canvas, base_w, base_h, level)
+			_draw_mage_top(canvas, base_w, base_h, accent, level)
 		"mancinik":
-			_draw_catapult_top(canvas, base_w, base_h, level)
+			_draw_catapult_top(canvas, base_w, base_h, accent, level)
 		"sifa":
-			_draw_fountain_top(canvas, base_w, base_h, level)
+			_draw_fountain_top(canvas, base_w, base_h, accent, level)
 
 
 static func _draw_archer_top(canvas: CanvasItem, w: float, h: float, tint: Color, level: int) -> void:
@@ -182,23 +189,25 @@ static func _draw_archer_top(canvas: CanvasItem, w: float, h: float, tint: Color
 		Color("#7a4a22"), 2.0 + level, true)
 
 
-static func _draw_mage_top(canvas: CanvasItem, w: float, h: float, level: int) -> void:
+static func _draw_mage_top(canvas: CanvasItem, w: float, h: float, accent: Color,
+		level: int) -> void:
 	var top := -h * 0.5
 	# Sivri külah
 	filled_polygon(canvas, PackedVector2Array([
 		Vector2(-w * 0.44, top),
 		Vector2(0, top - h * (0.30 + 0.05 * level)),
 		Vector2(w * 0.44, top),
-	]), Color("#3f5fa8"))
+	]), shade(accent, -0.15))
 	# Yüzen rün küresi
 	var orb := Vector2(0, top - h * (0.34 + 0.05 * level))
 	filled_circle(canvas, orb, 5.0 + level * 1.6, Color("#8fd6ff"))
 	canvas.draw_arc(orb, 9.0 + level * 2.0, 0.0, TAU, 18, Color(0.6, 0.85, 1.0, 0.5), 2.0, true)
 
 
-static func _draw_catapult_top(canvas: CanvasItem, w: float, h: float, level: int) -> void:
+static func _draw_catapult_top(canvas: CanvasItem, w: float, h: float, accent: Color,
+		level: int) -> void:
 	var top := -h * 0.5
-	rounded_rect(canvas, Rect2(-w * 0.5, top - h * 0.1, w, h * 0.12), 2.0, Color("#6b4a2c"))
+	rounded_rect(canvas, Rect2(-w * 0.5, top - h * 0.1, w, h * 0.12), 2.0, shade(accent, -0.25))
 	# Fırlatma kolu
 	var pivot := Vector2(-w * 0.1, top - h * 0.08)
 	var arm_end := pivot + Vector2(w * 0.46, -h * (0.24 + 0.04 * level))
@@ -206,7 +215,8 @@ static func _draw_catapult_top(canvas: CanvasItem, w: float, h: float, level: in
 	filled_circle(canvas, arm_end, 5.0 + level * 1.5, Color("#5a5f66"))
 
 
-static func _draw_fountain_top(canvas: CanvasItem, w: float, h: float, level: int) -> void:
+static func _draw_fountain_top(canvas: CanvasItem, w: float, h: float, accent: Color,
+		level: int) -> void:
 	var top := -h * 0.5
 	# Çanak
 	filled_polygon(canvas, PackedVector2Array([
@@ -216,7 +226,7 @@ static func _draw_fountain_top(canvas: CanvasItem, w: float, h: float, level: in
 		Vector2(-w * 0.3, top - h * 0.14),
 	]), Color("#cfd8dd"))
 	# Su
-	ellipse(canvas, Vector2(0, top - h * 0.13), Vector2(w * 0.28, h * 0.05), Color("#4fbf6a"), false)
+	ellipse(canvas, Vector2(0, top - h * 0.13), Vector2(w * 0.28, h * 0.05), accent, false)
 	for i in level:
 		var offset := (i - (level - 1) * 0.5) * w * 0.2
 		canvas.draw_line(Vector2(offset, top - h * 0.14), Vector2(offset, top - h * 0.3),

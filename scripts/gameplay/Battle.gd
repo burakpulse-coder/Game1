@@ -1,0 +1,570 @@
+extends Control
+
+## Seviye oynanışının orkestratörü.
+##
+## Ekran düzeni (dikey):
+##   üst  ~%60  Battlefield  — yollar, kuleler, düşmanlar, kale
+##   alt  ~%40  LetterWheel  — harf çarkı
+##   üstte HUD ve öğretici katmanı
+##
+## Temel döngü: oyuncu kelime kaydırır -> WordEngine doğrular -> kelimenin
+## kategorisi TowerSystem'e inşa puanı yazar -> puan dolunca yuvaya kule dikilir.
+## Bu sırada WaveManager düşman göndermeye devam eder (gerçek zamanlı tempo).
+
+## Ekran bantları: savaş alanı üstte, HUD göstergeleri ortada, çark altta.
+## Üçü ayrı bantlarda durur ki HUD savaş alanının üstünü kapatmasın.
+const BATTLE_RATIO := 0.53
+const BAND_TOP := 0.535
+const BAND_BOTTOM := 0.685
+const WHEEL_TOP := 0.685
+
+var level_id := 1
+var level := {}
+
+var battlefield: Battlefield
+var wheel: LetterWheel
+var hud: Hud
+var tutorial: TutorialOverlay
+var waves: WaveManager
+var towers: TowerSystem
+
+var _found_words: Array = []
+var _combo := 0
+var _ulti_charge := 0.0
+var _finished := false
+var _paused := false
+var _enemies_killed := 0
+var _ancient_words := 0
+var _stolen := {}          ## Enemy -> harf indeksi
+var _pause_menu: Control = null
+var _elapsed := 0.0
+var _continue_used := false
+
+
+func _ready() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	level_id = SceneRouter.pending_level_id
+	level = LevelDB.get_level(level_id)
+	if level.is_empty():
+		push_error("[Battle] Seviye bulunamadı: %d" % level_id)
+		SceneRouter.go_to("harita")
+		return
+
+	_build_layout()
+	_start_level()
+	AudioManager.play_music("savas")
+
+
+## --------------------------------------------------------------------------
+## Kurulum
+## --------------------------------------------------------------------------
+
+func _build_layout() -> void:
+	var background := UiKit.background(Color("#2b3d2a"), Color("#171425"))
+	add_child(background)
+
+	battlefield = Battlefield.new()
+	battlefield.anchor_right = 1.0
+	battlefield.anchor_bottom = BATTLE_RATIO
+	battlefield.offset_bottom = 0
+	add_child(battlefield)
+
+	wheel = LetterWheel.new()
+	wheel.anchor_top = WHEEL_TOP
+	wheel.anchor_right = 1.0
+	wheel.anchor_bottom = 1.0
+	add_child(wheel)
+
+	hud = Hud.new()
+	add_child(hud)
+	hud.set_band(BAND_TOP, BAND_BOTTOM)
+
+	tutorial = TutorialOverlay.new()
+	add_child(tutorial)
+
+	waves = WaveManager.new()
+	add_child(waves)
+
+	towers = TowerSystem.new()
+	add_child(towers)
+
+	# --- Sinyaller ---------------------------------------------------------
+	battlefield.enemy_died.connect(_on_enemy_died)
+	battlefield.enemy_reached_castle.connect(_on_enemy_reached_castle)
+	battlefield.enemy_spawned.connect(_on_enemy_spawned)
+	battlefield.slot_tapped.connect(_on_slot_tapped)
+
+	wheel.word_submitted.connect(_on_word_submitted)
+	wheel.selection_changed.connect(func(word): hud.set_word(word))
+
+	hud.pause_pressed.connect(_toggle_pause)
+	hud.hint_pressed.connect(_on_hint)
+	hud.shuffle_pressed.connect(func(): wheel.shuffle())
+	hud.ulti_pressed.connect(_on_ulti)
+
+	waves.wave_started.connect(_on_wave_started)
+	waves.break_started.connect(func(seconds): hud.set_break(seconds))
+	waves.all_waves_finished.connect(_on_all_waves_finished)
+	waves.spawn_requested.connect(_on_spawn_requested)
+
+	towers.points_changed.connect(_on_points_changed)
+	towers.tower_ready.connect(_on_tower_ready)
+	towers.tower_built.connect(_on_tower_built)
+	towers.tower_upgraded.connect(_on_tower_upgraded)
+
+
+func _start_level() -> void:
+	battlefield.build(int(level.get("yol_sayisi", 1)), int(level.get("slot_sayisi", 4)))
+	battlefield.castle.setup(EconomyManager.castle_max_hp() * float(level.get("kale_can_carpani", 1.0)))
+	battlefield.castle.health_changed.connect(hud.set_health)
+	battlefield.castle.destroyed.connect(_on_defeat)
+	hud.set_health(battlefield.castle.hp, battlefield.castle.max_hp)
+
+	wheel.set_letters(level.get("harfler", []))
+	towers.setup(battlefield)
+	waves.setup(level.get("dalgalar", []))
+
+	hud.set_found_count(0)
+	hud.set_ulti(0.0)
+	hud.set_hint_label(SaveManager.free_hints_left())
+
+	var step := str(level.get("ogretici", ""))
+	if step != "" and not SaveManager.is_tutorial_done(step):
+		tutorial.begin(step, self)
+		tutorial.finished.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
+	else:
+		waves.start()
+
+
+func _on_tutorial_finished(step: String) -> void:
+	SaveManager.mark_tutorial_done(step)
+	waves.start()
+
+
+func _process(delta: float) -> void:
+	if not _finished and not _paused:
+		_elapsed += delta
+	hud.set_break(waves.break_remaining())
+
+
+## --------------------------------------------------------------------------
+## Kelime akışı
+## --------------------------------------------------------------------------
+
+func _on_word_submitted(raw: String) -> void:
+	if _finished:
+		return
+	var result: WordEngine.WordResult = WordEngine.submit(raw, _found_words)
+	if not result.valid:
+		_combo = 0
+		towers.set_combo_bonus(0.0)
+		hud.set_combo(0, 0.0)
+		hud.toast(result.reason, UiKit.DANGER)
+		wheel.reject()
+		AudioManager.play_sfx("kelime_yanlis")
+		Haptics.word_rejected()
+		return
+
+	_found_words.append(result.word)
+	_combo += 1
+	var combo_bonus := minf((_combo - 1) * GameConfig.COMBO_STEP, GameConfig.COMBO_MAX)
+	towers.set_combo_bonus(combo_bonus)
+	hud.set_combo(_combo, combo_bonus)
+	hud.set_found_count(_found_words.size())
+
+	var target := _wheel_target_for(result.tower_type)
+	var color := UiKit.GOLD
+	if result.tower_type != "":
+		color = Color(GameConfig.TOWERS[result.tower_type]["renk"])
+	wheel.accept(target, color)
+
+	AudioManager.play_sfx("kelime_dogru", 1.0 + minf(_combo, 6) * 0.05)
+	Haptics.word_accepted()
+
+	if result.tower_type != "":
+		towers.add_category_word(result.tower_type, result.length_multiplier)
+		var meta: Dictionary = WordEngine.category_meta(result.category)
+		hud.toast("%s  →  %s" % [TurkishText.to_upper(result.word), meta.get("ad", "")], color)
+	else:
+		towers.add_general_energy(result.length_multiplier)
+		hud.toast("%s  →  Genel enerji" % TurkishText.to_upper(result.word), UiKit.INK)
+
+	if result.is_ancient:
+		_ancient_words += 1
+		_ulti_charge = minf(1.0, _ulti_charge
+			+ GameConfig.ULTI_CHARGE_PER_ANCIENT * EconomyManager.ulti_charge_multiplier())
+		hud.set_ulti(_ulti_charge)
+		hud.toast("KADİM KELİME!", UiKit.GOLD)
+		Haptics.ancient_word()
+		SaveManager.unlock_achievement("kadim_kelime")
+
+	_track_word_stats(result)
+	tutorial.notify("kelime", result.category)
+
+
+func _track_word_stats(result: WordEngine.WordResult) -> void:
+	var stats: Dictionary = SaveManager.progress["istatistik"]
+	stats["bulunan_kelime"] = int(stats.get("bulunan_kelime", 0)) + 1
+	if result.is_ancient:
+		stats["kadim_kelime"] = int(stats.get("kadim_kelime", 0)) + 1
+	if result.word.length() > str(stats.get("en_uzun_kelime", "")).length():
+		stats["en_uzun_kelime"] = result.word
+	SaveManager.mark_dirty()
+	SaveManager.unlock_achievement("ilk_kelime")
+	if int(stats["bulunan_kelime"]) >= 500:
+		SaveManager.unlock_achievement("kelime_ustasi")
+
+
+## Harflerin uçacağı hedef: o tipteki bir kule, yoksa boş bir yuva, o da yoksa kale.
+func _wheel_target_for(tower_type: String) -> Vector2:
+	var point := battlefield.castle.global_position
+	if tower_type != "":
+		for node in battlefield.towers():
+			var tower := node as Tower
+			if tower.tower_type == tower_type:
+				point = tower.global_position
+				break
+	return wheel.get_global_transform_with_canvas().affine_inverse() \
+		* (battlefield.get_global_transform_with_canvas() * point)
+
+
+## --------------------------------------------------------------------------
+## Kule olayları
+## --------------------------------------------------------------------------
+
+func _on_points_changed(tower_type: String, points: float, threshold: float) -> void:
+	hud.set_meter(tower_type, points, threshold, towers.is_ready(tower_type))
+
+
+func _on_tower_ready(tower_type: String) -> void:
+	for slot in battlefield.slots:
+		slot.set_ready(slot.is_empty())
+	var config: Dictionary = GameConfig.TOWERS[tower_type]
+	hud.toast("%s hazır — boş bir yuvaya dokun" % config["ad"], Color(config["renk"]))
+	tutorial.notify("kule_hazir", tower_type)
+
+
+func _on_slot_tapped(slot: TowerSlot) -> void:
+	if _finished or _paused:
+		return
+	if towers.build_on(slot):
+		return
+	hud.toast("Önce kategoriden kelime bul", UiKit.INK_SOFT)
+
+
+func _on_tower_built(tower: Tower, tower_type: String) -> void:
+	tower.wants_heal.connect(_on_tower_heal)
+	for slot in battlefield.slots:
+		slot.set_ready(slot.is_empty() and not towers.ready_types().is_empty())
+	Haptics.tower_built()
+	SaveManager.unlock_achievement("ilk_kule")
+	tutorial.notify("kule_kuruldu", tower_type)
+
+
+func _on_tower_upgraded(tower: Tower, tower_level: int) -> void:
+	hud.toast("%s → Seviye %d" % [tower.config.get("ad", ""), tower_level], UiKit.GOLD)
+	if tower_level >= GameConfig.MAX_TOWER_LEVEL:
+		SaveManager.unlock_achievement("usta_mimar")
+
+
+func _on_tower_heal(_tower: Tower, amount: float) -> void:
+	battlefield.castle.heal(amount)
+
+
+## --------------------------------------------------------------------------
+## Dalga ve düşman olayları
+## --------------------------------------------------------------------------
+
+func _on_wave_started(index: int, total: int, is_boss: bool) -> void:
+	hud.set_wave(index, total, is_boss)
+	if is_boss:
+		hud.toast("BOSS GELİYOR!", UiKit.DANGER)
+
+
+func _on_spawn_requested(enemy_type: String, path_index: int, power: float) -> void:
+	battlefield.spawn_enemy(enemy_type, path_index, power)
+
+
+func _on_enemy_spawned(enemy: Enemy) -> void:
+	if enemy.is_boss:
+		enemy.phase_changed.connect(_on_boss_phase)
+	if not enemy.steals_letter:
+		return
+	# Harf Hırsızı doğar doğmaz çarktan bir harfi kilitler.
+	var index := wheel.pick_lockable_index()
+	if index < 0:
+		return
+	enemy.stolen_letter = index
+	_stolen[enemy] = index
+	wheel.lock_letter(index, enemy.steal_duration)
+	hud.toast("Harf Hırsızı bir harfi çaldı!", UiKit.DANGER)
+
+
+func _on_boss_phase(enemy: Enemy, phase: int) -> void:
+	var summon := enemy.phase_summon(phase)
+	if summon == "":
+		return
+	hud.toast("Boss yardım çağırıyor!", UiKit.DANGER)
+	for i in 3:
+		waves.force_spawn(summon, i % maxi(battlefield.tracks.size(), 1), 1.0)
+
+
+func _on_enemy_died(enemy: Enemy) -> void:
+	_enemies_killed += 1
+	EconomyManager.add_gold(enemy.gold)
+	_release_stolen_letter(enemy)
+	var stats: Dictionary = SaveManager.progress["istatistik"]
+	stats["oldurulen_dusman"] = int(stats.get("oldurulen_dusman", 0)) + 1
+	if _finished:
+		return
+	if waves.is_finished() and battlefield.live_enemy_count() == 0:
+		_on_victory()
+
+
+func _on_enemy_reached_castle(enemy: Enemy, damage: float) -> void:
+	_release_stolen_letter(enemy)
+	battlefield.castle.take_damage(damage)
+	if not _finished and waves.is_finished() and battlefield.live_enemy_count() == 0:
+		_on_victory()
+
+
+## Hırsız öldüğünde ya da kaleye ulaştığında kilitlediği harf açılır.
+func _release_stolen_letter(enemy: Enemy) -> void:
+	if not _stolen.has(enemy):
+		return
+	wheel.unlock_letter(int(_stolen[enemy]))
+	_stolen.erase(enemy)
+	enemy.stolen_letter = -1
+
+
+## --------------------------------------------------------------------------
+## İpucu, ulti, duraklatma
+## --------------------------------------------------------------------------
+
+func _on_hint() -> void:
+	if _finished:
+		return
+	var preferred := ""
+	var targets: Array = level.get("hedef_kategoriler", [])
+	if not targets.is_empty():
+		preferred = str(targets[0])
+	var suggestion: String = WordEngine.hint(Array(wheel.letters).map(
+		func(l): return TurkishText.to_lower(l)), _found_words, preferred)
+	if suggestion == "":
+		hud.toast("Bu çarkta bulunacak kelime kalmadı", UiKit.INK_SOFT)
+		return
+	if not EconomyManager.try_spend_hint():
+		hud.toast("Yeterli elmas yok", UiKit.DANGER)
+		return
+	wheel.flash_hint(suggestion)
+	hud.toast("%d harfli bir kelime: %s…" % [suggestion.length(),
+		TurkishText.to_upper(suggestion.substr(0, 2))], UiKit.GOLD)
+	hud.set_hint_label(SaveManager.free_hints_left())
+
+
+func _on_ulti() -> void:
+	if _ulti_charge < 1.0 or _finished:
+		return
+	_ulti_charge = 0.0
+	hud.set_ulti(0.0)
+	AudioManager.play_sfx("ulti")
+	Haptics.pulse(Haptics.STRONG)
+	var hits := battlefield.cast_ulti(GameConfig.ULTI_DAMAGE)
+	hud.toast("Kadim Büyü! %d düşman vuruldu" % hits, UiKit.GOLD)
+
+
+func _toggle_pause() -> void:
+	if _finished:
+		return
+	_paused = not _paused
+	get_tree().paused = _paused
+	if _paused:
+		_show_pause_menu()
+	elif _pause_menu != null:
+		_pause_menu.queue_free()
+		_pause_menu = null
+
+
+func _show_pause_menu() -> void:
+	var overlay := ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0.72)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+
+	var box := UiKit.vbox(20)
+	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	box.anchor_left = 0.12
+	box.anchor_right = 0.88
+	box.offset_left = 0
+	box.offset_right = 0
+	box.offset_top = -220
+	box.offset_bottom = 220
+
+	box.add_child(UiKit.title("Duraklatıldı"))
+	var resume := UiKit.button("Devam Et", UiKit.SUCCESS)
+	resume.pressed.connect(_toggle_pause)
+	box.add_child(resume)
+	var restart := UiKit.ghost_button("Yeniden Başla")
+	restart.pressed.connect(func():
+		get_tree().paused = false
+		SceneRouter.play_level(level_id))
+	box.add_child(restart)
+	var quit := UiKit.ghost_button("Haritaya Dön")
+	quit.pressed.connect(func():
+		get_tree().paused = false
+		SceneRouter.go_to("harita"))
+	box.add_child(quit)
+
+	overlay.add_child(box)
+	add_child(overlay)
+	_pause_menu = overlay
+
+
+## --------------------------------------------------------------------------
+## Bitiş
+## --------------------------------------------------------------------------
+
+func _on_all_waves_finished() -> void:
+	if not _finished and battlefield.live_enemy_count() == 0:
+		_on_victory()
+
+
+func _on_victory() -> void:
+	if _finished:
+		return
+	_finished = true
+	wheel.enabled = false
+	AudioManager.play_sfx("zafer")
+
+	var hp_ratio := battlefield.castle.health_ratio()
+	var stars := 1
+	if hp_ratio >= GameConfig.STAR_THRESHOLDS[2]:
+		stars = 3
+	elif hp_ratio >= GameConfig.STAR_THRESHOLDS[1]:
+		stars = 2
+
+	var first_clear := SaveManager.level_stars(level_id) == 0
+	var reward := EconomyManager.level_reward(level_id, stars, _found_words.size(), first_clear)
+	EconomyManager.add_gold(reward)
+	SaveManager.record_level_result(level_id, stars, hp_ratio)
+
+	if hp_ratio >= 0.999:
+		SaveManager.unlock_achievement("kusursuz")
+	if GameConfig.is_boss_level(level_id):
+		var region := GameConfig.region_of_level(level_id)
+		SaveManager.unlock_achievement(["vadi_fatihi", "orman_fatihi", "buz_fatihi",
+			"ejder_avcisi"][region])
+	PlayServices.submit_score("toplam_yildiz", SaveManager.total_stars())
+
+	_finish({
+		"zafer": true,
+		"seviye": level_id,
+		"yildiz": stars,
+		"altin": reward,
+		"kelime": _found_words.size(),
+		"kadim": _ancient_words,
+		"oldurulen": _enemies_killed,
+		"can_orani": hp_ratio,
+		"ilk_gecis": first_clear,
+		"sure": _elapsed,
+	})
+
+
+func _on_defeat() -> void:
+	if _finished:
+		return
+	_finished = true
+	wheel.enabled = false
+	AudioManager.play_sfx("yenilgi")
+	# "Devam et" teklifi seviye başına bir kez ve yalnızca ödüllü video hazırsa.
+	if not _continue_used and AdManager.rewarded_available():
+		_show_continue_offer()
+		return
+	_report_defeat()
+
+
+func _report_defeat() -> void:
+	_finish({
+		"zafer": false,
+		"seviye": level_id,
+		"yildiz": 0,
+		"altin": 0,
+		"kelime": _found_words.size(),
+		"kadim": _ancient_words,
+		"oldurulen": _enemies_killed,
+		"can_orani": 0.0,
+		"ilk_gecis": false,
+		"sure": _elapsed,
+	})
+
+
+func _finish(result: Dictionary) -> void:
+	# Reklam yalnızca seviye BİTTİKTEN sonra; oyun ortasında asla.
+	set_process(false)
+	battlefield.clear_all()
+	SaveManager.save_progress()
+	SceneRouter.show_result(result)
+
+
+## --------------------------------------------------------------------------
+## "Devam et" ödüllü reklamı
+## --------------------------------------------------------------------------
+
+## Kale yıkıldığında, seviyeyi baştan almak yerine ödüllü video izleyip
+## kaldığı yerden devam etme teklifi. Seviye başına tek kez sunulur.
+func _show_continue_offer() -> void:
+	var overlay := ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0.78)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var box := UiKit.vbox(20)
+	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	box.anchor_left = 0.1
+	box.anchor_right = 0.9
+	box.offset_top = -240
+	box.offset_bottom = 240
+
+	box.add_child(UiKit.title("Kale düştü!"))
+	box.add_child(UiKit.label(
+		"Kısa bir video izle, kalen %d%% canla ayağa kalksın ve kaldığın yerden devam et."
+			% roundi(GameConfig.CONTINUE_REVIVE_HP_RATIO * 100.0),
+		UiKit.FONT_BODY, UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER))
+
+	var watch := UiKit.button("Video izle ve devam et", UiKit.SUCCESS)
+	watch.pressed.connect(func():
+		watch.disabled = true
+		AdManager.rewarded_finished.connect(_on_continue_ad_finished.bind(overlay),
+			CONNECT_ONE_SHOT)
+		AdManager.show_rewarded(AdManager.PLACEMENT_CONTINUE))
+	box.add_child(watch)
+
+	var give_up := UiKit.ghost_button("Vazgeç")
+	give_up.pressed.connect(func():
+		overlay.queue_free()
+		_report_defeat())
+	box.add_child(give_up)
+
+	overlay.add_child(box)
+	add_child(overlay)
+
+
+func _on_continue_ad_finished(success: bool, placement: String, overlay: Control) -> void:
+	if placement != AdManager.PLACEMENT_CONTINUE:
+		return
+	if is_instance_valid(overlay):
+		overlay.queue_free()
+	if not success:
+		hud.toast("Video izlenemedi", UiKit.DANGER)
+		_report_defeat()
+		return
+	_continue_used = true
+	revive_and_continue()
+
+
+## Kaleyi diriltip savaşı kaldığı yerden sürdürür.
+func revive_and_continue() -> void:
+	_finished = false
+	wheel.enabled = true
+	battlefield.castle.revive(GameConfig.CONTINUE_REVIVE_HP_RATIO)
+	hud.toast("Kale ayağa kalktı!", UiKit.SUCCESS)
+	set_process(true)

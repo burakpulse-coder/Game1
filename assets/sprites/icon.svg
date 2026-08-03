@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Kelime Kalesi uygulama simgesi: taş kale + kadim harf -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b2f5c"/>
+      <stop offset="1" stop-color="#171425"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9b2a4"/>
+      <stop offset="1" stop-color="#7c7466"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#sky)"/>
+  <circle cx="368" cy="132" r="52" fill="#f4d06a" opacity="0.85"/>
+
+  <!-- Sur -->
+  <path d="M96 250 h320 v168 H96 Z" fill="url(#stone)" stroke="#241f2e" stroke-width="12"/>
+  <g fill="url(#stone)" stroke="#241f2e" stroke-width="12">
+    <rect x="96" y="212" width="56" height="46"/>
+    <rect x="184" y="212" width="56" height="46"/>
+    <rect x="272" y="212" width="56" height="46"/>
+    <rect x="360" y="212" width="56" height="46"/>
+  </g>
+
+  <!-- Yan kuleler -->
+  <g fill="#98907f" stroke="#241f2e" stroke-width="12">
+    <rect x="60" y="196" width="72" height="222"/>
+    <rect x="380" y="196" width="72" height="222"/>
+  </g>
+  <path d="M52 200 L96 132 L140 200 Z" fill="#8c3f3f" stroke="#241f2e" stroke-width="12"/>
+  <path d="M372 200 L416 132 L460 200 Z" fill="#8c3f3f" stroke="#241f2e" stroke-width="12"/>
+
+  <!-- Kapı -->
+  <path d="M226 418 v-84 a30 30 0 0 1 60 0 v84 Z" fill="#4a3524" stroke="#241f2e" stroke-width="12"/>
+
+  <!-- Kadim harf taşı -->
+  <circle cx="256" cy="176" r="66" fill="#cdbb96" stroke="#241f2e" stroke-width="12"/>
+  <text x="256" y="176" font-family="Georgia, 'Times New Roman', serif" font-size="86"
+        font-weight="bold" fill="#2e2418" text-anchor="middle" dominant-baseline="central">K</text>
+</svg>
