@@ -210,28 +210,63 @@ Görsel denetim için `scenes/EkranGoruntusu.tscn` her ekranın PNG'sini üretir
 
 ## Android derlemesi
 
-Hedef: **min API 24**, target API 34, `arm64-v8a` + `armeabi-v7a` + `x86_64`,
-dikey kilitli, immersive mod.
+Hedef: **min API 24**, target API 34, `arm64-v8a` + `armeabi-v7a`, dikey kilitli,
+immersive mod. `export_presets.cfg` iki preset içerir:
 
-`export_presets.cfg` hazırdır. Derlemek için:
+| Preset | Derleme | Kullanım |
+|---|---|---|
+| `Android` | Gradle | Yayın derlemesi. min/target SDK'yı belirler, eklentileri (AdMob, Billing, Play Games) destekler. |
+| `Android (şablon, imzasız)` | Hazır şablon | SDK kurmadan hızlı test derlemesi. Eklenti desteklemez ve min SDK'yı şablonun varsayılanına (21) bırakır. |
 
-1. **Godot dışa aktarma şablonlarını** kur (Editor → Manage Export Templates).
-2. **Android SDK + JDK 17** kur ve Editor Settings → Export → Android altında
-   SDK yolunu göster.
-3. Project → Install Android Build Template (eklenti kullanacaksanız zorunlu).
-4. İmzalama anahtarını üret ve `export_presets.local.cfg` içinde tanımla
-   (bu dosya `.gitignore`'dadır — anahtar deposuna asla depoya girmez):
+### Doğrulanmış derleme
+
+Bu depodaki yapılandırma **gerçekten derlendi ve doğrulandı**:
+
+| Çıktı | Boyut | minSdk | targetSdk | Mimariler |
+|---|---|---|---|---|
+| `kelime_kalesi.aab` (release) | 47,0 MB | 24 | 34 | arm64-v8a, armeabi-v7a |
+| `kelime_kalesi.apk` (release) | 139,9 MB | 24 | 34 | arm64-v8a, armeabi-v7a |
+
+APK'nın büyüklüğü Godot çalışma zamanının sıkıştırılmamış `libgodot_android.so`
+dosyalarından gelir (2 mimari için ~125 MB); **oyunun kendi verisi 1,8 MB'dır**
+(sözlük 309 KB, seviyeler 197 KB, ses 1,3 MB, görseller yordamsal). Play Store'a
+AAB yüklenir ve cihaza yalnızca tek mimari indirilir — bu yüzden asıl ölçü
+47 MB'lık AAB'dir.
+
+İzinler (manifest'ten doğrulandı): `INTERNET`, `ACCESS_NETWORK_STATE`,
+`ACCESS_WIFI_STATE`, `VIBRATE`. Konum, kişiler, depolama izni istenmez.
+
+### Derleme adımları
 
 ```bash
-keytool -genkeypair -v -keystore kelime_kalesi.keystore \
-  -alias kelimekalesi -keyalg RSA -keysize 2048 -validity 10000
-```
+# 1. Gereksinimler: Godot 4.3, JDK 17 (Godot Gradle derlemesi 21'i kabul etmez),
+#    Android SDK (build-tools;34.0.0 + platforms;android-34)
+export ANDROID_HOME=/yol/android-sdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-5. Dışa aktar:
+# 2. Godot editör ayarlarında SDK yolunu göster
+#    (Editor Settings -> Export -> Android -> Android Sdk Path)
 
-```bash
+# 3. Android derleme şablonunu projeye kur
+#    Project -> Install Android Build Template
+#    (CLI: android_source.zip'i android/build/ altına aç)
+
+# 4. Yayın imzalama anahtarını üret
+keytool -genkeypair -v -keystore kelime_kalesi.keystore -alias kelimekalesi \
+  -keyalg RSA -keysize 2048 -validity 10000
+
+# 5. Anahtarı ortam değişkenleriyle ver — depoya asla girmez
+export GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$PWD/kelime_kalesi.keystore
+export GODOT_ANDROID_KEYSTORE_RELEASE_USER=kelimekalesi
+export GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=...
+
+# 6. Dışa aktar
 godot --headless --path . --export-release "Android" build/kelime_kalesi.aab
 ```
+
+`android/.gdignore` dosyası şarttır: olmazsa Godot, Android kaynak klasöründeki
+PNG'ler için `.import` dosyaları üretir ve Gradle'ın `mergeDebugResources`
+adımı hata verir.
 
 ### Android eklentileri
 
@@ -303,8 +338,11 @@ dışına taşmaz.
 * **Yerelleştirme altyapısı hazır ama tek dil.** Metinler şu an kaynak içinde;
   `ayarlar.dil` anahtarı ve dil ekranı mevcut, çeviri dosyası eklendiğinde
   `tr()` çağrılarına geçilebilir.
-* Bu depoda **APK üretilmedi** — Android SDK gerektiriyor. `export_presets.cfg`
-  doğrulandı (Godot presetten yalnızca SDK eksikliği nedeniyle şikayet ediyor).
+* **Cihazda oynanış testi yapılmadı.** Derleme ve tüm sistemler başsız olarak
+  doğrulandı, imzalı AAB/APK üretildi; ancak gerçek bir telefonda dokunma
+  hissi, kare hızı ve ses dengesi ölçülmedi.
+* **Reklam/IAP/Play Games akışları uçtan uca denenmedi** — eklentiler bu ortamda
+  kurulu olmadığı için yalnızca "eklenti yok" davranışı doğrulandı.
 
 ---
 
