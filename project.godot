@@ -1,0 +1,71 @@
+; Kelime Kalesi — Godot 4.3 proje ayarları
+; Dikey (portrait) Android oyunu, 1080x1920 referans çözünürlük.
+
+config_version=5
+
+[application]
+
+config/name="Kelime Kalesi"
+config/description="Türkçe kelime bulmaca + kule savunma hibriti."
+config/version="0.6.0"
+run/main_scene="res://scenes/Acilis.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+config/icon="res://assets/sprites/icon.svg"
+boot_splash/bg_color=Color(0.078, 0.086, 0.129, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+GameLog="*res://scripts/autoload/GameLog.gd"
+SaveManager="*res://scripts/autoload/SaveManager.gd"
+PlayServices="*res://scripts/autoload/PlayServices.gd"
+WordEngine="*res://scripts/autoload/WordEngine.gd"
+LevelDB="*res://scripts/autoload/LevelDB.gd"
+EconomyManager="*res://scripts/autoload/EconomyManager.gd"
+AudioManager="*res://scripts/autoload/AudioManager.gd"
+Haptics="*res://scripts/autoload/Haptics.gd"
+AdManager="*res://scripts/autoload/AdManager.gd"
+IapManager="*res://scripts/autoload/IapManager.gd"
+PerfManager="*res://scripts/autoload/PerfManager.gd"
+SceneRouter="*res://scripts/autoload/SceneRouter.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/size/resizable=false
+window/handheld/orientation=1
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/vsync/vsync_mode=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+anti_aliasing/quality/msaa_2d=1
+environment/defaults/default_clear_color=Color(0.078, 0.086, 0.129, 1)
+
+[physics]
+
+common/physics_ticks_per_second=60
+2d/default_gravity=0.0
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
+theme/default_font_subpixel_positioning=1
+
+[file_customization]
+
+folder_colors={
+"res://assets/": "orange",
+"res://data/": "green",
+"res://scripts/": "blue",
+"res://tools/": "gray"
+}

@@ -1,0 +1,23 @@
+# Godot 4
+.godot/
+/android/build/
+/android/.build_version
+/android/*.keystore
+/android/*.jks
+export_presets.local.cfg
+
+# Derleme çıktıları
+/build/
+*.apk
+*.aab
+*.idsig
+
+# Python araçları
+__pycache__/
+*.pyc
+
+# Editör / işletim sistemi
+.DS_Store
+*.swp
+.idea/
+.vscode/
