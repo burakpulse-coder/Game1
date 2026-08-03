@@ -60,7 +60,10 @@ func _process(delta: float) -> void:
 		return
 	position += to_target.normalized() * step
 	rotation = to_target.angle() if tower_type == "okcu" else 0.0
-	queue_redraw()
+	# Yalnızca dönen büyü küresinin görüntüsü kare kare değişir; ok ve gülle
+	# sabit çizimdir, konumları düğüm dönüşümüyle güncellenir.
+	if tower_type == "buyu":
+		queue_redraw()
 
 
 func _impact() -> void:

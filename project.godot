@@ -68,3 +68,10 @@ folder_colors={
 "res://scripts/": "blue",
 "res://tools/": "gray"
 }
+
+[editor]
+
+; Movie Maker: tanıtım/hata ayıklama kaydı için sabit kare hızı.
+movie_writer/fps=30
+movie_writer/mjpeg_quality=0.85
+movie_writer/disable_vsync=true

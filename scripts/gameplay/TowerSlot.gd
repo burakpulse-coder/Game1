@@ -4,10 +4,12 @@ extends Node2D
 ## Kule yuvası. Boşken dokunulabilir; inşa puanı dolu bir kule tipi varsa
 ## parıldar ve dokunuşla o kule inşa edilir.
 
-signal tapped(slot: TowerSlot)
+## Dokunma isabeti Battlefield'ın `_gui_input`'inde çözülür: kök Control'ler
+## dokunma olaylarını yuttuğu için `_unhandled_input` savaş sahnesinde hiç
+## tetiklenmiyordu. Bu düğüm yalnızca kendi görünümünden sorumludur.
 
 const RADIUS := 46.0
-const TOUCH_RADIUS := 62.0
+const TOUCH_RADIUS := 74.0
 
 var index := 0
 var tower: Tower = null
@@ -35,24 +37,6 @@ func _process(delta: float) -> void:
 	if ready_to_build and is_empty():
 		_pulse += delta
 		queue_redraw()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not is_empty():
-		return
-	var point := Vector2.INF
-	if event is InputEventScreenTouch and event.pressed:
-		point = (event as InputEventScreenTouch).position
-	elif event is InputEventMouseButton and event.pressed \
-			and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
-		point = (event as InputEventMouseButton).position
-	if point == Vector2.INF:
-		return
-	# Ekran koordinatını düğümün yerel uzayına çevirip dokunma yarıçapına bak.
-	var local := get_global_transform_with_canvas().affine_inverse() * point
-	if local.length() <= TOUCH_RADIUS:
-		get_viewport().set_input_as_handled()
-		tapped.emit(self)
 
 
 func _draw() -> void:

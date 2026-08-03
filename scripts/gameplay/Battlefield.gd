@@ -11,6 +11,10 @@ signal slot_tapped(slot: TowerSlot)
 
 const SLOT_CLEARANCE := PathTrack.PATH_WIDTH * 0.5 + TowerSlot.RADIUS + 14.0
 const CASTLE_CLEARANCE := 150.0
+## HUD'un üst şeridi (duraklat düğmesi, kale canı, dalga bilgisi) savaş alanının
+## üstünü kaplar. Bu şeridin altına yuva konulursa yuvaya dokunmak düğmeye basar;
+## bu yüzden üst bant yuva yerleşiminden dışlanır.
+const TOP_UI_CLEARANCE := 210.0
 const ENEMY_PREWARM := 24
 const PROJECTILE_PREWARM := 24
 
@@ -35,7 +39,9 @@ var _built := false
 
 func _ready() -> void:
 	clip_contents = true
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Yuva dokunuşları buradan çözülür; savaş alanında başka etkileşimli
+	# öğe yok, bu yüzden alan tüm dokunuşları alabilir.
+	mouse_filter = Control.MOUSE_FILTER_STOP
 
 	_path_layer = _make_layer(1)
 	_slot_layer = _make_layer(2)
@@ -96,7 +102,6 @@ func build(path_count: int, slot_count: int) -> void:
 	for i in _slot_count:
 		var slot := TowerSlot.new()
 		slot.index = i
-		slot.tapped.connect(func(s): slot_tapped.emit(s))
 		_slot_layer.add_child(slot)
 		slots.append(slot)
 
@@ -127,12 +132,14 @@ func _layout() -> void:
 func _pick_slot_positions(rect: Rect2) -> Array:
 	var candidates: Array = []
 	var cols := 6
-	var rows := 5
+	var rows := 6
 	for row in rows:
 		for col in cols:
 			var point := rect.position + Vector2(
 				rect.size.x * (col + 0.5) / cols,
 				rect.size.y * (row + 0.5) / rows)
+			if point.y - rect.position.y < TOP_UI_CLEARANCE:
+				continue
 			if point.distance_to(castle.position) < CASTLE_CLEARANCE:
 				continue
 			var clear := true
@@ -146,9 +153,10 @@ func _pick_slot_positions(rect: Rect2) -> Array:
 	if candidates.is_empty():
 		# Hiç uygun nokta yoksa (çok dar ekran) yolun sağ kenarına diz.
 		var fallback: Array = []
+		var usable := maxf(rect.size.y - TOP_UI_CLEARANCE, 1.0)
 		for i in _slot_count:
 			fallback.append(rect.position + Vector2(rect.size.x * 0.9,
-				rect.size.y * (i + 1.0) / (_slot_count + 1.0)))
+				TOP_UI_CLEARANCE + usable * (i + 1.0) / (_slot_count + 1.0)))
 		return fallback
 
 	var chosen: Array = [candidates.pop_front()]
@@ -164,6 +172,41 @@ func _pick_slot_positions(rect: Rect2) -> Array:
 				best_index = i
 		chosen.append(candidates.pop_at(best_index))
 	return chosen
+
+
+## --------------------------------------------------------------------------
+## Dokunma
+## --------------------------------------------------------------------------
+
+func _gui_input(event: InputEvent) -> void:
+	var point := Vector2.INF
+	if event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed:
+		point = (event as InputEventScreenTouch).position
+	elif event is InputEventMouseButton:
+		var click := event as InputEventMouseButton
+		if click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+			point = click.position
+	if point == Vector2.INF:
+		return
+	var slot := slot_at(point)
+	if slot == null:
+		return
+	accept_event()
+	slot_tapped.emit(slot)
+
+
+## Verilen (savaş alanına göre yerel) noktaya en yakın boş yuva; menzil dışıysa null.
+func slot_at(point: Vector2) -> TowerSlot:
+	var best: TowerSlot = null
+	var best_distance := TowerSlot.TOUCH_RADIUS
+	for slot in slots:
+		if not slot.is_empty():
+			continue
+		var distance := slot.position.distance_to(point)
+		if distance <= best_distance:
+			best_distance = distance
+			best = slot
+	return best
 
 
 ## --------------------------------------------------------------------------

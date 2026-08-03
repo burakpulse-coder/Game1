@@ -10,6 +10,10 @@ signal phase_changed(enemy: Enemy, phase: int)
 
 const BASE_RADIUS := 31.0
 const HEALTH_BAR_WIDTH := 54.0
+## Yürüyüş animasyonu yeniden çizim hızı. Konum her karede güncellenir (düğüm
+## dönüşümü), ama _draw() bu hızda çalışır — düşük cihazlarda ciddi kazanç.
+const REDRAW_HZ := 20.0
+const REDRAW_HZ_LOW := 10.0
 
 var type_id := ""
 var data := {}
@@ -38,6 +42,7 @@ var _phases: Array = []
 var _hit_flash := 0.0
 var _slow_until := 0.0
 var _speed_scale := 1.0
+var _redraw_timer := 0.0
 
 
 func _ready() -> void:
@@ -75,6 +80,7 @@ func configure(enemy_type: String, path: PathTrack, power: float) -> void:
 	distance = 0.0
 	alive = true
 	stolen_letter = -1
+	_redraw_timer = 0.0
 	position = track.position_at(0.0)
 	queue_redraw()
 
@@ -111,7 +117,11 @@ func _process(delta: float) -> void:
 	if not is_equal_approx(position.x, previous.x):
 		_facing = signf(position.x - previous.x)
 	_walk += delta * (6.0 + speed * 0.03)
-	queue_redraw()
+
+	_redraw_timer -= delta
+	if _redraw_timer <= 0.0:
+		_redraw_timer = 1.0 / (REDRAW_HZ_LOW if PerfManager.low_quality else REDRAW_HZ)
+		queue_redraw()
 
 
 func _phase_speed() -> float:

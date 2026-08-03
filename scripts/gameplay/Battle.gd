@@ -60,6 +60,10 @@ func _ready() -> void:
 ## --------------------------------------------------------------------------
 
 func _build_layout() -> void:
+	# Kök Control dokunuşları yutmamalı; girdiyi çocuklar (savaş alanı, çark,
+	# HUD düğmeleri) kendileri alır.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	var background := UiKit.background(Color("#2b3d2a"), Color("#171425"))
 	add_child(background)
 

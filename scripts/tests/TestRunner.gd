@@ -28,6 +28,7 @@ func _ready() -> void:
 	_run("Ekonomi ve yükseltmeler", _test_economy)
 	_run("Kayıt sistemi", _test_save)
 	await _run_async("Savaş turu (uçtan uca)", _test_battle)
+	await _run_async("Gerçek dokunma girdisi", _test_touch_input)
 
 	print("\n=== Sonuç: %d başarılı, %d başarısız ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -377,3 +378,105 @@ func _test_battle() -> void:
 
 	battle.queue_free()
 	await get_tree().process_frame
+
+
+## --------------------------------------------------------------------------
+## Gerçek dokunma girdisi
+## --------------------------------------------------------------------------
+
+## Oyunun iç metotları değil, gerçek InputEvent yolu sınanır: çarkta kelime
+## kurma ve yuvaya dokunup kule dikme. Bu test, kök Control'ün dokunuşları
+## yuttuğu ve yuvaların hiç tıklanamadığı hatayı yakalamak için eklendi.
+func _test_touch_input() -> void:
+	SceneRouter.pending_level_id = 4
+	var battle: Node = load("res://scenes/Oyun.tscn").instantiate()
+	add_child(battle)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var wheel: LetterWheel = battle.wheel
+	var level := LevelDB.get_level(4)
+
+	# Çarktan gerçekten kurulabilen bir kategori kelimesi seç.
+	var word := ""
+	for category in level.get("kategori_kelimeler", {}):
+		for candidate in level["kategori_kelimeler"][category]:
+			if word == "":
+				word = str(candidate)
+	_check(word != "", "seviyede kategori kelimesi var")
+
+	# Harfleri taşlara eşle.
+	var stones: Array = []
+	var upper := TurkishText.to_upper(word)
+	for i in upper.length():
+		for stone in wheel.letters.size():
+			if not stones.has(stone) and wheel.letters[stone] == upper[i]:
+				stones.append(stone)
+				break
+	_equal(stones.size(), upper.length(), "kelimenin her harfi çarkta bulundu")
+
+	# Parmağı taşların üzerinden gerçek dokunma olaylarıyla geçir.
+	_touch(wheel, wheel._positions[stones[0]], true)
+	await get_tree().process_frame
+	_check(wheel._selection.size() == 1, "dokunma ilk harfi seçti")
+	for index in range(1, stones.size()):
+		_drag(wheel, wheel._positions[stones[index]])
+		await get_tree().process_frame
+	_equal(wheel._selection.size(), stones.size(), "kaydırma tüm harfleri seçti")
+	_touch(wheel, wheel._positions[stones[stones.size() - 1]], false)
+	await get_tree().process_frame
+	_check(battle._found_words.has(word), "parmak kalkınca kelime kabul edildi: %s" % word)
+
+	# Kule hazır olana kadar kelime göndermeye devam et.
+	for candidate in level.get("cozum_kelimeler", []):
+		if not battle.towers.ready_types().is_empty():
+			break
+		battle._on_word_submitted(str(candidate))
+	_check(not battle.towers.ready_types().is_empty(), "inşa puanı kule için doldu")
+
+	# Boş bir yuvaya GERÇEK dokunma olayı gönder; kule dikilmeli.
+	var target: TowerSlot = null
+	for slot in battle.battlefield.slots:
+		if slot.is_empty():
+			target = slot
+			break
+	_check(target != null, "boş yuva var")
+	var before: int = (battle.battlefield.towers() as Array).size()
+	_touch(battle.battlefield, target.position, true)
+	await get_tree().process_frame
+	_check(battle.battlefield.towers().size() > before,
+		"yuvaya dokunmak kule dikti (%d -> %d)" % [before, battle.battlefield.towers().size()])
+
+	# Hiçbir yuva HUD üst şeridinin altında kalmamalı; yoksa yuvaya dokunmak
+	# duraklat düğmesine basar.
+	var under_hud := 0
+	for slot in battle.battlefield.slots:
+		if slot.position.y < Battlefield.TOP_UI_CLEARANCE:
+			under_hud += 1
+	_equal(under_hud, 0, "hiçbir yuva HUD üst şeridinin altında değil")
+
+	battle.queue_free()
+	await get_tree().process_frame
+
+
+## Kontrole yerel koordinatta gerçek bir dokunma olayı gönderir.
+func _touch(control: Control, local_point: Vector2, pressed: bool) -> void:
+	var event := InputEventScreenTouch.new()
+	event.index = 0
+	event.pressed = pressed
+	event.position = _to_window(control, local_point)
+	Input.parse_input_event(event)
+
+
+func _drag(control: Control, local_point: Vector2) -> void:
+	var event := InputEventScreenDrag.new()
+	event.index = 0
+	event.position = _to_window(control, local_point)
+	Input.parse_input_event(event)
+
+
+## Girdi olayları pencere uzayında beklenir; oyun 1080x1920 tuvalini pencereye
+## ölçeklediği için dönüşüm gerekir.
+func _to_window(control: Control, local_point: Vector2) -> Vector2:
+	var canvas: Vector2 = control.get_global_transform_with_canvas() * local_point
+	return get_viewport().get_screen_transform() * canvas
