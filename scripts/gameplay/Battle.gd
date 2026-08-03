@@ -13,6 +13,11 @@ extends Control
 
 ## Ekran bantları: savaş alanı üstte, HUD göstergeleri ortada, çark altta.
 ## Üçü ayrı bantlarda durur ki HUD savaş alanının üstünü kapatmasın.
+## Seviye bittiğinde, sonuç ekranına yönlendirilmeden önce yayınlanır.
+## (Yönlendirme call_deferred ile yapıldığından, dışarıdan `_finished` alanını
+## yoklamak kare sırasına bağlı kalıyordu.)
+signal level_finished(result: Dictionary)
+
 const BATTLE_RATIO := 0.53
 const BAND_TOP := 0.535
 const BAND_BOTTOM := 0.685
@@ -505,6 +510,7 @@ func _report_defeat() -> void:
 func _finish(result: Dictionary) -> void:
 	# Reklam yalnızca seviye BİTTİKTEN sonra; oyun ortasında asla.
 	set_process(false)
+	level_finished.emit(result)
 	battlefield.clear_all()
 	SaveManager.save_progress()
 	SceneRouter.show_result(result)

@@ -187,7 +187,7 @@ tonlar tek dosyadan ayarlanır. Toplam 1,3 MB.
 godot --headless --path . scenes/Testler.tscn
 ```
 
-604 doğrulama; başarısızlıkta çıkış kodu 1 (CI'da kullanılabilir). Kapsam:
+618 doğrulama; başarısızlıkta çıkış kodu 1 (CI'da kullanılabilir). Kapsam:
 
 * **Türkçe harf dönüşümü** — `i↔İ`, `I↔ı`, düzeltme işareti katlama, alfabe sıralaması
 * **Trie sözlük** — bilinen kelimeler var, uydurma kelimeler yok, ön ek sorgusu
@@ -204,7 +204,39 @@ godot --headless --path . scenes/Testler.tscn
   hayalet bağışıklığı, trol zırhı ve mancınık zayıflığı, harf hırsızının
   harf kilitleyip ölünce açması, ultinin ekranı temizlemesi
 
+* **Gerçek dokunma girdisi** — çarkta `InputEventScreenTouch`/`Drag` ile kelime
+  kurma, yuvaya dokunup kule dikme, yuvaların HUD şeridinin altına düşmemesi ve
+  her yuvanın en kısa kule menzilinden yakın olması
+
 Görsel denetim için `scenes/EkranGoruntusu.tscn` her ekranın PNG'sini üretir.
+
+### Otomatik oynatıcı (demo pilotu)
+
+`scenes/Demo.tscn` bir bölümü baştan sona kendisi oynar. Girdi taklit edilmez,
+gerçekten üretilir: parmak hareketi dokunma olayı olarak enjekte edilir.
+Hem denge taraması hem de tanıtım videosu bununla alınır.
+
+```bash
+# Bir bölümü oyna ve sonucu yaz
+godot --headless --path . scenes/Demo.tscn -- --seviye=26 --yukseltme=0
+
+# Video kaydı (60 FPS, sabit adımlı; ses dahil)
+xvfb-run -a godot --path . --resolution 540x960 \
+  --write-movie demo.avi scenes/Demo.tscn -- --seviye=26
+```
+
+Ölçülen denge (pilot, kalıcı yükseltme yokken):
+
+| Bölüm | Sonuç | Yıldız | Kalan can | Öldürülen |
+|---|---|---|---|---|
+| 1 | Zafer | 3 | %100 | 26 |
+| 8 | Zafer | 3 | %100 | 34 |
+| 22 | Zafer | 3 | %100 | 56 |
+| 26 | Zafer | 3 | %83 | 63 |
+| 45 | Zafer (yükseltme 6) | 2 | %52 | 130 |
+| 60 | Zafer (yükseltme 9) | — | %93 | 164 |
+
+Son bölge, tasarım gereği kalıcı yükseltme almadan bitirilemez.
 
 ---
 

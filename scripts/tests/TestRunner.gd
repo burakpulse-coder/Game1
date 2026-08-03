@@ -455,6 +455,28 @@ func _test_touch_input() -> void:
 			under_hud += 1
 	_equal(under_hud, 0, "hiçbir yuva HUD üst şeridinin altında değil")
 
+	# Her yuva en kısa menzilli saldırı kulesinin yolu dövebileceği kadar yola
+	# yakın olmalı. Bu sağlanmazsa kuleler hiçbir düşmana yetişemez ve seviye
+	# yalnızca Şifa Çeşmesi'yle "kazanılır" — oynanış tamamen bozulur.
+	var shortest_range := INF
+	for tower_type in GameConfig.TOWERS:
+		var config: Dictionary = GameConfig.TOWERS[tower_type]
+		var reach := float(config["menzil"])
+		if reach > 0.0:
+			shortest_range = minf(shortest_range, reach)
+	var out_of_reach := 0
+	for slot in battle.battlefield.slots:
+		var nearest := INF
+		for track in battle.battlefield.tracks:
+			nearest = minf(nearest, (track as PathTrack).distance_to_path(slot.position))
+		if nearest > shortest_range:
+			out_of_reach += 1
+		# Yuva yolun üstünde de olmamalı.
+		_check(nearest >= PathTrack.PATH_WIDTH * 0.5,
+			"yuva %d yolun üstünde değil (%.0f px)" % [slot.index, nearest])
+	_equal(out_of_reach, 0,
+		"her yuva en kısa kule menzilinden (%.0f px) yakın" % shortest_range)
+
 	battle.queue_free()
 	await get_tree().process_frame
 

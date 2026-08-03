@@ -51,6 +51,7 @@ func _ready() -> void:
 	_read_args()
 	SceneRouter.pending_level_id = level_id
 	battle = load("res://scenes/Oyun.tscn").instantiate()
+	battle.level_finished.connect(_on_level_finished)
 	add_child(battle)
 
 	var level := LevelDB.get_level(level_id)
@@ -118,28 +119,18 @@ func _process(delta: float) -> void:
 			get_tree().create_timer(AFTER_RESULT_SECONDS).timeout.connect(get_tree().quit)
 		return
 
-	if battle._finished and _phase != Phase.BITTI:
-		_phase = Phase.BITTI
-		var hp: float = battle.battlefield.castle.health_ratio()
-		print("[Demo] SONUC seviye=%d %s can=%%%d kelime=%d kule=%d sure=%.0fs" % [
-			level_id, "ZAFER" if hp > 0.0 else "YENILGI", roundi(hp * 100.0),
-			battle._found_words.size(), battle.battlefield.towers().size(), _elapsed])
-		if not _quit_armed:
-			_quit_armed = true
-			get_tree().create_timer(AFTER_RESULT_SECONDS).timeout.connect(get_tree().quit)
-		return
 	if _phase == Phase.BITTI:
 		return
-
 	_elapsed += delta
 	_report -= delta
 	if _report <= 0.0:
 		_report = 2.0
-		print("[Demo] %5.1fs dalga=%d/%d kelime=%d kule=%d kale=%d/%d dusman=%d" % [
+		print("[Demo] %5.1fs dalga=%d/%d kelime=%d kule=%d kale=%d/%d dusman=%d oldurulen=%d kuleler=%s" % [
 			_elapsed, battle.waves.current_index + 1, battle.waves.wave_count(),
 			battle._found_words.size(), battle.battlefield.towers().size(),
 			roundi(battle.battlefield.castle.hp), roundi(battle.battlefield.castle.max_hp),
-			battle.battlefield.live_enemy_count()])
+			battle.battlefield.live_enemy_count(), battle._enemies_killed,
+			str((battle.battlefield.towers() as Array).map(func(t): return t.tower_type))])
 
 	_advance_tutorial(delta)
 	_use_ulti_if_ready()
@@ -304,6 +295,22 @@ func _use_ulti_if_ready() -> void:
 	if battle.battlefield.live_enemy_count() < 4:
 		return
 	battle._on_ulti()
+
+
+## Seviye bitti: sonucu yaz ve sonuç ekranı görünsün diye biraz bekleyip çık.
+## Sinyal, sahne değişiminden önce geldiği için pilot serbest bırakılsa bile
+## sonuç kaydedilmiş olur.
+func _on_level_finished(result: Dictionary) -> void:
+	_phase = Phase.BITTI
+	print("[Demo] SONUC seviye=%d %s yildiz=%d can=%%%d kelime=%d kadim=%d oldurulen=%d sure=%.0fs" % [
+		level_id, "ZAFER" if result.get("zafer", false) else "YENILGI",
+		int(result.get("yildiz", 0)), roundi(float(result.get("can_orani", 0.0)) * 100.0),
+		int(result.get("kelime", 0)), int(result.get("kadim", 0)),
+		int(result.get("oldurulen", 0)), float(result.get("sure", 0.0))])
+	print("[Demo] denetim: battle._enemies_killed=%d  sonuc.oldurulen=%s" % [battle._enemies_killed, result.get("oldurulen")])
+	if not _quit_armed:
+		_quit_armed = true
+		get_tree().create_timer(AFTER_RESULT_SECONDS).timeout.connect(get_tree().quit)
 
 
 ## Öğretici balonu "Anladım" beklerken oyuncunun yapacağını yapar: metni

@@ -61,7 +61,9 @@ def path_count_for(level_id: int) -> int:
 
 
 def slot_count_for(paths: int) -> int:
-    return {1: 4, 2: 6, 3: 8}[paths]
+    # Üç yollu bölümlerde savunma üç şeride bölündüğü için yuva sayısı artar;
+    # 8 yuva ile üç şerit birden tutulamıyordu.
+    return {1: 4, 2: 6, 3: 9}[paths]
 
 
 def target_categories_for(level_id: int) -> list[str]:
@@ -144,7 +146,11 @@ def build_waves(level_id: int, paths: int) -> list[dict]:
     pool = unlocked_enemies(level_id)
 
     wave_count = min(8, 3 + region + step // 5)
-    strength = 1.0 + 0.055 * (level_id - 1)
+    # Düşman gücü, oyuncunun ulaşabileceği güçle birlikte artmalı. Oyuncunun
+    # tavanı: kule seviyesi 2.0x, kalıcı yükseltme 1.6x, combo 2.0x.
+    # 0.055'lik eğim son bölgede 4.25x'e çıkıyordu ve tam yükseltmeyle bile
+    # bölüm bitirilemiyordu; 0.030 ile son bölüm 2.77x'te kalıyor.
+    strength = 1.0 + 0.030 * (level_id - 1)
 
     waves: list[dict] = []
     for index in range(wave_count):
@@ -179,7 +185,7 @@ def build_waves(level_id: int, paths: int) -> list[dict]:
                 "adet": 1,
                 "aralik": 1.0,
                 "yol": 0,
-                "guc": round(1.0 + 0.03 * (level_id - 1), 3),
+                "guc": round(1.0 + 0.022 * (level_id - 1), 3),
             }],
         })
     return waves

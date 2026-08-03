@@ -17,7 +17,9 @@ const COMBO_MAX := 1.0         ## En fazla +%100
 const GENERAL_ENERGY_RATIO := 0.05  ## Kategori dışı kelime: tüm kulelere %5
 
 # --- İnşa puanı ---------------------------------------------------------
-const BUILD_POINTS_PER_WORD := 34.0   ## 3 harfli kelimenin taban katkısı
+## 3 harfli kelimenin taban katkısı. Geç bölümlerde yuva sayısı 9'a çıktığı için
+## kuleler zamanında ayağa kalkmıyordu; bu değer savunmanın kurulma hızını belirler.
+const BUILD_POINTS_PER_WORD := 48.0
 const BUILD_POINT_THRESHOLD := 100.0  ## Yeni kule için gereken puan
 const UPGRADE_COST_L2 := 130.0
 const UPGRADE_COST_L3 := 190.0

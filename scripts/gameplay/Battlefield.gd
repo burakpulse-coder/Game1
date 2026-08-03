@@ -15,6 +15,22 @@ const CASTLE_CLEARANCE := 150.0
 ## üstünü kaplar. Bu şeridin altına yuva konulursa yuvaya dokunmak düğmeye basar;
 ## bu yüzden üst bant yuva yerleşiminden dışlanır.
 const TOP_UI_CLEARANCE := 210.0
+## Yuva yola yakın olmalı: en kısa menzilli saldırı kulesi bile yolu dövebilsin.
+## Aksi hâlde yuvalar savaş alanına dengeli ama işe yaramaz biçimde dağılıyor,
+## kuleler hiçbir düşmana yetişemiyor ve seviye yalnızca Şifa Çeşmesi'yle
+## sürünerek "kazanılıyordu". Sınır menzilden türetilir, elle yazılmaz.
+const PREFERRED_RANGE_RATIO := 0.78
+const RELAXED_RANGE_RATIO := 0.92
+
+
+## En kısa saldırı menzili (Şifa Çeşmesi saldırmadığı için sayılmaz).
+static func shortest_attack_range() -> float:
+	var best := INF
+	for tower_type in GameConfig.TOWERS:
+		var reach := float(GameConfig.TOWERS[tower_type]["menzil"])
+		if reach > 0.0:
+			best = minf(best, reach)
+	return best
 const ENEMY_PREWARM := 24
 const PROJECTILE_PREWARM := 24
 
@@ -131,8 +147,13 @@ func _layout() -> void:
 ## Böylece yol sayısı değişse de yuvalar hep dengeli dağılır.
 func _pick_slot_positions(rect: Rect2) -> Array:
 	var candidates: Array = []
-	var cols := 6
-	var rows := 6
+	# Yoğun ızgara: yola "ne üstünde ne menzil dışında" olan dar bant yeterince
+	# aday barındırsın.
+	var cols := 9
+	var rows := 9
+	var preferred_max := maxf(SLOT_CLEARANCE + 20.0,
+		shortest_attack_range() * PREFERRED_RANGE_RATIO)
+	var relaxed_max := shortest_attack_range() * RELAXED_RANGE_RATIO
 	for row in rows:
 		for col in cols:
 			var point := rect.position + Vector2(
@@ -142,13 +163,31 @@ func _pick_slot_positions(rect: Rect2) -> Array:
 				continue
 			if point.distance_to(castle.position) < CASTLE_CLEARANCE:
 				continue
-			var clear := true
+			var nearest := INF
 			for track in tracks:
-				if track.distance_to_path(point) < SLOT_CLEARANCE:
-					clear = false
-					break
-			if clear:
+				nearest = minf(nearest, track.distance_to_path(point))
+			# Yolun üstünde olmayacak kadar uzak, menzil dışında kalmayacak kadar yakın.
+			if nearest >= SLOT_CLEARANCE and nearest <= preferred_max:
 				candidates.append(point)
+
+	if candidates.size() < _slot_count:
+		# Yeterli aday yoksa yakınlık koşulunu gevşet (dar ekran / tek yol).
+		for row in rows:
+			for col in cols:
+				var point := rect.position + Vector2(
+					rect.size.x * (col + 0.5) / cols,
+					rect.size.y * (row + 0.5) / rows)
+				if point.y - rect.position.y < TOP_UI_CLEARANCE:
+					continue
+				if point.distance_to(castle.position) < CASTLE_CLEARANCE:
+					continue
+				if candidates.has(point):
+					continue
+				var nearest := INF
+				for track in tracks:
+					nearest = minf(nearest, track.distance_to_path(point))
+				if nearest >= SLOT_CLEARANCE and nearest <= relaxed_max:
+					candidates.append(point)
 
 	if candidates.is_empty():
 		# Hiç uygun nokta yoksa (çok dar ekran) yolun sağ kenarına diz.

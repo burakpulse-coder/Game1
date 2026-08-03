@@ -164,7 +164,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.055
+       "guc": 1.03
       }
      ]
     },
@@ -176,7 +176,7 @@
        "adet": 6,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.055
+       "guc": 1.03
       }
      ]
     },
@@ -188,14 +188,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.055
+       "guc": 1.03
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.055
+       "guc": 1.03
       }
      ]
     }
@@ -264,7 +264,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.11
+       "guc": 1.06
       }
      ]
     },
@@ -276,7 +276,7 @@
        "adet": 6,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.11
+       "guc": 1.06
       }
      ]
     },
@@ -288,14 +288,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.11
+       "guc": 1.06
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.11
+       "guc": 1.06
       }
      ]
     }
@@ -355,7 +355,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.165
+       "guc": 1.09
       }
      ]
     },
@@ -367,7 +367,7 @@
        "adet": 4,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.165
+       "guc": 1.09
       }
      ]
     },
@@ -379,14 +379,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.165
+       "guc": 1.09
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.165
+       "guc": 1.09
       }
      ]
     }
@@ -451,7 +451,7 @@
        "adet": 4,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.22
+       "guc": 1.12
       }
      ]
     },
@@ -463,7 +463,7 @@
        "adet": 6,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.22
+       "guc": 1.12
       }
      ]
     },
@@ -475,14 +475,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.22
+       "guc": 1.12
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.22
+       "guc": 1.12
       }
      ]
     }
@@ -546,7 +546,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.275
+       "guc": 1.15
       }
      ]
     },
@@ -558,7 +558,7 @@
        "adet": 4,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.275
+       "guc": 1.15
       }
      ]
     },
@@ -570,14 +570,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.275
+       "guc": 1.15
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.275
+       "guc": 1.15
       }
      ]
     },
@@ -589,14 +589,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.275
+       "guc": 1.15
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.275
+       "guc": 1.15
       }
      ]
     }
@@ -658,7 +658,7 @@
        "adet": 4,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.33
+       "guc": 1.18
       }
      ]
     },
@@ -670,7 +670,7 @@
        "adet": 6,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.33
+       "guc": 1.18
       }
      ]
     },
@@ -682,14 +682,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.33
+       "guc": 1.18
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.33
+       "guc": 1.18
       }
      ]
     },
@@ -701,14 +701,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.33
+       "guc": 1.18
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.33
+       "guc": 1.18
       }
      ]
     }
@@ -772,7 +772,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.385
+       "guc": 1.21
       }
      ]
     },
@@ -784,7 +784,7 @@
        "adet": 4,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.385
+       "guc": 1.21
       }
      ]
     },
@@ -796,14 +796,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.385
+       "guc": 1.21
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.385
+       "guc": 1.21
       }
      ]
     },
@@ -815,14 +815,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.385
+       "guc": 1.21
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.385
+       "guc": 1.21
       }
      ]
     }
@@ -890,7 +890,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.44
+       "guc": 1.24
       }
      ]
     },
@@ -902,7 +902,7 @@
        "adet": 4,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.44
+       "guc": 1.24
       }
      ]
     },
@@ -914,14 +914,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.44
+       "guc": 1.24
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.44
+       "guc": 1.24
       }
      ]
     },
@@ -933,14 +933,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.44
+       "guc": 1.24
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.44
+       "guc": 1.24
       }
      ]
     }
@@ -1013,7 +1013,7 @@
        "adet": 4,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.495
+       "guc": 1.27
       }
      ]
     },
@@ -1025,7 +1025,7 @@
        "adet": 2,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.495
+       "guc": 1.27
       }
      ]
     },
@@ -1037,14 +1037,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.495
+       "guc": 1.27
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.495
+       "guc": 1.27
       }
      ]
     },
@@ -1056,14 +1056,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.495
+       "guc": 1.27
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.495
+       "guc": 1.27
       }
      ]
     }
@@ -1133,7 +1133,7 @@
        "adet": 2,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       }
      ]
     },
@@ -1145,7 +1145,7 @@
        "adet": 6,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       }
      ]
     },
@@ -1157,14 +1157,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       }
      ]
     },
@@ -1176,14 +1176,14 @@
        "adet": 3,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       }
      ]
     },
@@ -1195,21 +1195,21 @@
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.55
+       "guc": 1.3
       }
      ]
     }
@@ -1273,7 +1273,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       }
      ]
     },
@@ -1285,7 +1285,7 @@
        "adet": 4,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       }
      ]
     },
@@ -1297,14 +1297,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       }
      ]
     },
@@ -1316,14 +1316,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       }
      ]
     },
@@ -1335,21 +1335,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.605
+       "guc": 1.33
       }
      ]
     }
@@ -1445,7 +1445,7 @@
        "adet": 4,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       }
      ]
     },
@@ -1457,7 +1457,7 @@
        "adet": 2,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       }
      ]
     },
@@ -1469,14 +1469,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       }
      ]
     },
@@ -1488,14 +1488,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       }
      ]
     },
@@ -1507,21 +1507,21 @@
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.66
+       "guc": 1.36
       }
      ]
     }
@@ -1621,7 +1621,7 @@
        "adet": 2,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       }
      ]
     },
@@ -1633,7 +1633,7 @@
        "adet": 6,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       }
      ]
     },
@@ -1645,14 +1645,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       }
      ]
     },
@@ -1664,14 +1664,14 @@
        "adet": 3,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       }
      ]
     },
@@ -1683,21 +1683,21 @@
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.715
+       "guc": 1.39
       }
      ]
     }
@@ -1777,7 +1777,7 @@
        "adet": 6,
        "aralik": 1.25,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       }
      ]
     },
@@ -1789,7 +1789,7 @@
        "adet": 4,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       }
      ]
     },
@@ -1801,14 +1801,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       }
      ]
     },
@@ -1820,14 +1820,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       }
      ]
     },
@@ -1839,21 +1839,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.77
+       "guc": 1.42
       }
      ]
     },
@@ -1866,7 +1866,7 @@
        "adet": 1,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 1.42
+       "guc": 1.308
       }
      ]
     }
@@ -1963,7 +1963,7 @@
        "adet": 7,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       }
      ]
     },
@@ -1975,14 +1975,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       }
      ]
     },
@@ -1994,14 +1994,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       }
      ]
     },
@@ -2013,21 +2013,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.825
+       "guc": 1.45
       }
      ]
     }
@@ -2134,7 +2134,7 @@
        "adet": 5,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       }
      ]
     },
@@ -2146,14 +2146,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       },
       {
        "tip": "hayalet",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       }
      ]
     },
@@ -2165,14 +2165,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       }
      ]
     },
@@ -2184,21 +2184,21 @@
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.88
+       "guc": 1.48
       }
      ]
     }
@@ -2296,7 +2296,7 @@
        "adet": 3,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       }
      ]
     },
@@ -2308,14 +2308,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       }
      ]
     },
@@ -2327,14 +2327,14 @@
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       }
      ]
     },
@@ -2346,21 +2346,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.935
+       "guc": 1.51
       }
      ]
     }
@@ -2459,7 +2459,7 @@
        "adet": 5,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       }
      ]
     },
@@ -2471,14 +2471,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       }
      ]
     },
@@ -2490,14 +2490,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       }
      ]
     },
@@ -2509,21 +2509,21 @@
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 1.99
+       "guc": 1.54
       }
      ]
     }
@@ -2619,7 +2619,7 @@
        "adet": 7,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       }
      ]
     },
@@ -2631,14 +2631,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       }
      ]
     },
@@ -2650,14 +2650,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       }
      ]
     },
@@ -2669,21 +2669,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.045
+       "guc": 1.57
       }
      ]
     }
@@ -2806,7 +2806,7 @@
        "adet": 5,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       }
      ]
     },
@@ -2818,14 +2818,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       },
       {
        "tip": "hayalet",
        "adet": 5,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.1
+       "guc": 1.6
       }
      ]
     },
@@ -2837,14 +2837,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.1
+       "guc": 1.6
       }
      ]
     },
@@ -2856,21 +2856,21 @@
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.1
+       "guc": 1.6
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       }
      ]
     },
@@ -2882,21 +2882,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.1
+       "guc": 1.6
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.1
+       "guc": 1.6
       }
      ]
     }
@@ -3009,7 +3009,7 @@
        "adet": 3,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       }
      ]
     },
@@ -3021,14 +3021,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       },
       {
        "tip": "harf_hirsizi",
        "adet": 3,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.155
+       "guc": 1.63
       }
      ]
     },
@@ -3040,14 +3040,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.155
+       "guc": 1.63
       }
      ]
     },
@@ -3059,21 +3059,21 @@
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.155
+       "guc": 1.63
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       }
      ]
     },
@@ -3085,21 +3085,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.155
+       "guc": 1.63
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.155
+       "guc": 1.63
       }
      ]
     }
@@ -3199,7 +3199,7 @@
        "adet": 5,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       }
      ]
     },
@@ -3211,14 +3211,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.21
+       "guc": 1.66
       }
      ]
     },
@@ -3230,14 +3230,14 @@
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.21
+       "guc": 1.66
       }
      ]
     },
@@ -3249,21 +3249,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.21
+       "guc": 1.66
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       }
      ]
     },
@@ -3275,21 +3275,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.21
+       "guc": 1.66
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.21
+       "guc": 1.66
       }
      ]
     }
@@ -3399,7 +3399,7 @@
        "adet": 3,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       }
      ]
     },
@@ -3411,14 +3411,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.265
+       "guc": 1.69
       }
      ]
     },
@@ -3430,14 +3430,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.265
+       "guc": 1.69
       }
      ]
     },
@@ -3449,21 +3449,21 @@
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.265
+       "guc": 1.69
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       }
      ]
     },
@@ -3475,21 +3475,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.265
+       "guc": 1.69
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.265
+       "guc": 1.69
       }
      ]
     }
@@ -3632,7 +3632,7 @@
        "adet": 7,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       }
      ]
     },
@@ -3644,14 +3644,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.32
+       "guc": 1.72
       }
      ]
     },
@@ -3663,14 +3663,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.32
+       "guc": 1.72
       }
      ]
     },
@@ -3682,21 +3682,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.32
+       "guc": 1.72
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       }
      ]
     },
@@ -3708,21 +3708,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.32
+       "guc": 1.72
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.72
       }
      ]
     }
@@ -3862,7 +3862,7 @@
        "adet": 5,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       }
      ]
     },
@@ -3874,14 +3874,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "hayalet",
        "adet": 5,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.375
+       "guc": 1.75
       }
      ]
     },
@@ -3893,14 +3893,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.375
+       "guc": 1.75
       }
      ]
     },
@@ -3912,21 +3912,21 @@
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       }
      ]
     },
@@ -3938,21 +3938,21 @@
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       }
      ]
     },
@@ -3964,21 +3964,21 @@
        "adet": 7,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.375
+       "guc": 1.75
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.375
+       "guc": 1.75
       }
      ]
     }
@@ -4112,7 +4112,7 @@
        "adet": 3,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       }
      ]
     },
@@ -4124,14 +4124,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "harf_hirsizi",
        "adet": 3,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.43
+       "guc": 1.78
       }
      ]
     },
@@ -4143,14 +4143,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.43
+       "guc": 1.78
       }
      ]
     },
@@ -4162,21 +4162,21 @@
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       }
      ]
     },
@@ -4188,21 +4188,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       }
      ]
     },
@@ -4214,21 +4214,21 @@
        "adet": 5,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.43
+       "guc": 1.78
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.43
+       "guc": 1.78
       }
      ]
     }
@@ -4368,7 +4368,7 @@
        "adet": 5,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       }
      ]
     },
@@ -4380,14 +4380,14 @@
        "adet": 3,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "goblin",
        "adet": 7,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.485
+       "guc": 1.81
       }
      ]
     },
@@ -4399,14 +4399,14 @@
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.485
+       "guc": 1.81
       }
      ]
     },
@@ -4418,21 +4418,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       }
      ]
     },
@@ -4444,21 +4444,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       }
      ]
     },
@@ -4470,21 +4470,21 @@
        "adet": 7,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.485
+       "guc": 1.81
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.485
+       "guc": 1.81
       }
      ]
     }
@@ -4627,7 +4627,7 @@
        "adet": 3,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       }
      ]
     },
@@ -4639,14 +4639,14 @@
        "adet": 7,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "ork",
        "adet": 5,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.54
+       "guc": 1.84
       }
      ]
     },
@@ -4658,14 +4658,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.54
+       "guc": 1.84
       }
      ]
     },
@@ -4677,21 +4677,21 @@
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       }
      ]
     },
@@ -4703,21 +4703,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       }
      ]
     },
@@ -4729,21 +4729,21 @@
        "adet": 5,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.54
+       "guc": 1.84
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.54
+       "guc": 1.84
       }
      ]
     }
@@ -4883,7 +4883,7 @@
        "adet": 7,
        "aralik": 1.2,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       }
      ]
     },
@@ -4895,14 +4895,14 @@
        "adet": 5,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "zirhli_trol",
        "adet": 3,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.595
+       "guc": 1.87
       }
      ]
     },
@@ -4914,14 +4914,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.595
+       "guc": 1.87
       }
      ]
     },
@@ -4933,21 +4933,21 @@
        "adet": 6,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       }
      ]
     },
@@ -4959,21 +4959,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       }
      ]
     },
@@ -4985,21 +4985,21 @@
        "adet": 9,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.595
+       "guc": 1.87
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.595
+       "guc": 1.87
       }
      ]
     },
@@ -5012,7 +5012,7 @@
        "adet": 1,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 1.87
+       "guc": 1.638
       }
      ]
     }
@@ -5133,14 +5133,14 @@
        "adet": 6,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.65
+       "guc": 1.9
       }
      ]
     },
@@ -5152,14 +5152,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.65
+       "guc": 1.9
       }
      ]
     },
@@ -5171,21 +5171,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       }
      ]
     },
@@ -5197,21 +5197,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       }
      ]
     },
@@ -5223,21 +5223,21 @@
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.65
+       "guc": 1.9
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.65
+       "guc": 1.9
       }
      ]
     }
@@ -5363,14 +5363,14 @@
        "adet": 4,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.705
+       "guc": 1.93
       }
      ]
     },
@@ -5382,14 +5382,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.705
+       "guc": 1.93
       }
      ]
     },
@@ -5401,21 +5401,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       }
      ]
     },
@@ -5427,21 +5427,21 @@
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       }
      ]
     },
@@ -5453,21 +5453,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.705
+       "guc": 1.93
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.705
+       "guc": 1.93
       }
      ]
     }
@@ -5601,14 +5601,14 @@
        "adet": 6,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.76
+       "guc": 1.96
       }
      ]
     },
@@ -5620,14 +5620,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.76
+       "guc": 1.96
       }
      ]
     },
@@ -5639,21 +5639,21 @@
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       }
      ]
     },
@@ -5665,21 +5665,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       }
      ]
     },
@@ -5691,21 +5691,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.76
+       "guc": 1.96
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.76
+       "guc": 1.96
       }
      ]
     }
@@ -5835,14 +5835,14 @@
        "adet": 4,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.815
+       "guc": 1.99
       }
      ]
     },
@@ -5854,14 +5854,14 @@
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.815
+       "guc": 1.99
       }
      ]
     },
@@ -5873,21 +5873,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       }
      ]
     },
@@ -5899,21 +5899,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       }
      ]
     },
@@ -5925,21 +5925,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.815
+       "guc": 1.99
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.815
+       "guc": 1.99
       }
      ]
     }
@@ -6062,14 +6062,14 @@
        "adet": 8,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.87
+       "guc": 2.02
       }
      ]
     },
@@ -6081,14 +6081,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.87
+       "guc": 2.02
       }
      ]
     },
@@ -6100,21 +6100,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       }
      ]
     },
@@ -6126,21 +6126,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       }
      ]
     },
@@ -6152,21 +6152,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.87
+       "guc": 2.02
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.87
+       "guc": 2.02
       }
      ]
     }
@@ -6294,14 +6294,14 @@
        "adet": 6,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.925
+       "guc": 2.05
       }
      ]
     },
@@ -6313,14 +6313,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.925
+       "guc": 2.05
       }
      ]
     },
@@ -6332,21 +6332,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       }
      ]
     },
@@ -6358,21 +6358,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       }
      ]
     },
@@ -6384,21 +6384,21 @@
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       }
      ]
     },
@@ -6410,21 +6410,21 @@
        "adet": 8,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 2.925
+       "guc": 2.05
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 2.925
+       "guc": 2.05
       }
      ]
     }
@@ -6574,14 +6574,14 @@
        "adet": 4,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 2.98
+       "guc": 2.08
       }
      ]
     },
@@ -6593,14 +6593,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 2.98
+       "guc": 2.08
       }
      ]
     },
@@ -6612,21 +6612,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       }
      ]
     },
@@ -6638,21 +6638,21 @@
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       }
      ]
     },
@@ -6664,21 +6664,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       }
      ]
     },
@@ -6690,21 +6690,21 @@
        "adet": 6,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 2.98
+       "guc": 2.08
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 2.98
+       "guc": 2.08
       }
      ]
     }
@@ -6851,14 +6851,14 @@
        "adet": 6,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.035
+       "guc": 2.11
       }
      ]
     },
@@ -6870,14 +6870,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.035
+       "guc": 2.11
       }
      ]
     },
@@ -6889,21 +6889,21 @@
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       }
      ]
     },
@@ -6915,21 +6915,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       }
      ]
     },
@@ -6941,21 +6941,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       }
      ]
     },
@@ -6967,21 +6967,21 @@
        "adet": 8,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.035
+       "guc": 2.11
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.035
+       "guc": 2.11
       }
      ]
     }
@@ -7127,14 +7127,14 @@
        "adet": 4,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.09
+       "guc": 2.14
       }
      ]
     },
@@ -7146,14 +7146,14 @@
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.09
+       "guc": 2.14
       }
      ]
     },
@@ -7165,21 +7165,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       }
      ]
     },
@@ -7191,21 +7191,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       }
      ]
     },
@@ -7217,21 +7217,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       }
      ]
     },
@@ -7243,21 +7243,21 @@
        "adet": 6,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.09
+       "guc": 2.14
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.09
+       "guc": 2.14
       }
      ]
     }
@@ -7401,14 +7401,14 @@
        "adet": 8,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.145
+       "guc": 2.17
       }
      ]
     },
@@ -7420,14 +7420,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.145
+       "guc": 2.17
       }
      ]
     },
@@ -7439,21 +7439,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       }
      ]
     },
@@ -7465,21 +7465,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       }
      ]
     },
@@ -7491,21 +7491,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       }
      ]
     },
@@ -7517,21 +7517,21 @@
        "adet": 10,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.145
+       "guc": 2.17
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.145
+       "guc": 2.17
       }
      ]
     }
@@ -7672,7 +7672,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.48,
    "dalgalar": [
     {
@@ -7683,14 +7683,14 @@
        "adet": 6,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     },
@@ -7702,14 +7702,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     },
@@ -7721,21 +7721,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     },
@@ -7747,21 +7747,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     },
@@ -7773,21 +7773,21 @@
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     },
@@ -7799,21 +7799,21 @@
        "adet": 8,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     },
@@ -7825,21 +7825,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.2
+       "guc": 2.2
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.2
+       "guc": 2.2
       }
      ]
     }
@@ -7982,7 +7982,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.492,
    "dalgalar": [
     {
@@ -7993,14 +7993,14 @@
        "adet": 4,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "hayalet",
        "adet": 6,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     },
@@ -8012,14 +8012,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     },
@@ -8031,21 +8031,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     },
@@ -8057,21 +8057,21 @@
        "adet": 9,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     },
@@ -8083,21 +8083,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     },
@@ -8109,21 +8109,21 @@
        "adet": 6,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     },
@@ -8135,21 +8135,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.255
+       "guc": 2.23
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.255
+       "guc": 2.23
       }
      ]
     }
@@ -8292,7 +8292,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.504,
    "dalgalar": [
     {
@@ -8303,14 +8303,14 @@
        "adet": 6,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "harf_hirsizi",
        "adet": 4,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     },
@@ -8322,14 +8322,14 @@
        "adet": 4,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     },
@@ -8341,21 +8341,21 @@
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     },
@@ -8367,21 +8367,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     },
@@ -8393,21 +8393,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     },
@@ -8419,21 +8419,21 @@
        "adet": 8,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     },
@@ -8445,21 +8445,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.31
+       "guc": 2.26
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.31
+       "guc": 2.26
       }
      ]
     }
@@ -8601,7 +8601,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.516,
    "dalgalar": [
     {
@@ -8612,14 +8612,14 @@
        "adet": 4,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "goblin",
        "adet": 8,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     },
@@ -8631,14 +8631,14 @@
        "adet": 8,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     },
@@ -8650,21 +8650,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     },
@@ -8676,21 +8676,21 @@
        "adet": 5,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     },
@@ -8702,21 +8702,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     },
@@ -8728,21 +8728,21 @@
        "adet": 6,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     },
@@ -8754,21 +8754,21 @@
        "adet": 11,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.365
+       "guc": 2.29
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.365
+       "guc": 2.29
       }
      ]
     }
@@ -8912,7 +8912,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.528,
    "dalgalar": [
     {
@@ -8923,14 +8923,14 @@
        "adet": 8,
        "aralik": 1.15,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "ork",
        "adet": 6,
        "aralik": 1.15,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -8942,14 +8942,14 @@
        "adet": 6,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "zirhli_trol",
        "adet": 4,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -8961,21 +8961,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -8987,21 +8987,21 @@
        "adet": 7,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -9013,21 +9013,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -9039,21 +9039,21 @@
        "adet": 10,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -9065,21 +9065,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.42
+       "guc": 2.32
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.42
+       "guc": 2.32
       }
      ]
     },
@@ -9092,7 +9092,7 @@
        "adet": 1,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.32
+       "guc": 1.968
       }
      ]
     }
@@ -9234,7 +9234,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.54,
    "dalgalar": [
     {
@@ -9245,14 +9245,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.475
+       "guc": 2.35
       }
      ]
     },
@@ -9264,21 +9264,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.475
+       "guc": 2.35
       }
      ]
     },
@@ -9290,21 +9290,21 @@
        "adet": 8,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.475
+       "guc": 2.35
       }
      ]
     },
@@ -9316,21 +9316,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.475
+       "guc": 2.35
       }
      ]
     },
@@ -9342,21 +9342,21 @@
        "adet": 11,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.475
+       "guc": 2.35
       }
      ]
     },
@@ -9368,21 +9368,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.475
+       "guc": 2.35
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.475
+       "guc": 2.35
       }
      ]
     }
@@ -9523,7 +9523,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.552,
    "dalgalar": [
     {
@@ -9534,14 +9534,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.53
+       "guc": 2.38
       }
      ]
     },
@@ -9553,21 +9553,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.53
+       "guc": 2.38
       }
      ]
     },
@@ -9579,21 +9579,21 @@
        "adet": 6,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.53
+       "guc": 2.38
       }
      ]
     },
@@ -9605,21 +9605,21 @@
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.53
+       "guc": 2.38
       }
      ]
     },
@@ -9631,21 +9631,21 @@
        "adet": 9,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.53
+       "guc": 2.38
       }
      ]
     },
@@ -9657,21 +9657,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.53
+       "guc": 2.38
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.53
+       "guc": 2.38
       }
      ]
     }
@@ -9811,7 +9811,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.564,
    "dalgalar": [
     {
@@ -9822,14 +9822,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.585
+       "guc": 2.41
       }
      ]
     },
@@ -9841,21 +9841,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.585
+       "guc": 2.41
       }
      ]
     },
@@ -9867,21 +9867,21 @@
        "adet": 10,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.585
+       "guc": 2.41
       }
      ]
     },
@@ -9893,21 +9893,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.585
+       "guc": 2.41
       }
      ]
     },
@@ -9919,21 +9919,21 @@
        "adet": 7,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.585
+       "guc": 2.41
       }
      ]
     },
@@ -9945,21 +9945,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.585
+       "guc": 2.41
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.585
+       "guc": 2.41
       }
      ]
     }
@@ -10098,7 +10098,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.576,
    "dalgalar": [
     {
@@ -10109,14 +10109,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.64
+       "guc": 2.44
       }
      ]
     },
@@ -10128,21 +10128,21 @@
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.64
+       "guc": 2.44
       }
      ]
     },
@@ -10154,21 +10154,21 @@
        "adet": 8,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.64
+       "guc": 2.44
       }
      ]
     },
@@ -10180,21 +10180,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.64
+       "guc": 2.44
       }
      ]
     },
@@ -10206,21 +10206,21 @@
        "adet": 9,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.64
+       "guc": 2.44
       }
      ]
     },
@@ -10232,21 +10232,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.64
+       "guc": 2.44
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.64
+       "guc": 2.44
       }
      ]
     }
@@ -10387,7 +10387,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.588,
    "dalgalar": [
     {
@@ -10398,14 +10398,14 @@
        "adet": 9,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.695
+       "guc": 2.47
       }
      ]
     },
@@ -10417,21 +10417,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.695
+       "guc": 2.47
       }
      ]
     },
@@ -10443,21 +10443,21 @@
        "adet": 6,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.695
+       "guc": 2.47
       }
      ]
     },
@@ -10469,21 +10469,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.695
+       "guc": 2.47
       }
      ]
     },
@@ -10495,21 +10495,21 @@
        "adet": 7,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.695
+       "guc": 2.47
       }
      ]
     },
@@ -10521,21 +10521,21 @@
        "adet": 11,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.695
+       "guc": 2.47
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.695
+       "guc": 2.47
       }
      ]
     }
@@ -10677,7 +10677,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.6,
    "dalgalar": [
     {
@@ -10688,14 +10688,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     },
@@ -10707,21 +10707,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     },
@@ -10733,21 +10733,21 @@
        "adet": 8,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     },
@@ -10759,21 +10759,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     },
@@ -10785,21 +10785,21 @@
        "adet": 11,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     },
@@ -10811,21 +10811,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     },
@@ -10837,21 +10837,21 @@
        "adet": 8,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "hayalet",
        "adet": 10,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 3.75
+       "guc": 2.5
       },
       {
        "tip": "harf_hirsizi",
        "adet": 8,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 3.75
+       "guc": 2.5
       }
      ]
     }
@@ -10993,7 +10993,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.612,
    "dalgalar": [
     {
@@ -11004,14 +11004,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     },
@@ -11023,21 +11023,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     },
@@ -11049,21 +11049,21 @@
        "adet": 6,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     },
@@ -11075,21 +11075,21 @@
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     },
@@ -11101,21 +11101,21 @@
        "adet": 9,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     },
@@ -11127,21 +11127,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     },
@@ -11153,21 +11153,21 @@
        "adet": 10,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "harf_hirsizi",
        "adet": 8,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 3.805
+       "guc": 2.53
       },
       {
        "tip": "goblin",
        "adet": 12,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 3.805
+       "guc": 2.53
       }
      ]
     }
@@ -11303,7 +11303,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.624,
    "dalgalar": [
     {
@@ -11314,14 +11314,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     },
@@ -11333,21 +11333,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     },
@@ -11359,21 +11359,21 @@
        "adet": 10,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     },
@@ -11385,21 +11385,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     },
@@ -11411,21 +11411,21 @@
        "adet": 7,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     },
@@ -11437,21 +11437,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     },
@@ -11463,21 +11463,21 @@
        "adet": 8,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "goblin",
        "adet": 12,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 3.86
+       "guc": 2.56
       },
       {
        "tip": "ork",
        "adet": 10,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 3.86
+       "guc": 2.56
       }
      ]
     }
@@ -11619,7 +11619,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.636,
    "dalgalar": [
     {
@@ -11630,14 +11630,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     },
@@ -11649,21 +11649,21 @@
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     },
@@ -11675,21 +11675,21 @@
        "adet": 8,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     },
@@ -11701,21 +11701,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     },
@@ -11727,21 +11727,21 @@
        "adet": 9,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     },
@@ -11753,21 +11753,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     },
@@ -11779,21 +11779,21 @@
        "adet": 12,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "ork",
        "adet": 10,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 3.915
+       "guc": 2.59
       },
       {
        "tip": "zirhli_trol",
        "adet": 8,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 3.915
+       "guc": 2.59
       }
      ]
     }
@@ -11934,7 +11934,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.648,
    "dalgalar": [
     {
@@ -11945,14 +11945,14 @@
        "adet": 9,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     },
@@ -11964,21 +11964,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     },
@@ -11990,21 +11990,21 @@
        "adet": 6,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     },
@@ -12016,21 +12016,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     },
@@ -12042,21 +12042,21 @@
        "adet": 7,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     },
@@ -12068,21 +12068,21 @@
        "adet": 11,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     },
@@ -12094,21 +12094,21 @@
        "adet": 10,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "zirhli_trol",
        "adet": 8,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 3.97
+       "guc": 2.62
       },
       {
        "tip": "hayalet",
        "adet": 10,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 3.97
+       "guc": 2.62
       }
      ]
     }
@@ -12249,7 +12249,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.66,
    "dalgalar": [
     {
@@ -12260,14 +12260,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12279,21 +12279,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12305,21 +12305,21 @@
        "adet": 8,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12331,21 +12331,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12357,21 +12357,21 @@
        "adet": 11,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12383,21 +12383,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12409,21 +12409,21 @@
        "adet": 8,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "hayalet",
        "adet": 10,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "harf_hirsizi",
        "adet": 8,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     },
@@ -12435,21 +12435,21 @@
        "adet": 10,
        "aralik": 0.75,
        "yol": 0,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "harf_hirsizi",
        "adet": 8,
        "aralik": 0.75,
        "yol": 1,
-       "guc": 4.025
+       "guc": 2.65
       },
       {
        "tip": "goblin",
        "adet": 12,
        "aralik": 0.75,
        "yol": 2,
-       "guc": 4.025
+       "guc": 2.65
       }
      ]
     }
@@ -12590,7 +12590,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.672,
    "dalgalar": [
     {
@@ -12601,14 +12601,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12620,21 +12620,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12646,21 +12646,21 @@
        "adet": 6,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12672,21 +12672,21 @@
        "adet": 10,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12698,21 +12698,21 @@
        "adet": 9,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12724,21 +12724,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12750,21 +12750,21 @@
        "adet": 10,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "harf_hirsizi",
        "adet": 8,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "goblin",
        "adet": 12,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     },
@@ -12776,21 +12776,21 @@
        "adet": 8,
        "aralik": 0.75,
        "yol": 0,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "goblin",
        "adet": 12,
        "aralik": 0.75,
        "yol": 1,
-       "guc": 4.08
+       "guc": 2.68
       },
       {
        "tip": "ork",
        "adet": 10,
        "aralik": 0.75,
        "yol": 2,
-       "guc": 4.08
+       "guc": 2.68
       }
      ]
     }
@@ -12930,7 +12930,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.684,
    "dalgalar": [
     {
@@ -12941,14 +12941,14 @@
        "adet": 7,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "harf_hirsizi",
        "adet": 5,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -12960,21 +12960,21 @@
        "adet": 5,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -12986,21 +12986,21 @@
        "adet": 10,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "ork",
        "adet": 8,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -13012,21 +13012,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -13038,21 +13038,21 @@
        "adet": 7,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "hayalet",
        "adet": 9,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -13064,21 +13064,21 @@
        "adet": 9,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -13090,21 +13090,21 @@
        "adet": 8,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "goblin",
        "adet": 12,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "ork",
        "adet": 10,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     },
@@ -13116,21 +13116,21 @@
        "adet": 12,
        "aralik": 0.75,
        "yol": 0,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "ork",
        "adet": 10,
        "aralik": 0.75,
        "yol": 1,
-       "guc": 4.135
+       "guc": 2.71
       },
       {
        "tip": "zirhli_trol",
        "adet": 8,
        "aralik": 0.75,
        "yol": 2,
-       "guc": 4.135
+       "guc": 2.71
       }
      ]
     }
@@ -13269,7 +13269,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.696,
    "dalgalar": [
     {
@@ -13280,14 +13280,14 @@
        "adet": 5,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "goblin",
        "adet": 9,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13299,21 +13299,21 @@
        "adet": 9,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13325,21 +13325,21 @@
        "adet": 8,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "zirhli_trol",
        "adet": 6,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13351,21 +13351,21 @@
        "adet": 6,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13377,21 +13377,21 @@
        "adet": 9,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "harf_hirsizi",
        "adet": 7,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13403,21 +13403,21 @@
        "adet": 7,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13429,21 +13429,21 @@
        "adet": 12,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "ork",
        "adet": 10,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "zirhli_trol",
        "adet": 8,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     },
@@ -13455,21 +13455,21 @@
        "adet": 10,
        "aralik": 0.75,
        "yol": 0,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "zirhli_trol",
        "adet": 8,
        "aralik": 0.75,
        "yol": 1,
-       "guc": 4.19
+       "guc": 2.74
       },
       {
        "tip": "hayalet",
        "adet": 10,
        "aralik": 0.75,
        "yol": 2,
-       "guc": 4.19
+       "guc": 2.74
       }
      ]
     }
@@ -13608,7 +13608,7 @@
     ]
    },
    "yol_sayisi": 3,
-   "slot_sayisi": 8,
+   "slot_sayisi": 9,
    "kale_can_carpani": 1.708,
    "dalgalar": [
     {
@@ -13619,14 +13619,14 @@
        "adet": 9,
        "aralik": 1.1,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "ork",
        "adet": 7,
        "aralik": 1.1,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13638,21 +13638,21 @@
        "adet": 7,
        "aralik": 1.05,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "zirhli_trol",
        "adet": 5,
        "aralik": 1.05,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "hayalet",
        "adet": 7,
        "aralik": 1.05,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13664,21 +13664,21 @@
        "adet": 6,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "hayalet",
        "adet": 8,
        "aralik": 1.0,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 1.0,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13690,21 +13690,21 @@
        "adet": 8,
        "aralik": 0.95,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "harf_hirsizi",
        "adet": 6,
        "aralik": 0.95,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "goblin",
        "adet": 10,
        "aralik": 0.95,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13716,21 +13716,21 @@
        "adet": 7,
        "aralik": 0.9,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "goblin",
        "adet": 11,
        "aralik": 0.9,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.9,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13742,21 +13742,21 @@
        "adet": 11,
        "aralik": 0.85,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "ork",
        "adet": 9,
        "aralik": 0.85,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "zirhli_trol",
        "adet": 7,
        "aralik": 0.85,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13768,21 +13768,21 @@
        "adet": 10,
        "aralik": 0.8,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "zirhli_trol",
        "adet": 8,
        "aralik": 0.8,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "hayalet",
        "adet": 10,
        "aralik": 0.8,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13794,21 +13794,21 @@
        "adet": 8,
        "aralik": 0.75,
        "yol": 0,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "hayalet",
        "adet": 10,
        "aralik": 0.75,
        "yol": 1,
-       "guc": 4.245
+       "guc": 2.77
       },
       {
        "tip": "harf_hirsizi",
        "adet": 8,
        "aralik": 0.75,
        "yol": 2,
-       "guc": 4.245
+       "guc": 2.77
       }
      ]
     },
@@ -13821,7 +13821,7 @@
        "adet": 1,
        "aralik": 1.0,
        "yol": 0,
-       "guc": 2.77
+       "guc": 2.298
       }
      ]
     }
