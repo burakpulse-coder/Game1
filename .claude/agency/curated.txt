@@ -1,0 +1,45 @@
+# Bu projede varsayilan olarak kurulu tutulan ajanlar.
+# install-agents.sh argumansiz calistirildiginda bu liste kurulur.
+# Slug = upstream'deki dosya adi (.md'siz). Tum roster: catalog.md
+#
+# Yeni bir ajan isteniyorsa: catalog.md'den slug'i bul, buraya ekle,
+# sonra ./.claude/agency/install-agents.sh calistir.
+
+# --- Oyun gelistirme (Godot 4 / Kelime Kalesi) ---
+godot-gameplay-scripter
+godot-shader-developer
+game-designer
+level-designer
+economy-designer
+narrative-designer
+game-audio-engineer
+technical-artist
+
+# --- Muhendislik ---
+engineering-code-reviewer
+engineering-senior-developer
+engineering-software-architect
+engineering-mobile-app-builder
+engineering-mobile-release-engineer
+engineering-minimal-change-engineer
+engineering-rapid-prototyper
+engineering-i18n-engineer
+engineering-git-workflow-master
+engineering-technical-writer
+
+# --- Tasarim ---
+design-ui-designer
+design-ux-researcher
+design-whimsy-injector
+design-visual-storyteller
+
+# --- Test / kalite ---
+testing-reality-checker
+testing-performance-benchmarker
+testing-test-results-analyzer
+testing-accessibility-auditor
+
+# --- Urun / yayin ---
+product-manager
+product-sprint-prioritizer
+marketing-app-store-optimizer

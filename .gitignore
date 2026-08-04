@@ -16,6 +16,9 @@ export_presets.local.cfg
 __pycache__/
 *.pyc
 
+# Agency Agents upstream klonu (ajanların kendisi .claude/agents/ altında commit edilir)
+.claude/agency/.cache/
+
 # Editör / işletim sistemi
 .DS_Store
 *.swp
