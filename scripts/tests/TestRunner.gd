@@ -29,6 +29,7 @@ func _ready() -> void:
 	_run("Kayıt sistemi", _test_save)
 	await _run_async("Savaş turu (uçtan uca)", _test_battle)
 	await _run_async("Gerçek dokunma girdisi", _test_touch_input)
+	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
 
 	print("\n=== Sonuç: %d başarılı, %d başarısız ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -502,3 +503,64 @@ func _drag(control: Control, local_point: Vector2) -> void:
 func _to_window(control: Control, local_point: Vector2) -> Vector2:
 	var canvas: Vector2 = control.get_global_transform_with_canvas() * local_point
 	return get_viewport().get_screen_transform() * canvas
+
+
+## --------------------------------------------------------------------------
+## Fare girdisi
+## --------------------------------------------------------------------------
+
+## Masaüstünde oyun fareyle oynanır. Projede emulate_touch_from_mouse açık
+## olduğu için fare olayları ayrıca dokunma olayına da çevrilir; çarkın her iki
+## olay tipini de işlemesi çift tetiklemeye yol açmamalı.
+func _test_mouse_input() -> void:
+	SceneRouter.pending_level_id = 4
+	var battle: Node = load("res://scenes/Oyun.tscn").instantiate()
+	add_child(battle)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var wheel: LetterWheel = battle.wheel
+	var level := LevelDB.get_level(4)
+	var word := ""
+	for category in level.get("kategori_kelimeler", {}):
+		for candidate in level["kategori_kelimeler"][category]:
+			if word == "":
+				word = str(candidate)
+
+	var stones: Array = []
+	var upper := TurkishText.to_upper(word)
+	for i in upper.length():
+		for stone in wheel.letters.size():
+			if not stones.has(stone) and wheel.letters[stone] == upper[i]:
+				stones.append(stone)
+				break
+
+	_click(wheel, wheel._positions[stones[0]], true)
+	await get_tree().process_frame
+	_equal(wheel._selection.size(), 1, "fare tıklaması ilk harfi seçti (çift eklemedi)")
+	for index in range(1, stones.size()):
+		_move(wheel, wheel._positions[stones[index]])
+		await get_tree().process_frame
+	_equal(wheel._selection.size(), stones.size(), "fareyi sürüklemek harfleri sırayla seçti")
+	_click(wheel, wheel._positions[stones[stones.size() - 1]], false)
+	await get_tree().process_frame
+	_check(battle._found_words.has(word), "fare bırakılınca kelime kabul edildi: %s" % word)
+	_equal(battle._found_words.size(), 1, "kelime yalnızca bir kez sayıldı")
+
+	battle.queue_free()
+	await get_tree().process_frame
+
+
+func _click(control: Control, local_point: Vector2, pressed: bool) -> void:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = pressed
+	event.position = _to_window(control, local_point)
+	Input.parse_input_event(event)
+
+
+func _move(control: Control, local_point: Vector2) -> void:
+	var event := InputEventMouseMotion.new()
+	event.button_mask = MOUSE_BUTTON_MASK_LEFT
+	event.position = _to_window(control, local_point)
+	Input.parse_input_event(event)

@@ -33,7 +33,12 @@ SceneRouter="*res://scripts/autoload/SceneRouter.gd"
 
 window/size/viewport_width=1080
 window/size/viewport_height=1920
-window/size/resizable=false
+; Masaüstünde 1080x1920'lik pencere çoğu ekrana sığmıyor; oyun mantığı yine
+; 1080x1920 tuvalinde çalışır, yalnızca pencere küçültülür. Android'de bu
+; ayarların etkisi yoktur (pencere boyutunu işletim sistemi belirler).
+window/size/window_width_override=486
+window/size/window_height_override=864
+window/size/resizable=true
 window/handheld/orientation=1
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"

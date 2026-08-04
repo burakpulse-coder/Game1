@@ -23,11 +23,32 @@ Kelime uzunluğu çarpanı: 3 harf 1x · 4 harf 1.5x · 5 harf 2x · 6+ harf 3x.
 
 ## Hızlı başlangıç
 
+### PC'de oynamak
+
+Oyun masaüstünde de oynanabilir: fare parmak yerine geçer (`emulate_touch_from_mouse`),
+pencere 486x864 açılır ve yeniden boyutlandırılabilir.
+
+1. [Godot 4.3](https://godotengine.org/download/archive/4.3-stable/) indir
+   (kurulum gerekmez, tek dosya).
+2. Depoyu indir: `git clone <depo-adresi>`
+3. Godot'u aç → **Import** → depodaki `project.godot` dosyasını seç → **Import & Edit**
+4. **F5** (ya da sağ üstteki ▶) ile başlat.
+
+Kendi çalıştırılabilir dosyanı üretmek istersen (Godot'ta Editor → Manage Export
+Templates ile şablonları kurduktan sonra):
+
+```bash
+godot --headless --path . --export-release "Windows" build/windows/KelimeKalesi.exe
+godot --headless --path . --export-release "Linux"   build/linux/KelimeKalesi.x86_64
+```
+
+### Geliştirme komutları
+
 ```bash
 # Godot 4.3 ile projeyi aç
 godot --path .
 
-# Testleri çalıştır (604 doğrulama; başarısızlıkta çıkış kodu 1)
+# Testleri çalıştır (622 doğrulama; başarısızlıkta çıkış kodu 1)
 godot --headless --path . scenes/Testler.tscn
 
 # Her ekranın PNG görüntüsünü üret (görsel denetim için)
@@ -187,7 +208,7 @@ tonlar tek dosyadan ayarlanır. Toplam 1,3 MB.
 godot --headless --path . scenes/Testler.tscn
 ```
 
-618 doğrulama; başarısızlıkta çıkış kodu 1 (CI'da kullanılabilir). Kapsam:
+622 doğrulama; başarısızlıkta çıkış kodu 1 (CI'da kullanılabilir). Kapsam:
 
 * **Türkçe harf dönüşümü** — `i↔İ`, `I↔ı`, düzeltme işareti katlama, alfabe sıralaması
 * **Trie sözlük** — bilinen kelimeler var, uydurma kelimeler yok, ön ek sorgusu
@@ -207,6 +228,8 @@ godot --headless --path . scenes/Testler.tscn
 * **Gerçek dokunma girdisi** — çarkta `InputEventScreenTouch`/`Drag` ile kelime
   kurma, yuvaya dokunup kule dikme, yuvaların HUD şeridinin altına düşmemesi ve
   her yuvanın en kısa kule menzilinden yakın olması
+* **Fare girdisi** — masaüstünde çarkın fareyle çalışması ve fare→dokunma
+  öykünmesinin kelimeyi iki kez saymaması
 
 Görsel denetim için `scenes/EkranGoruntusu.tscn` her ekranın PNG'sini üretir.
 
@@ -247,8 +270,10 @@ immersive mod. `export_presets.cfg` iki preset içerir:
 
 | Preset | Derleme | Kullanım |
 |---|---|---|
-| `Android` | Gradle | Yayın derlemesi. min/target SDK'yı belirler, eklentileri (AdMob, Billing, Play Games) destekler. |
+| `Android` | Gradle | Mağaza için AAB. min/target SDK'yı belirler, eklentileri (AdMob, Billing, Play Games) destekler. |
+| `Android (APK, yan yükleme)` | Gradle | Elden kurulum / emülatör için APK (67 MB; kütüphaneler sıkıştırılır, x86_64 dahil). |
 | `Android (şablon, imzasız)` | Hazır şablon | SDK kurmadan hızlı test derlemesi. Eklenti desteklemez ve min SDK'yı şablonun varsayılanına (21) bırakır. |
+| `Windows` / `Linux` | — | Masaüstünde oynamak ve elle test etmek için. |
 
 ### Doğrulanmış derleme
 
