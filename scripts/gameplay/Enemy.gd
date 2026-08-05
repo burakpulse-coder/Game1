@@ -14,6 +14,8 @@ const HEALTH_BAR_WIDTH := 54.0
 ## dönüşümü), ama _draw() bu hızda çalışır — düşük cihazlarda ciddi kazanç.
 const REDRAW_HZ := 20.0
 const REDRAW_HZ_LOW := 10.0
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 
 var type_id := ""
 var data := {}

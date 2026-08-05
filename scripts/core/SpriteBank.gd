@@ -1,4 +1,3 @@
-class_name SpriteBank
 extends RefCounted
 
 ## Elle çizilmiş sprite'ların kayıt defteri.
@@ -10,6 +9,12 @@ extends RefCounted
 ##
 ## Dosyalar ekrandaki boyutlarına yakın (256 piksel yükseklik) tutulur; büyük
 ## dosyaları küçültmek hem paketi şişiriyor hem mipmap'siz titreme yapıyordu.
+##
+## Bilerek `class_name` KULLANMIYOR. Global sınıf adları yalnızca editör
+## projeyi taradığında `.godot/global_script_class_cache.cfg` dosyasına yazılır;
+## editör açıkken `git pull` yapan bir kurulumda yeni bir global sınıf
+## çözülemiyor ve onu kullanan her betik derlenemiyor — düşmanlar hiç doğmuyordu.
+## Yol üzerinden `preload` bu kayıttan bağımsızdır, her zaman çalışır.
 
 const ENEMY_PATH := "res://assets/sprites/dusman/%s.png"
 const ENEMY_HEIGHT := 2.65   ## sprite yüksekliği / oyun yarıçapı oranı

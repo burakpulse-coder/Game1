@@ -56,4 +56,17 @@ if echo "$CIKTI" | grep -qE "SCRIPT ERROR|Parse Error|Failed to load script|Sahn
 	exit 1
 fi
 
+# Yeni çekilen bir kurulumda .import dosyaları gelir ama içe aktarılmış dokular
+# (.godot/imported) gelmez. Sprite'lar yüklenemediğinde oyun yordamsal çizime
+# düşmeli — düşmanların görünmez kalması kabul edilemez.
+echo "== Doku yokken geri düşüş =="
+find "$PROJE/.godot/imported" -name "*.ctex" -delete 2>/dev/null
+find "$PROJE/.godot/imported" -name "*.md5" -delete 2>/dev/null
+CIKTI2="$(KOS --headless --path "$PROJE" --quit-after 300 2>&1)"
+if echo "$CIKTI2" | grep -qE "SCRIPT ERROR|Compilation failed|Parse Error"; then
+	echo "$CIKTI2" | grep -E "SCRIPT ERROR|Compilation failed|Parse Error" | head -5 >&2
+	echo "BAŞARISIZ: doku yokken betikler çöküyor — oyuncu boş savaş alanı görür." >&2
+	exit 1
+fi
+
 echo "TAMAM: soğuk başlangıç temiz."

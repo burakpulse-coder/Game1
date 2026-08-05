@@ -9,6 +9,8 @@ extends Control
 ## ayrı bir simge seti bakımı gerekmez.
 
 enum Kind { TOWER, ENEMY, STONE }
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 
 var kind: Kind = Kind.TOWER
 var id := ""
