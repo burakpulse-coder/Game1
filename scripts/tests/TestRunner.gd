@@ -679,28 +679,38 @@ func _test_sprite_flip() -> void:
 		_check(false, "goblin yürüyüş şeridi yüklendi")
 		return
 
+	# Ölçüm KENDİ görüntü alanında yapılır. Ana görüntü alanı kullanıldığında
+	# önceki testlerden kalan sahneler (öğretici kartı) sprite'ların üstünü
+	# kapatıyordu ve test aslında onları ölçüyordu — hata vermeden.
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(1080, 900)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
 	var canvas := _FlipCanvas.new()
 	canvas.sheet = sheet
-	add_child(canvas)
+	viewport.add_child(canvas)
 	await RenderingServer.frame_post_draw
 	await RenderingServer.frame_post_draw
-	var shot := get_viewport().get_texture().get_image()
+	var shot := viewport.get_texture().get_image()
+	if OS.has_environment("KK_SONDA"):
+		shot.save_png("user://sonda_yon.png")
 
 	var boxes := []
 	for center in _FlipCanvas.CENTERS:
 		var x0 := 1 << 30
 		var x1 := -1
 		for y in range(300, 900, 2):
-			for x in range(int(center) - 200, int(center) + 200):
+			for x in range(int(center) - 150, int(center) + 150):
 				if _differs(shot, x, y):
 					x0 = mini(x0, x)
 					x1 = maxi(x1, x)
 		boxes.append([x0, x1])
-	canvas.queue_free()
+	viewport.queue_free()
 	await get_tree().process_frame
 
-	_check(boxes[0][1] > boxes[0][0], "sola bakan sprite çizildi")
-	_check(boxes[1][1] > boxes[1][0], "sağa bakan sprite çizildi")
+	_check(boxes[0][1] > boxes[0][0], "sağa yürüyen sprite çizildi")
+	_check(boxes[1][1] > boxes[1][0], "sola yürüyen sprite çizildi")
+	_check(boxes[2][1] > boxes[2][0], "ham doku çizildi")
 	if boxes[0][1] <= boxes[0][0] or boxes[1][1] <= boxes[1][0]:
 		return
 
@@ -708,11 +718,61 @@ func _test_sprite_flip() -> void:
 	var width_right: int = boxes[1][1] - boxes[1][0]
 	_check(absi(width_left - width_right) <= 2,
 		"iki yön aynı genişlikte (%d / %d)" % [width_left, width_right])
-	for i in 2:
+	for i in 3:
 		var middle: float = (boxes[i][0] + boxes[i][1]) * 0.5
 		_check(absf(middle - _FlipCanvas.CENTERS[i]) <= 6.0,
 			"sprite kendi konumunda (%d: merkez %.1f, beklenen %.1f)"
 				% [i, middle, _FlipCanvas.CENTERS[i]])
+
+	# Asıl mesele: HANGİ yönün aynalandığı. Görseller sağa bakacak şekilde
+	# çizildi, yani sağa yürüyen ham dokuyla AYNI, sola yürüyen onun aynası
+	# olmalı. Bu kural ters kurulduğunda düşmanlar iki yönde de gittikleri
+	# yönün tersine bakıyordu ve konum ölçümü bunu yakalamıyordu.
+	# Karşılaştırma bloğun nominal merkezine göre değil, ÖLÇÜLEN sprite
+	# merkezine göre hizalanır: karakter hücrenin içinde birkaç piksel yana
+	# kaçık ve aynalama bu kaçıklığı ikiye katlıyor.
+	var mid: Array = []
+	for box in boxes:
+		mid.append((box[0] + box[1]) * 0.5)
+	var same := _overlap(shot, mid[0], mid[2], false)
+	var mirrored := _overlap(shot, mid[1], mid[2], true)
+	var wrong := _overlap(shot, mid[1], mid[2], false)
+	_check(same > 0.85, "sağa yürüyen ham dokuyla aynı (%.2f)" % same)
+	_check(mirrored > wrong + 0.15,
+		"sola yürüyen ham dokunun aynası: ayna %.2f > düz %.2f" % [mirrored, wrong])
+	_check(same > wrong + 0.15,
+		"çevirme yönü doğru: aynı %.2f, ters %.2f" % [same, wrong])
+
+
+## İki bloğun örtüşme oranı. `mirror` açıkken ikinci blok yatay çevrilerek
+## karşılaştırılır.
+##
+## Karşılaştırma RENK üzerinden yapılır, silüet üzerinden değil: karakterlerin
+## dış hatları neredeyse simetrik olduğu için silüet aynalansa da %96 örtüşüyor
+## ve yön hatasını göstermiyordu. Bıçak, göz ve pelerin gibi ayrıntılar ancak
+## renkle ayırt ediliyor.
+func _overlap(shot: Image, first: float, second: float, mirror: bool) -> float:
+	var hit := 0
+	var total := 0
+	for y in range(500, 820, 2):
+		for x in range(-120, 120, 2):
+			var left := Vector2i(int(round(first)) + x, y)
+			var offset := -x if mirror else x
+			var right := Vector2i(int(round(second)) + offset, y)
+			var a := _differs(shot, left.x, left.y)
+			var b := _differs(shot, right.x, right.y)
+			if not (a or b):
+				continue
+			total += 1
+			if a and b and _same_color(shot, left, right):
+				hit += 1
+	return float(hit) / maxf(total, 1)
+
+
+func _same_color(shot: Image, first: Vector2i, second: Vector2i) -> bool:
+	var a := shot.get_pixel(first.x, first.y)
+	var b := shot.get_pixel(second.x, second.y)
+	return absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) < 0.22
 
 
 func _differs(img: Image, x: int, y: int) -> bool:
@@ -727,18 +787,23 @@ func _differs(img: Image, x: int, y: int) -> bool:
 ## Testin ölçeceği iki sprite'ı çizen geçici tuval. Enemy._draw ile aynı kalıbı
 ## kullanır: çevirme dış dönüşümde, SpriteBank pozitif dikdörtgenle çizer.
 class _FlipCanvas extends Node2D:
-	const CENTERS := [270.0, 810.0]
+	## 0: sağa yürüyen, 1: sola yürüyen, 2: ham doku (çevirmesiz).
+	const CENTERS := [180.0, 540.0, 900.0]
 	const RADIUS := 60.0
 	var sheet: Texture2D
 
 	func _draw() -> void:
 		if sheet == null:
 			return
+		# Üç blok da AYNI zemine otursun: arkada kalan başka bir sahne
+		# karşılaştırmayı bozuyordu.
+		draw_rect(Rect2(0, 460, 1080, 400), Color(0.078, 0.086, 0.129))
 		var bank := preload("res://scripts/core/SpriteBank.gd")
-		for i in 2:
+		for i in 3:
 			var scale := Vector2(1.0, 1.0)
-			if i == 1:
-				scale.x = -1.0
+			if i < 2:
+				# Enemy._draw ile aynı kural.
+				scale.x = bank.facing_scale(1.0 if i == 0 else -1.0)
 			draw_set_transform(Vector2(CENTERS[i], 700.0), 0.0, scale)
 			bank.draw_enemy_frame(self, sheet, RADIUS, 0.0, 0)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

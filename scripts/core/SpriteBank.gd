@@ -19,6 +19,12 @@ extends RefCounted
 const ENEMY_PATH := "res://assets/sprites/dusman/%s.png"
 const WALK_PATH := "res://assets/sprites/dusman/%s_yurume.png"
 const WALK_FRAMES := 4       ## yürüyüş şeridindeki eşit hücre sayısı
+
+## Bütün düşman görselleri SAĞA bakacak şekilde çizildi (burun, silah ve
+## bakış sağda). Yani sağa yürürken doku olduğu gibi, sola yürürken aynalanır.
+## Bu tersine kurulduğunda düşmanlar iki yönde de gittikleri yönün tersine
+## bakıyordu ve hiçbir hata mesajı çıkmıyordu.
+const ART_FACES_RIGHT := true
 ## Bölge zeminleri JPEG: saydamlık gerekmiyor ve PNG bu boyutta paketi
 ## megabaytlarca şişiriyordu.
 const REGION_PATH := "res://assets/sprites/bolge/%s.jpg"
@@ -63,6 +69,14 @@ static func prop(kind: String) -> Texture2D:
 ## Kulenin attığı mermi.
 static func shot(type_id: String) -> Texture2D:
 	return _load(SHOT_PATH % type_id)
+
+
+## Düşman görselinin yatay ölçeği: -1 ise doku aynalanmalı.
+## `facing` yürüyüş yönü (+1 sağa, -1 sola).
+static func facing_scale(facing: float) -> float:
+	if ART_FACES_RIGHT:
+		return -1.0 if facing < 0.0 else 1.0
+	return -1.0 if facing > 0.0 else 1.0
 
 
 ## Harf taşı: "normal", "secili", "kilitli".

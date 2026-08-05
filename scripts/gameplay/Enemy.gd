@@ -225,8 +225,8 @@ func _draw() -> void:
 	# birincisini siliyor. Yordamsal çizim yönü kendi ele aldığı için çevirme
 	# yalnızca sprite kullanılırken uygulanır.
 	var squash := Vector2(1.0 + _hit_flash * 0.16, 1.0 - _hit_flash * 0.14)
-	if has_art and _facing > 0.0:
-		squash.x = -squash.x
+	if has_art:
+		squash.x *= SpriteBank.facing_scale(_facing)
 	if _hit_flash > 0.0 or squash.x < 0.0:
 		draw_set_transform(Vector2(0, _hit_flash * 3.0), 0.0, squash)
 
