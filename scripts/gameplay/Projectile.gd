@@ -1,6 +1,8 @@
 class_name Projectile
 extends Node2D
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Kulelerin attığı mermi. Havuzdan alınır, hedefe ulaşınca hasarı uygular
 ## ve geri bırakılır. Alan hasarlı mermiler çarpma noktasında patlar.
 
@@ -17,6 +19,9 @@ var _target_point := Vector2.ZERO
 var _battlefield: Node = null
 var _spin := 0.0
 var _active := false
+
+## Mermi sprite'ının ekrandaki yüksekliği (piksel).
+const SHOT_HEIGHT := 34.0
 
 
 func _ready() -> void:
@@ -76,4 +81,16 @@ func _impact() -> void:
 func _draw() -> void:
 	if not _active:
 		return
-	ProcArt.draw_projectile(self, tower_type, tint, _spin)
+	# Elle çizilmiş mermi varsa gidiş yönüne döndürülerek çizilir; yoksa
+	# yordamsal çizim (kendi dönüşünü zaten uyguluyor).
+	var sprite := SpriteBank.shot(tower_type)
+	if sprite == null:
+		ProcArt.draw_projectile(self, tower_type, tint, _spin)
+		return
+	var heading := (_target_point - position).angle()
+	var source := sprite.get_size()
+	var factor := SHOT_HEIGHT / maxf(source.y, 1.0)
+	var drawn := source * factor
+	draw_set_transform(Vector2.ZERO, heading, Vector2.ONE)
+	draw_texture_rect(sprite, Rect2(-drawn * 0.5, drawn), false)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

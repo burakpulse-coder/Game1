@@ -63,6 +63,13 @@ func _draw() -> void:
 			var config: Dictionary = GameConfig.TOWERS.get(id, {})
 			if config.is_empty():
 				return
+			# Sprite varsa simge de onu göstersin; önizlemedeki kule ile savaş
+			# alanındaki kule aynı görünmeli.
+			var sprite := SpriteBank.tower(id, level)
+			if sprite != null:
+				SpriteBank.draw_fitted(self, sprite, center + Vector2(0, box * 0.46),
+					Vector2(box * 0.92, box * 0.92))
+				return
 			# Kule çizimi (0,0) merkezli ve SLOT_RADIUS ölçeğinde; kutuya sığdır.
 			var factor := box / (Tower.SLOT_RADIUS * 3.0)
 			draw_set_transform(center + Vector2(0, box * 0.12), 0.0, Vector2(factor, factor))

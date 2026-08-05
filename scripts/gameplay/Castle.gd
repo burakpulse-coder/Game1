@@ -1,6 +1,8 @@
 class_name Castle
 extends Node2D
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Oyuncunun kalesi. Can barındırır, hasar/iyileşme geri bildirimini gösterir.
 
 signal destroyed
@@ -85,6 +87,14 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
+## Seçili kale kozmetiğinin sprite adı. Kozmetik kimlikleri "kale_altin"
+## biçiminde; dosya adları ön ek olmadan.
+func _skin_id() -> String:
+	var equipped := EconomyManager.equipped_cosmetic("kale")
+	var name := equipped.trim_prefix("kale_")
+	return "tas" if name.is_empty() or name == "varsayilan" else name
+
+
 func _draw() -> void:
 	# Sarsıntı düğümün konumunu değil, yalnızca çizimi kaydırır;
 	# böylece kule/yol yerleşimi bozulmaz.
@@ -94,7 +104,19 @@ func _draw() -> void:
 		stone = stone.lerp(Color("#d1544a"), _flash * 0.6)
 	if _heal_flash > 0.0:
 		stone = stone.lerp(Color("#5ec97a"), _heal_flash * 0.45)
-	ProcArt.draw_castle(self, WIDTH, stone, health_ratio())
+	# Elle çizilmiş kale varsa o kullanılır. Kozmetik burada renk değil ayrı
+	# görsel: taş/altın/obsidyen üçü de kendi malzemesiyle çizildi.
+	var sprite := SpriteBank.castle(_skin_id())
+	if sprite != null:
+		var tint := Color.WHITE
+		if _flash > 0.0:
+			tint = tint.lerp(Color("#ff6a5a"), _flash * 0.6)
+		if _heal_flash > 0.0:
+			tint = tint.lerp(Color("#7dffa0"), _heal_flash * 0.45)
+		SpriteBank.draw_fitted(self, sprite, Vector2(0, WIDTH * 0.40),
+			Vector2(WIDTH * 1.15, WIDTH * 0.95), tint)
+	else:
+		ProcArt.draw_castle(self, WIDTH, stone, health_ratio())
 
 	if _heal_flash > 0.0:
 		draw_arc(Vector2.ZERO, WIDTH * (0.55 + (1.0 - _heal_flash) * 0.4), 0.0, TAU, 32,

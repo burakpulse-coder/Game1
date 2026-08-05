@@ -22,6 +22,10 @@ const WALK_FRAMES := 4       ## yürüyüş şeridindeki eşit hücre sayısı
 ## Bölge zeminleri JPEG: saydamlık gerekmiyor ve PNG bu boyutta paketi
 ## megabaytlarca şişiriyordu.
 const REGION_PATH := "res://assets/sprites/bolge/%s.jpg"
+const TOWER_PATH := "res://assets/sprites/kule/%s_%d.png"
+const CASTLE_PATH := "res://assets/sprites/kale/%s.png"
+const PROP_PATH := "res://assets/sprites/sus/%s.png"
+const SHOT_PATH := "res://assets/sprites/mermi/%s.png"
 const ENEMY_HEIGHT := 2.65   ## sprite yüksekliği / oyun yarıçapı oranı
 const ENEMY_HEAD := 1.85     ## sprite tepesi (yarıçap katı); üst süsler bunun üstüne
 
@@ -35,6 +39,41 @@ static func enemy(type_id: String) -> Texture2D:
 
 static func has_enemy(type_id: String) -> bool:
 	return enemy(type_id) != null
+
+
+## Kule sprite'ı (tip ve yükseltme seviyesi); yoksa null.
+static func tower(type_id: String, level: int) -> Texture2D:
+	return _load(TOWER_PATH % [type_id, clampi(level, 1, 3)])
+
+
+## Kale görünümü: "tas", "altin", "obsidyen".
+static func castle(skin_id: String) -> Texture2D:
+	return _load(CASTLE_PATH % skin_id)
+
+
+## Manzara süsü: agac, cam, cali, kaya, mantar, buz, kutuk, lav.
+static func prop(kind: String) -> Texture2D:
+	return _load(PROP_PATH % kind)
+
+
+## Kulenin attığı mermi.
+static func shot(type_id: String) -> Texture2D:
+	return _load(SHOT_PATH % type_id)
+
+
+## Dokuyu en-boy oranını koruyarak kutuya sığdırır ve TABANINDAN hizalar.
+##
+## Kule, kale ve süsler zemine oturur; merkezden hizalanınca havada duruyor
+## gibi görünüyorlardı. Ayrıca dönüşüm KULLANMAZ: çağıranların çoğu (kulede
+## inşa animasyonu, kalede sarsıntı) kendi dönüşümünü kurmuş oluyor ve
+## Godot'ta geçerli çizim dönüşümü okunamadığı için ikincisi birincisini siler.
+static func draw_fitted(canvas: CanvasItem, texture: Texture2D, base: Vector2,
+		box: Vector2, tint: Color = Color.WHITE) -> void:
+	var source := texture.get_size()
+	var factor := minf(box.x / maxf(source.x, 1.0), box.y / maxf(source.y, 1.0))
+	var drawn := source * factor
+	canvas.draw_texture_rect(texture,
+		Rect2(base - Vector2(drawn.x * 0.5, drawn.y), drawn), false, tint)
 
 
 ## Bölgenin savaş alanı zemini; yoksa null (Scenery yordamsal manzaraya döner).

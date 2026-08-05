@@ -1,6 +1,8 @@
 class_name Tower
 extends Node2D
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Yerleştirilmiş kule. Menzilindeki düşmanı hedefler ve mermi atar.
 ## Şifa Çeşmesi saldırmaz; belirli aralıklarla kaleyi iyileştirir.
 
@@ -8,6 +10,11 @@ signal wants_shot(tower: Tower, target: Enemy)
 signal wants_heal(tower: Tower, amount: float)
 
 const SLOT_RADIUS := 46.0
+## Kule sprite'ının sığdırılacağı kutu (yuva yarıçapı katı). Seviye başına
+## %14 büyür — sprite'ların kendi tasarımı zaten farklı, bu yalnızca boy farkı.
+const SPRITE_BOX := Vector2(2.4, 2.7)
+const SPRITE_LEVEL_GROWTH := 0.14
+const DEFAULT_STONE := Color("#9a8f7f")
 
 var tower_type := ""
 var level := 1
@@ -146,6 +153,15 @@ func _pick_target() -> Enemy:
 	return best
 
 
+## Kozmetik kule görünümü sprite'ta renk olarak yok; varsayılan dışında bir
+## görünüm seçiliyse sprite o renge doğru boyanır. Tam renk basmak taş dokusunu
+## öldürüyor, o yüzden beyazla yumuşatılır.
+func _skin_tint() -> Color:
+	if stone.is_equal_approx(DEFAULT_STONE):
+		return Color.WHITE
+	return stone.lerp(Color.WHITE, 0.55)
+
+
 func _draw() -> void:
 	# İnşa/yükseltme animasyonu: aşağıdan yukarı esneyerek oturur.
 	if _build_anim > 0.0:
@@ -162,7 +178,14 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, attack_range(), 0.0, TAU, 48,
 			Color(tint.r, tint.g, tint.b, 0.28 * _range_flash), 3.0, true)
 
-	ProcArt.draw_tower(self, tower_type, level, SLOT_RADIUS, stone, tint)
+	# Elle çizilmiş kule varsa o kullanılır; yoksa yordamsal çizime düşülür.
+	var sprite := SpriteBank.tower(tower_type, level)
+	if sprite != null:
+		var growth := 1.0 + (level - 1) * SPRITE_LEVEL_GROWTH
+		SpriteBank.draw_fitted(self, sprite, Vector2(0, SLOT_RADIUS * 0.85),
+			SPRITE_BOX * SLOT_RADIUS * growth, _skin_tint())
+	else:
+		ProcArt.draw_tower(self, tower_type, level, SLOT_RADIUS, stone, tint)
 
 	if _muzzle > 0.0:
 		var flash := Color(1, 0.95, 0.75, _muzzle * 0.7)

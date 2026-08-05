@@ -272,8 +272,31 @@ func _vignette() -> void:
 ## Süsler
 ## --------------------------------------------------------------------------
 
+## Süs yüksekliği yordamsal ağaçla aynı ölçüde (74 piksel); böylece sprite'a
+## geçince manzaranın yoğunluğu değişmiyor.
+const PROP_HEIGHT := 74.0
+
+## Her süs kendi doğal boyunda olmalı. Sprite sayfasında hepsi aynı yükseklikte
+## çizildiği için hepsini aynı boya sığdırınca kaya ağaçtan, mantar çalıdan
+## büyük görünüyordu.
+const PROP_SCALE := {
+	"agac": 1.00, "cam": 1.15, "cali": 0.55, "kaya": 0.62,
+	"mantar": 0.48, "buz": 0.80, "kutuk": 0.50, "lav": 0.52,
+}
+
+
 func _draw_prop(kind: String, point: Vector2, scale: float, phase: float) -> void:
 	var sway := 0.0 if PerfManager.low_quality else sin(_sway + phase) * 3.0 * scale
+
+	var sprite: Texture2D = SpriteBank.prop(kind)
+	if sprite != null:
+		var height := PROP_HEIGHT * scale * float(PROP_SCALE.get(kind, 1.0))
+		_shadow(point, height * 0.30)
+		# Sallanma tepede olmalı, tabanda değil: taban zemine sabit durur.
+		SpriteBank.draw_fitted(self, sprite, point + Vector2(sway * 0.35, 0.0),
+			Vector2(height * 1.7, height))
+		return
+
 	match kind:
 		"agac":
 			_draw_tree(point, scale, sway)
