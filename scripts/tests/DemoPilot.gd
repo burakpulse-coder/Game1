@@ -15,7 +15,9 @@ extends Node
 ##   godot --headless --path . scenes/Demo.tscn -- --seviye=15 --hizli --yukseltme=5
 const VARSAYILAN_SEVIYE := 26
 
-const MAX_SECONDS := 260.0       ## güvenlik: bu süre dolunca çık
+## Güvenlik: bu süre dolunca çık. Uzun bölümlerin kaydı için --sure ile
+## büyütülür (45. bölüm tek başına 232 saniye sürüyor).
+var max_seconds := 260.0
 const AFTER_RESULT_SECONDS := 8.0
 const FINGER_SPEED := 2100.0     ## piksel/sn (1080x1920 tuval biriminde)
 var pause_between_words := 0.55   ## --kelime-hizi ile insan temposuna çekilir
@@ -78,10 +80,10 @@ func _ready() -> void:
 	# Kayıt sırasında sabit adımlı döngü 30 FPS ölçüldüğü için otomatik kalite
 	# düşürme devreye girerdi; kayıtta efektler tam kalsın diye 60 FPS modu sabitlenir.
 	SaveManager.set_setting("kare_hizi", 1)
-	# Süre sınırı: sahne değişse bile SceneTree üzerinde yaşar.
-	get_tree().create_timer(MAX_SECONDS).timeout.connect(get_tree().quit)
-
 	_read_args()
+	# Süre sınırı: sahne değişse bile SceneTree üzerinde yaşar.
+	get_tree().create_timer(max_seconds).timeout.connect(get_tree().quit)
+
 	SceneRouter.pending_level_id = level_id
 	battle = load("res://scenes/Oyun.tscn").instantiate()
 	battle.level_finished.connect(_on_level_finished)
@@ -96,6 +98,7 @@ func _ready() -> void:
 
 
 ## --seviye=N   oynanacak bölüm
+## --sure=N     güvenlik süresi (sn); uzun bölümlerin kaydı için büyüt
 ## --hizli      zamanı hızlandır (denge taraması için; kayıt alırken kullanılmaz)
 ## --yukseltme=N  oyuncunun kalıcı yükseltmelerini N seviyeye ayarla
 ##                (--yukseltme=oto: bölüme kadar biriktirilebilecek kadar)
@@ -111,7 +114,9 @@ func _read_args() -> void:
 			level_id = clampi(int(arg.split("=")[1]), 1, GameConfig.TOTAL_LEVELS)
 
 	for arg in args:
-		if arg == "--hizli":
+		if arg.begins_with("--sure="):
+			max_seconds = maxf(float(arg.split("=")[1]), 10.0)
+		elif arg == "--hizli":
 			Engine.time_scale = 5.0
 		elif arg == "--insan":
 			human = true
