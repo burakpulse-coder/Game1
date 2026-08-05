@@ -21,6 +21,39 @@ const FINGER_SPEED := 2100.0     ## piksel/sn (1080x1920 tuval biriminde)
 var pause_between_words := 0.55   ## --kelime-hizi ile insan temposuna çekilir
 const START_DELAY := 1.6
 
+## --------------------------------------------------------------------------
+## İnsan profili (--insan)
+## --------------------------------------------------------------------------
+##
+## Varsayılan pilot bir insanın yapamayacağı şeyleri yapıyor: bölümün bütün
+## çözüm kelimelerini biliyor, en uzunlarını önce yazıyor, hiç yanlış
+## denemiyor, parmağı saniyede 2100 piksel gidiyor ve kule ile ultiyi anında
+## kullanıyor. Böyle bir pilotun bölümü geçmesi, bölümün bir insan için
+## geçilebilir olduğunu göstermez.
+##
+## Aşağıdaki sayılar ölçüm değil, MODEL: "ortalama bir oyuncu" varsayımı.
+## Amaç mutlak doğruluk değil, bölümleri birbiriyle aynı ölçütle
+## karşılaştırabilmek.
+
+## Kelime uzunluğuna göre "bu kelimeyi aklıma getirebilir miyim" olasılığı.
+## Kısa kelimeler kolay bulunur, 7-8 harfliler nadiren akla gelir.
+const HUMAN_VOCAB := {3: 0.92, 4: 0.78, 5: 0.55, 6: 0.32, 7: 0.18, 8: 0.10}
+const HUMAN_VOCAB_MIN := 0.08          ## 9+ harf
+## Somut isimler (hayvan/doğa/nesne/yiyecek) daha kolay akla gelir.
+const HUMAN_CONCRETE_BONUS := 0.30     ## akla gelme şansına eklenir
+const HUMAN_CONCRETE_HEAD_START := 2.5 ## sırada bu kadar öne alınır
+const HUMAN_WORDS_PER_MINUTE := 11.0   ## ortalama tempo
+const HUMAN_TEMPO_JITTER := 0.45       ## molalara ± bu oranda sapma
+const HUMAN_MISTAKE_CHANCE := 0.18     ## denemelerin bu kadarı geçersiz kelime
+const HUMAN_FINGER_SPEED := 850.0      ## piksel/sn
+const HUMAN_BUILD_REACTION := Vector2(0.9, 2.4)  ## kule dikmeden önceki tepki
+const HUMAN_ULTI_REACTION := 1.8       ## ulti düğmesini fark etme süresi
+const HUMAN_ULTI_MISS := 0.30          ## ulti fırsatını tamamen kaçırma oranı
+
+var human := false
+var _rng := RandomNumberGenerator.new()
+var _ulti_wait := -1.0
+
 enum Phase { HAZIRLIK, DUSUN, KAYDIR, BEKLE, BITTI }
 
 var battle: Node = null
@@ -56,19 +89,32 @@ func _ready() -> void:
 
 	var level := LevelDB.get_level(level_id)
 	_pool = _plan_words(level)
-	print("[Demo] Seviye %d — %s | çark: %s | %d kelime planlandı" % [
-		level_id, level.get("ad", ""), "".join(level.get("harfler", [])), _pool.size()])
+	print("[Demo] Seviye %d — %s | çark: %s | %d/%d kelime planlandı%s" % [
+		level_id, level.get("ad", ""), "".join(level.get("harfler", [])),
+		_pool.size(), (level.get("cozum_kelimeler", []) as Array).size(),
+		" (insan profili)" if human else ""])
 
 
 ## --seviye=N   oynanacak bölüm
 ## --hizli      zamanı hızlandır (denge taraması için; kayıt alırken kullanılmaz)
 ## --yukseltme=N  oyuncunun kalıcı yükseltmelerini N seviyeye ayarla
+##                (--yukseltme=oto: bölüme kadar biriktirilebilecek kadar)
+## --insan      ortalama bir oyuncuyu taklit et (sınırlı kelime dağarcığı,
+##              insan temposu, yanlış denemeler, yavaş parmak, tepki gecikmesi)
 func _read_args() -> void:
-	for arg in OS.get_cmdline_user_args():
+	var args := OS.get_cmdline_user_args()
+
+	# Bölüm numarası önce okunur: --yukseltme=oto ona bakıyor, sıraya bağlı
+	# kalmasın.
+	for arg in args:
 		if arg.begins_with("--seviye="):
 			level_id = clampi(int(arg.split("=")[1]), 1, GameConfig.TOTAL_LEVELS)
-		elif arg == "--hizli":
+
+	for arg in args:
+		if arg == "--hizli":
 			Engine.time_scale = 5.0
+		elif arg == "--insan":
+			human = true
 		elif arg.begins_with("--kelime-hizi="):
 			# Dakikada kaç kelime bulunsun? Bot varsayılanı ~38/dk; gerçek bir
 			# oyuncu 8-15/dk civarında. Denge insan temposunda ölçülmeli.
@@ -76,15 +122,66 @@ func _read_args() -> void:
 			# Kaydırma süresi ~0.8 sn; kalanı düşünme molası olarak eklenir.
 			pause_between_words = maxf(60.0 / per_minute - 0.8, 0.2)
 		elif arg.begins_with("--yukseltme="):
-			var seviye := int(arg.split("=")[1])
+			var value := arg.split("=")[1]
+			var seviye := _auto_upgrade_level() if value == "oto" else int(value)
 			for key in GameConfig.UPGRADES:
 				SaveManager.set_upgrade_level(key,
 					mini(seviye, int(GameConfig.UPGRADES[key]["max_seviye"])))
+
+	if human:
+		# Tohum bölüme bağlı: aynı bölüm her koşuda aynı "oyuncuyu" yaşar,
+		# yani liste tekrar üretilebilir olur.
+		_rng.seed = level_id * 2654435761
+		pause_between_words = maxf(60.0 / HUMAN_WORDS_PER_MINUTE - 1.4, 0.4)
+
+
+## Bölüme kadar oynamış bir oyuncunun makul yükseltme seviyesi.
+## 60. bölüme gelen oyuncu her şeyi 10'a çıkarmış olur; 1. bölümdeki hiçbir şey
+## almamıştır. Aradaki bölümler doğrusal.
+func _auto_upgrade_level() -> int:
+	return clampi(roundi(level_id / 6.0), 0, 10)
+
+
+## Ortalama bir oyuncunun bu çarkta gerçekten bulabileceği kelimeler.
+##
+## Üç fark var:
+##  1. Dağarcık: uzun kelimeler nadiren akla gelir (HUMAN_VOCAB).
+##  2. Sıra: insan uzunları öne almaz, aklına ilk geleni yazar.
+##  3. Somut isimler öne geçer: harflere bakan biri "inek"i "eksin"den önce
+##     görür. Oyunun kategori listesi (hayvan/doğa/nesne/yiyecek) tam olarak
+##     bu somut isimlerden oluşuyor, o yüzden onlara öncelik verilir.
+func _plan_words_human(level: Dictionary) -> Array:
+	var category_words := {}
+	for category in level.get("kategori_kelimeler", {}):
+		for word in level["kategori_kelimeler"][category]:
+			category_words[str(word)] = true
+
+	var words: Array = []
+	for word in level.get("cozum_kelimeler", []):
+		var text := str(word)
+		var chance: float = HUMAN_VOCAB.get(text.length(), HUMAN_VOCAB_MIN)
+		if category_words.has(text):
+			# Somut isim: akla gelme şansı belirgin yüksek.
+			chance = minf(chance + HUMAN_CONCRETE_BONUS, 0.97)
+		if _rng.randf() >= chance:
+			continue
+		# Sıralama anahtarı: kısa ve somut olan öne, ama kesin değil.
+		var key := float(text.length()) + _rng.randf_range(-1.2, 1.2)
+		if category_words.has(text):
+			key -= HUMAN_CONCRETE_HEAD_START
+		words.append([key, text])
+	words.sort_custom(func(a, b): return a[0] < b[0])
+	var plan: Array = []
+	for entry in words:
+		plan.append(entry[1])
+	return plan
 
 
 ## Kelime sırası: önce kategori kelimeleri (kule tipini belirler), sonra uzun
 ## kelimeler (daha çok inşa puanı), en sonda kısalar.
 func _plan_words(level: Dictionary) -> Array:
+	if human:
+		return _plan_words_human(level)
 	var category_words: Array = []
 	for category in level.get("kategori_kelimeler", {}):
 		for word in level["kategori_kelimeler"][category]:
@@ -139,7 +236,7 @@ func _process(delta: float) -> void:
 			str((battle.battlefield.towers() as Array).map(func(t): return t.tower_type))])
 
 	_advance_tutorial(delta)
-	_use_ulti_if_ready()
+	_use_ulti_if_ready(delta)
 	_tap_cooldown -= delta
 	_build_if_ready()
 
@@ -162,6 +259,11 @@ func _choose_word() -> void:
 	var wheel: LetterWheel = battle.wheel
 	var locked: Array = wheel.locked_indices()
 
+	# İnsan zaman zaman olmayan bir kelime dener: kaydırma süresi ve mola
+	# harcanır, karşılığında hiçbir şey gelmez.
+	if human and _rng.randf() < HUMAN_MISTAKE_CHANCE and _swipe_guess(locked):
+		return
+
 	for index in _pool.size():
 		var word: String = _pool[index]
 		if battle._found_words.has(word):
@@ -182,6 +284,33 @@ func _choose_word() -> void:
 	# Bu çarkta denenecek kelime kalmadı; dalgaların bitmesini bekle.
 	_phase = Phase.BEKLE
 	_timer = 1.0
+
+
+## Rastgele bir harf dizisi kaydırır — insanın tutmayan denemesi.
+## Gerçekten geçerli bir kelime çıkarsa (nadir) bu da gerçekçi: bazen tutar.
+func _swipe_guess(locked: Array) -> bool:
+	var wheel: LetterWheel = battle.wheel
+	var free: Array = []
+	for stone in wheel.letters.size():
+		if not locked.has(stone):
+			free.append(stone)
+	if free.size() < 3:
+		return false
+	for i in range(free.size() - 1, 0, -1):
+		var j := _rng.randi_range(0, i)
+		var swap = free[i]
+		free[i] = free[j]
+		free[j] = swap
+
+	var count := _rng.randi_range(3, mini(5, free.size()))
+	_points = []
+	for k in count:
+		_points.append(wheel._positions[free[k]])
+	_leg = 0
+	_finger = _points[0]
+	_press(_finger)
+	_phase = Phase.KAYDIR
+	return true
 
 
 ## Kelimenin harflerini çarktaki taşlara eşler. Kilitli taş kullanılamaz;
@@ -213,7 +342,7 @@ func _stones_for(word: String, locked: Array) -> Array:
 
 func _advance_finger(delta: float) -> void:
 	var target: Vector2 = _points[_leg]
-	var step := FINGER_SPEED * delta
+	var step := (HUMAN_FINGER_SPEED if human else FINGER_SPEED) * delta
 	var to_target := target - _finger
 
 	if to_target.length() <= step:
@@ -224,6 +353,9 @@ func _advance_finger(delta: float) -> void:
 			_release(_finger)
 			_phase = Phase.BEKLE
 			_timer = pause_between_words
+			if human:
+				# Her kelime aynı sürede bulunmaz; tempo dalgalanır.
+				_timer *= 1.0 + _rng.randf_range(-HUMAN_TEMPO_JITTER, HUMAN_TEMPO_JITTER)
 		return
 
 	_finger += to_target.normalized() * step
@@ -275,7 +407,10 @@ func _build_if_ready() -> void:
 		if not slot.is_empty():
 			continue
 		_tap_slot(slot)
-		_tap_cooldown = 0.4
+		# İnsan kulenin hazır olduğunu anında görmez: enerji dolduktan sonra
+		# fark edip yuvaya basana kadar bir-iki saniye geçer.
+		_tap_cooldown = _rng.randf_range(HUMAN_BUILD_REACTION.x, HUMAN_BUILD_REACTION.y) \
+			if human else 0.4
 		return
 
 
@@ -295,12 +430,24 @@ func _tap_slot(slot: TowerSlot) -> void:
 	Input.parse_input_event(release)
 
 
-func _use_ulti_if_ready() -> void:
-	if battle._ulti_charge < 1.0:
+func _use_ulti_if_ready(delta: float) -> void:
+	if battle._ulti_charge < 1.0 or battle.battlefield.live_enemy_count() < 4:
+		# Fırsat penceresi kapandı; bir sonraki kalabalıkta baştan karar verilir.
+		_ulti_wait = -1.0
 		return
-	if battle.battlefield.live_enemy_count() < 4:
+	if not human:
+		battle._on_ulti()
 		return
-	battle._on_ulti()
+
+	# İnsan: fırsatı bazen tamamen kaçırır, kaçırmazsa da geç basar.
+	if _ulti_wait < 0.0:
+		_ulti_wait = INF if _rng.randf() < HUMAN_ULTI_MISS else HUMAN_ULTI_REACTION
+	if is_inf(_ulti_wait):
+		return
+	_ulti_wait -= delta
+	if _ulti_wait <= 0.0:
+		_ulti_wait = -1.0
+		battle._on_ulti()
 
 
 ## Seviye bitti: sonucu yaz ve sonuç ekranı görünsün diye biraz bekleyip çık.

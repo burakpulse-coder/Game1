@@ -180,6 +180,21 @@ func level_stars(level_id: int) -> int:
 	return int(entry.get("yildiz", 0))
 
 
+## Bölge açık mı? Bölüm kilidiyle AYNI anahtarı sorar.
+##
+## Harita bunu ayrıca kendi hesaplıyordu ve "Tüm Bölümler" ayarını bilmiyordu:
+## bölümlerin kilidi açılıyor ama bölgenin üstündeki sis kalkmadığı için
+## haritada yalnızca ilk bölge oynanabiliyordu.
+func is_region_unlocked(region_index: int) -> bool:
+	if region_index <= 0:
+		return true
+	if bool(get_setting("tum_bolumler", false)):
+		return true
+	if region_index >= GameConfig.REGIONS.size():
+		return false
+	return total_stars() >= int(GameConfig.REGIONS[region_index]["gereken_yildiz"])
+
+
 func is_level_unlocked(level_id: int) -> bool:
 	if level_id <= 1:
 		return true
@@ -187,9 +202,7 @@ func is_level_unlocked(level_id: int) -> bool:
 	# yapar. İlerleme kaydı değişmez; kapatılınca normal kilit geri gelir.
 	if bool(get_setting("tum_bolumler", false)):
 		return true
-	var region := GameConfig.region_of_level(level_id)
-	var needed := int(GameConfig.REGIONS[region]["gereken_yildiz"])
-	if total_stars() < needed:
+	if not is_region_unlocked(GameConfig.region_of_level(level_id)):
 		return false
 	return level_stars(level_id - 1) > 0
 

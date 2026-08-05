@@ -1125,10 +1125,31 @@ func _test_kingdom_map() -> void:
 	for node in map._nodes:
 		var level_id := int(node["id"])
 		var should_lock := not SaveManager.is_level_unlocked(level_id) \
-			or SaveManager.total_stars() < int(GameConfig.REGIONS[int(node["bolge"])]["gereken_yildiz"])
+			or not SaveManager.is_region_unlocked(int(node["bolge"]))
 		if bool(node["kilitli"]) != should_lock:
 			mismatched += 1
 	_equal(mismatched, 0, "düğüm kilitleri kayıt durumuyla uyumlu")
+
+	# "Tüm Bölümler" test anahtarı açıkken haritada TEK BİR kilit kalmamalı.
+	#
+	# Ölçülmüş hata: anahtar yalnızca bölüm kilidini kaldırıyordu, harita bölge
+	# sisini kendi hesaplıyordu; ilk bölgenin 15 bölümü açılıyor, kalan 45'i
+	# sisin altında kapalı kalıyordu.
+	var previous_setting: Variant = SaveManager.get_setting("tum_bolumler", false)
+	SaveManager.set_setting("tum_bolumler", true)
+	map._rebuild()
+	var locked := 0
+	var fogged := 0
+	for node in map._nodes:
+		if bool(node["kilitli"]):
+			locked += 1
+	for band in map._region_bands:
+		if not bool(band["acik"]):
+			fogged += 1
+	_equal(locked, 0, "tüm bölümler açıkken kilitli bölüm kalmıyor")
+	_equal(fogged, 0, "tüm bölümler açıkken sisli bölge kalmıyor")
+	SaveManager.set_setting("tum_bolumler", previous_setting)
+	map._rebuild()
 
 	# Düğümler dokunma yarıçapından daha yakın olmamalı, yoksa yanlış bölüm açılır.
 	var too_close := 0

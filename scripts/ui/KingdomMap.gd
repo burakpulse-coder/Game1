@@ -53,13 +53,14 @@ func _rebuild() -> void:
 	if size.x <= 0.0:
 		return
 
-	var total_stars := SaveManager.total_stars()
 	var cursor := 40.0
 
 	for region_index in GameConfig.REGIONS.size():
 		var region: Dictionary = GameConfig.REGIONS[region_index]
 		var needed := int(region["gereken_yildiz"])
-		var region_open := total_stars >= needed
+		# Kilit kararı SaveManager'da: harita kendi hesaplayınca "Tüm Bölümler"
+		# test anahtarını görmüyor ve sis kalkmıyordu.
+		var region_open := SaveManager.is_region_unlocked(region_index)
 		var band_top := cursor
 		cursor += BANNER_HEIGHT
 
