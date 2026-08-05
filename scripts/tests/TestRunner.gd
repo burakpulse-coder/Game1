@@ -25,6 +25,7 @@ func _ready() -> void:
 	_run("Kelime motoru", _test_word_engine)
 	_run("Kategori verisi", _test_categories)
 	_run("Seviye verisi", _test_levels)
+	_run("Kelime kalitesi (küfür ve yaygınlık)", _test_word_quality)
 	_run("Ekonomi ve yükseltmeler", _test_economy)
 	_run("Kayıt sistemi", _test_save)
 	await _run_async("Savaş turu (uçtan uca)", _test_battle)
@@ -884,6 +885,64 @@ func _differs(img: Image, x: int, y: int) -> bool:
 	var background := Color(0.078, 0.086, 0.129)
 	return absf(c.r - background.r) + absf(c.g - background.g) \
 		+ absf(c.b - background.b) > 0.12
+
+
+## Sözlük ve bölüm verisi küfür içermemeli; erken bölümlerde oyuncunun
+## gerçekten bulabileceği yeterince kelime olmalı.
+##
+## İkisi de ölçülmüş hata: 1. bölümün çözüm listesinde müstehcen bir kelime
+## vardı; aynı listede "esik, kesi, nesi, sek, seki" gibi ağız/eskimiş
+## maddeler çoğunluktaydı ve "3 harf 0/7" göstergesi hiç dolmuyordu.
+func _test_word_quality() -> void:
+	# Örnek küfür listesi: hepsi TDK listesinde vardı, artık sözlükte olmamalı.
+	var yasak := ["sik", "bok", "göt", "orospu", "piç", "kahpe", "yarak",
+		"puşt", "ibne", "kaltak", "yavşak", "osuruk", "am"]
+	var sizan := 0
+	for word in yasak:
+		if WordEngine.contains(word):
+			sizan += 1
+			printerr("    sözlükte kalmış: %s" % word)
+	_equal(sizan, 0, "küfür sözlüğe girmiyor")
+
+	# Masum kelimeler elenmemiş olmalı: filtre tam eşleşme, alt dize değil.
+	for word in ["sikke", "boks", "yavşan", "sıçan", "kaşar", "götürmek", "fahiş"]:
+		_check(WordEngine.contains(word), "masum kelime korundu: %s" % word)
+
+	var eksik_bolum := 0
+	var en_dusuk := 999
+	var en_dusuk_bolum := 0
+	for level_id in range(1, GameConfig.TOTAL_LEVELS + 1):
+		var level := LevelDB.get_level(level_id)
+		var yaygin: Array = level.get("yaygin_kelimeler", [])
+		var cozum: Array = level.get("cozum_kelimeler", [])
+		_check(not yaygin.is_empty(), "seviye %d yaygın kelime listesi taşıyor" % level_id)
+
+		# Küfür bölüm verisine de sızmamalı.
+		for word in cozum:
+			if yasak.has(str(word)):
+				sizan += 1
+
+		# Oyuncunun bulabileceği kelime sayısı: gösterge dolabilmeli.
+		if yaygin.size() < en_dusuk:
+			en_dusuk = yaygin.size()
+			en_dusuk_bolum = level_id
+		if yaygin.size() < 7:
+			eksik_bolum += 1
+	_equal(sizan, 0, "küfür bölüm verisinde de yok")
+	_equal(eksik_bolum, 0,
+		"her bölümde en az 7 yaygın kelime var (en azı seviye %d: %d)"
+			% [en_dusuk_bolum, en_dusuk])
+
+	# İlk bölge en kırılgan yer: yeni oyuncu burada bırakır.
+	var oran_toplam := 0.0
+	for level_id in range(1, 16):
+		var level := LevelDB.get_level(level_id)
+		var yaygin: float = float((level.get("yaygin_kelimeler", []) as Array).size())
+		var cozum: float = maxf(float((level.get("cozum_kelimeler", []) as Array).size()), 1.0)
+		oran_toplam += yaygin / cozum
+	var ortalama := oran_toplam / 15.0
+	_check(ortalama >= 0.50,
+		"ilk bölgede çözümlerin en az yarısı yaygın kelime (%%%.0f)" % (ortalama * 100.0))
 
 
 ## Yol, her bölgede zeminden ayırt edilebilmeli.

@@ -172,9 +172,18 @@ func _start_level() -> void:
 ## Çarktan türetilebilen kelimeleri harf sayısına göre sayar. Oyuncu "burada
 ## 4 harfli 6 kelime var" bilgisini görünce ne arayacağını bilir; kelime bulmak
 ## bu oyunun asıl zorluğu ve tamamen kör aramak sinir bozucu.
+##
+## Sayım YAYGIN kelimeler üzerinden yapılır, sözlükteki her madde üzerinden
+## değil. Sözlük bir dil sözlüğü: ağız, eskimiş ve teknik maddelerle dolu.
+## 1. bölümün göstergesi "esik, kesi, nesi, sek, seki"yi de sayınca hiç
+## dolmuyordu — oyuncuya ulaşamayacağı bir hedef gösteriliyordu. Nadir
+## kelimeler hâlâ geçerli ve puan veriyor, sadece hedef olarak gösterilmiyor.
 func _build_word_totals() -> void:
 	_word_totals.clear()
-	for word in level.get("cozum_kelimeler", []):
+	var hedefler: Array = level.get("yaygin_kelimeler", [])
+	if hedefler.is_empty():
+		hedefler = level.get("cozum_kelimeler", [])
+	for word in hedefler:
 		var length := str(word).length()
 		_word_totals[length] = int(_word_totals.get(length, 0)) + 1
 	_refresh_word_progress()
@@ -187,9 +196,12 @@ func _refresh_word_progress() -> void:
 		found_by_length[length] = int(found_by_length.get(length, 0)) + 1
 	var progress := {}
 	for length in _word_totals:
+		var toplam := int(_word_totals[length])
 		progress[length] = {
-			"bulunan": int(found_by_length.get(length, 0)),
-			"toplam": int(_word_totals[length]),
+			# Nadir kelime bulmak göstergeyi erken doldurabilir; "8/7" yerine
+			# tamamlanmış görünsün.
+			"bulunan": mini(int(found_by_length.get(length, 0)), toplam),
+			"toplam": toplam,
 		}
 	wheel.set_word_progress(progress)
 

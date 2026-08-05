@@ -15,6 +15,7 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from kelime_listeleri import KUFUR
 from turkish import (
     ALPHABET,
     LETTER_INDEX,
@@ -38,7 +39,8 @@ VERSION = 1
 # --------------------------------------------------------------------------
 def clean_source(path: str) -> list[str]:
     words: set[str] = set()
-    dropped = {"ozel_isim": 0, "cok_kelime": 0, "yabanci_karakter": 0, "uzunluk": 0}
+    dropped = {"ozel_isim": 0, "cok_kelime": 0, "yabanci_karakter": 0, "uzunluk": 0,
+               "kufur": 0}
     with open(path, encoding="utf-8") as handle:
         for raw in handle:
             entry = raw.strip()
@@ -58,6 +60,12 @@ def clean_source(path: str) -> list[str]:
                 continue
             if not (MIN_LEN <= len(word) <= MAX_LEN):
                 dropped["uzunluk"] += 1
+                continue
+            # Müstehcen ve ağır hakaret sözlüğe hiç girmez: oyuncu yazamasın,
+            # hiçbir bölümün çözüm listesinde görünmesin. Tam eşleşme —
+            # "sikke", "boks", "yavşan", "sıçan" gibi masumlar kalmalı.
+            if word in KUFUR:
+                dropped["kufur"] += 1
                 continue
             words.add(word)
     print("  elenen:", dropped)

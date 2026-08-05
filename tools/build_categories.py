@@ -8,6 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from category_seeds import CATEGORY_META, PRIORITY, SEEDS
+from kelime_listeleri import kategori_disi
 from turkish import tr_sort_key
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,11 +23,18 @@ def main() -> int:
     assigned: dict[str, str] = {}
     rejected: dict[str, list[str]] = {}
     conflicts: list[tuple[str, str, str]] = []
+    # Kategori kelimeleri kule enerjisi veriyor; oyuncunun aklına gelmeyecek
+    # bir madde onu bulamadığı bir hedefe bağlar.
+    nadir = kategori_disi()
+    elenen_nadir = 0
 
     for category in PRIORITY:
         bad: list[str] = []
         for word in SEEDS[category]:
             if len(word) < MIN_LEN:
+                continue
+            if word in nadir:
+                elenen_nadir += 1
                 continue
             if word not in lexicon:
                 bad.append(word)
@@ -37,6 +45,8 @@ def main() -> int:
             elif owner != category:
                 conflicts.append((word, owner, category))
         rejected[category] = bad
+
+    print(f"  nadir olduğu için kategoriye alınmadı: {elenen_nadir}")
 
     out_dir = os.path.join(ROOT, "data", "categories")
     os.makedirs(out_dir, exist_ok=True)

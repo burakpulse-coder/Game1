@@ -161,8 +161,15 @@ func _plan_words_human(level: Dictionary) -> Array:
 		for word in level["kategori_kelimeler"][category]:
 			category_words[str(word)] = true
 
+	# Havuz yaygın kelimelerden: bölüm verisi zaten "oyuncunun bulmasını
+	# beklediğimiz kelimeler" listesini taşıyor. Ağız ve eskimiş maddeleri
+	# insanın aklına gelmez.
+	var aday: Array = level.get("yaygin_kelimeler", [])
+	if aday.is_empty():
+		aday = level.get("cozum_kelimeler", [])
+
 	var words: Array = []
-	for word in level.get("cozum_kelimeler", []):
+	for word in aday:
 		var text := str(word)
 		var chance: float = HUMAN_VOCAB.get(text.length(), HUMAN_VOCAB_MIN)
 		if category_words.has(text):

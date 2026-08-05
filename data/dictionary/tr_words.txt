@@ -1996,7 +1996,6 @@ alyans
 alyon
 alyuvar
 alzaymır
-am
 ama
 amabile
 amaç
@@ -7645,20 +7644,10 @@ bohçalatma
 bohçalatmak
 bohem
 bohriyum
-bok
-boklama
-boklamak
-boklanma
-boklanmak
-boklaşma
-boklaşmak
-boklu
-bokluk
 boks
 boksit
 boksör
 boksörlük
-boktan
 boktanlık
 bol
 bolalma
@@ -12587,7 +12576,6 @@ dalkavukluk
 dalkılıç
 dalkıran
 dalkurutan
-dallama
 dallamak
 dallamalık
 dallanabilme
@@ -12616,8 +12604,6 @@ dalya
 dalyan
 dalyancı
 dalyancılık
-dalyarak
-dalyaraklık
 dalyasan
 dam
 dama
@@ -18355,8 +18341,6 @@ fagot
 fağfur
 fağfuri
 fahiş
-fahişe
-fahişelik
 fahişlik
 fahrenhayt
 fahri
@@ -19556,7 +19540,6 @@ fuar
 fuarcı
 fuarcılık
 fuaye
-fuhuş
 fujer
 fukara
 fukaralık
@@ -20257,7 +20240,6 @@ genel
 genelci
 genelcilik
 geneleme
-genelev
 genelge
 genelgeçer
 genelgeçerlik
@@ -21254,7 +21236,6 @@ göstermek
 göstermelik
 göstertme
 göstertmek
-göt
 götürebilme
 götürebilmek
 götürme
@@ -24524,8 +24505,6 @@ iblisane
 iblisçe
 iblisçi
 iblisçilik
-ibne
-ibnelik
 ibra
 ibraname
 ibraz
@@ -26694,8 +26673,6 @@ jeton
 jetoncu
 jetonculuk
 jig
-jigolo
-jigololuk
 jikle
 jile
 jilet
@@ -27099,14 +27076,6 @@ kahin
 kahinlik
 kahir
 kahkaha
-kahpe
-kahpece
-kahpecik
-kahpelenme
-kahpelenmek
-kahpeleşme
-kahpeleşmek
-kahpelik
 kahraman
 kahramanca
 kahramancasına
@@ -27492,9 +27461,6 @@ kalsiyumsuz
 kaltaban
 kaltabanca
 kaltabanlık
-kaltak
-kaltakçı
-kaltaklık
 kalubela
 kalya
 kalyon
@@ -27667,9 +27633,6 @@ kancalanma
 kancalanmak
 kancalı
 kancasız
-kancık
-kancıkça
-kancıklık
 kancıl
 kancur
 kançılar
@@ -29708,8 +29671,6 @@ kerevet
 kerevit
 kereviz
 kerh
-kerhane
-kerhaneci
 kerhen
 kerih
 kerim
@@ -39409,10 +39370,6 @@ ornitolojik
 ornitorenk
 orografya
 orojeni
-orospu
-orospuluk
-orostopol
-orostopolluk
 orsa
 orsalama
 orsalamak
@@ -39479,13 +39436,6 @@ osteolog
 osteoloji
 osteolojik
 osteoporoz
-osurgan
-osurma
-osurmak
-osurtma
-osurtmak
-osuruk
-osuruş
 oşinografi
 ot
 otacı
@@ -41485,7 +41435,6 @@ penguen
 penguengiller
 penguenler
 peni
-penis
 penisilin
 pens
 pense
@@ -41710,8 +41659,6 @@ peynirsi
 peynirsiz
 peyrev
 peyzaj
-pezevenk
-pezevenklik
 ph
 pıhtı
 pıhtılanma
@@ -41778,10 +41725,6 @@ pıtırdatmak
 pıtırtı
 pıtrak
 pianta
-piç
-piçleşme
-piçleşmek
-piçlik
 piçsinek
 piçuta
 pide
@@ -42563,8 +42506,6 @@ pusulamak
 pusulasız
 pusuluk
 pusval
-puşt
-puştluk
 put
 putlaşma
 putlaşmak
@@ -45810,8 +45751,6 @@ sıçankuyruğu
 sıçanotu
 sıçırgan
 sıçırganlık
-sıçma
-sıçmak
 sıçrama
 sıçramak
 sıçratabilme
@@ -46327,20 +46266,13 @@ sihirli
 sihirlilik
 sihirsiz
 sihirsizlik
-sik
 sikalar
 sikatif
 sikke
 sikkeleme
 sikkelemek
 siklamen
-siklememe
-siklememek
 siklon
-sikme
-sikmek
-siktirici
-siktirmek
 silah
 silahaltı
 silahçı
@@ -48029,10 +47961,6 @@ sürtme
 sürtmek
 sürttürme
 sürttürmek
-sürtük
-sürtükleşme
-sürtükleşmek
-sürtüklük
 sürtülme
 sürtülmek
 sürtünme
@@ -48841,7 +48769,6 @@ süzüş
 şıklaştırmak
 şıklık
 şıkşık
-şıllık
 şımarabilme
 şımarabilmek
 şımarık
@@ -50167,8 +50094,6 @@ tasviri
 taş
 taşabilme
 taşabilmek
-taşak
-taşaklı
 taşayazma
 taşayazmak
 taşçı
@@ -51373,7 +51298,6 @@ testi
 testici
 testicilik
 testilik
-testis
 testosteron
 tesvit
 tesviye
@@ -54201,7 +54125,6 @@ vahyolunma
 vahyolunmak
 vaiz
 vaizlik
-vajina
 vaka
 vakanüvis
 vakanüvislik
@@ -55627,7 +55550,6 @@ yarabilmek
 yaradılış
 yaradılışlı
 yaradılıştan
-yarak
 yaralama
 yaralamak
 yaralanabilme
@@ -56058,7 +55980,6 @@ yavrulamak
 yavrulatma
 yavrulatmak
 yavsı
-yavşak
 yavşan
 yavuklama
 yavuklamak

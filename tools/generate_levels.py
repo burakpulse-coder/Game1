@@ -20,6 +20,7 @@ from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from category_seeds import CATEGORY_META
+from kelime_listeleri import yaygin_cekirdek
 from turkish import LETTER_INDEX, tr_sort_key
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -86,6 +87,30 @@ def word_threshold_for(size: int) -> int:
     return {5: 8, 6: 10, 7: 12, 8: 14}[size]
 
 
+# Yaygın kelime ölçütü.
+#
+# Eski üretimde çark yalnız "kaç kelime türetilebiliyor" ile seçiliyordu ve
+# TDK listesi ağzı/eskimiş maddelerle dolu olduğu için 1. bölümün çözümünde
+# "esik, kesi, nesi, sek, seki", 4. bölümde "gayr, gayrı, gır, ıra, yır"
+# vardı. Oyuncu bunları bulamıyor, "3 harf 0/7" göstergesi hiç dolmuyordu.
+#
+# Artık çark seçilirken çözümün yaygın kelime oranı da gözetiliyor. Erken
+# bölümlerde ölçüt sıkı; ileride gevşiyor, çünkü 7-8 harfli çarklardan
+# türetilen kelimelerin doğal olarak daha büyük kısmı nadir oluyor.
+def common_ratio_for(level_id: int) -> float:
+    if level_id <= 15:
+        return 0.55
+    if level_id <= 30:
+        return 0.45
+    return 0.34
+
+
+def common_count_for(level_id: int, size: int) -> int:
+    """Çarktan türetilebilen yaygın kelimenin alt sınırı."""
+    taban = {5: 7, 6: 8, 7: 10, 8: 12}[size]
+    return taban if level_id <= 30 else taban + 2
+
+
 def category_threshold_for(size: int, target_count: int) -> int:
     base = {5: 4, 6: 5, 7: 6, 8: 7}[size]
     return max(3, min(base, target_count * 3))
@@ -102,8 +127,12 @@ def mask_of(word: str) -> int:
 
 
 class Lexicon:
-    def __init__(self, words: list[str], categories: dict[str, str]) -> None:
+    def __init__(self, words: list[str], categories: dict[str, str],
+                 common: set[str]) -> None:
         self.categories = categories
+        # Yaygın kümesi = elle küratörlü çekirdek + kategori listeleri.
+        # Kategori kelimeleri zaten somut ve tanıdık isimler.
+        self.common = common | set(categories)
         # Çarkta en fazla 8 harf olabileceği için daha uzun kelimeler hiç aranmaz.
         self.entries = [
             (mask_of(w), Counter(w), w)
@@ -195,7 +224,7 @@ def build_waves(level_id: int, paths: int) -> list[dict]:
 # Çark seçimi
 # --------------------------------------------------------------------------
 def pick_wheel(lex: Lexicon, level_id: int, size: int, targets: list[str],
-               used: set[str], need_cat: int):
+               used: set[str], need_cat: int, need_common: int, need_ratio: float):
     """Ölçütleri sağlayan en uygun çarkı seçer. Deterministik: adaylar sıralı gezilir."""
     need_words = word_threshold_for(size)
 
@@ -222,6 +251,11 @@ def pick_wheel(lex: Lexicon, level_id: int, size: int, targets: list[str],
         solution = lex.solve(source)
         if len(solution) < need_words:
             continue
+        common = [w for w in solution if w in lex.common]
+        if len(common) < need_common:
+            continue
+        if len(common) / len(solution) < need_ratio:
+            continue
         cat_words = {c: [] for c in targets}
         for word in solution:
             category = lex.categories.get(word, "")
@@ -235,10 +269,13 @@ def pick_wheel(lex: Lexicon, level_id: int, size: int, targets: list[str],
             continue
         # Kaynak kelimenin kendisi tematikse (hedef kategoride) çark daha anlamlı olur.
         thematic = 6 if lex.categories.get(source, "") in targets else 0
-        score = total_cat * 4 + min(len(solution), 45) + thematic
+        # Puanda ham kelime sayısı değil YAYGIN kelime sayısı ağırlıklı:
+        # oyuncunun gerçekten bulabileceği kelime bolluğu iyi bir çarkı
+        # tanımlar, sözlükte kaç madde olduğu değil.
+        score = total_cat * 4 + min(len(common), 40) + len(solution) // 6 + thematic
         if best is None or score > best[0]:
-            best = (score, source, letters, solution, cat_words)
-            if total_cat >= need_cat + 5 and thematic:
+            best = (score, source, letters, solution, cat_words, common)
+            if total_cat >= need_cat + 5 and thematic and len(common) >= need_common + 4:
                 break
     return best
 
@@ -249,7 +286,8 @@ def main() -> int:
     with open(os.path.join(ROOT, "data", "categories", "index.json"), encoding="utf-8") as handle:
         categories = json.load(handle)["esleme"]
 
-    lex = Lexicon(words, categories)
+    lex = Lexicon(words, categories, yaygin_cekirdek())
+    print(f"  yaygın kelime kümesi: {len(lex.common)}")
     print(f"  aranabilir kelime (3-8 harf): {len(lex.entries)}")
 
     used_wheels: set[str] = set()
@@ -265,15 +303,34 @@ def main() -> int:
         # Gevşetme merdiveni: önce tam ölçüt, sonra sırayla kategori eşiği ve
         # hedef kategori sayısı düşürülerek denenir. Her seviyede mutlaka bir
         # çark bulunur, ama hangi seviyelerin gevşetildiği raporlanır.
+        # Gevşetme merdiveni. Yaygın kelime ölçütü EN SON gevşer: bölümün
+        # oynanabilirliği buna bağlı, kategori çeşitliliği ise süs.
         pick = None
         ladder = []
         full_need = category_threshold_for(size, len(targets))
+        need_common = common_count_for(level_id, size)
+        need_ratio = common_ratio_for(level_id)
         for need in range(full_need, 2, -1):
-            ladder.append((targets, need))
+            ladder.append((targets, need, need_common, need_ratio))
         for count in range(len(targets) - 1, 0, -1):
-            ladder.append((targets[:count], max(3, category_threshold_for(size, count) - 1)))
-        for index, (try_targets, need) in enumerate(ladder):
-            pick = pick_wheel(lex, level_id, size, try_targets, used_wheels, need)
+            ladder.append((targets[:count], max(3, category_threshold_for(size, count) - 1),
+                           need_common, need_ratio))
+        for gevsek in range(1, 6):
+            ladder.append((targets[:1], 3, max(4, need_common - gevsek),
+                           max(0.20, need_ratio - 0.05 * gevsek)))
+        # Son çare: hedef kategori serbest ve tek kelime yeter. Kategori
+        # listeleri nadir maddelerden temizlenince bazı seviyelerde (8) hiçbir
+        # çark tek kategoriden 3 kelime veremiyordu; merdiven burada bitiyordu
+        # ve üretim çuvallıyordu.
+        tum_kategoriler = ["hayvan", "doga", "nesne", "yiyecek"]
+        for need in (3, 2, 1):
+            ladder.append((tum_kategoriler, need, max(4, need_common - 3),
+                           max(0.20, need_ratio - 0.20)))
+        for need in (2, 1):
+            ladder.append((tum_kategoriler, need, 3, 0.0))
+        for index, (try_targets, need, try_common, try_ratio) in enumerate(ladder):
+            pick = pick_wheel(lex, level_id, size, try_targets, used_wheels, need,
+                              try_common, try_ratio)
             if pick is not None:
                 targets = try_targets
                 if index > 0:
@@ -282,7 +339,7 @@ def main() -> int:
         if pick is None:
             raise SystemExit(f"Seviye {level_id} için uygun çark bulunamadı.")
 
-        _score, source, letters, solution, cat_words = pick
+        _score, source, letters, solution, cat_words, common = pick
         used_wheels.add(letters)
         solution = sorted(solution, key=tr_sort_key)
 
@@ -297,6 +354,11 @@ def main() -> int:
             "hedef_kategoriler": targets,
             "cozum_kelimeler": solution[:MAX_STORED_WORDS],
             "cozum_sayisi": len(solution),
+            # Oyuncunun gerçekten bulmasını beklediğimiz kelimeler. İlerleme
+            # göstergeleri bunu sayar; nadir kelimeler yine geçerli, sadece
+            # hedef olarak gösterilmiyor.
+            "yaygin_kelimeler": sorted(common, key=tr_sort_key)[:MAX_STORED_WORDS],
+            "yaygin_sayisi": len(common),
             "kategori_kelimeler": {c: sorted(v, key=tr_sort_key)[:20] for c, v in cat_words.items()},
             "yol_sayisi": paths,
             "slot_sayisi": slot_count_for(paths),
@@ -316,6 +378,10 @@ def main() -> int:
         handle.write("\n")
 
     solved = [entry["cozum_sayisi"] for entry in levels]
+    yaygin = [entry["yaygin_sayisi"] for entry in levels]
+    oran = [e["yaygin_sayisi"] / max(e["cozum_sayisi"], 1) for e in levels]
+    print(f"  yaygın kelime:               min={min(yaygin)} ort={sum(yaygin)/len(yaygin):.1f}")
+    print(f"  yaygın oranı:                min=%{100*min(oran):.0f} ort=%{100*sum(oran)/len(oran):.0f}")
     cat_totals = [sum(len(v) for v in entry["kategori_kelimeler"].values()) for entry in levels]
     print(f"  {len(levels)} seviye yazıldı -> {out_path} ({os.path.getsize(out_path)/1024:.0f} KB)")
     print(f"  çarkta türetilebilen kelime: min={min(solved)} ort={sum(solved)/len(solved):.1f} maks={max(solved)}")
