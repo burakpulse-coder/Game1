@@ -69,6 +69,8 @@ func _ready() -> void:
 	# Manzara en altta: yolların ve her şeyin arkasında.
 	scenery = Scenery.new()
 	scenery.z_index = 0
+	# Savaş alanında süsler yolun üstünde çizilmeli; menülerde değil.
+	scenery.prop_layer_z = Scenery.PROP_LAYER_Z_BATTLE
 	add_child(scenery)
 
 	_path_layer = _make_layer(1)

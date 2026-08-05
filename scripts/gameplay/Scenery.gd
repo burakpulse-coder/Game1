@@ -31,14 +31,14 @@ var _hills: PackedVector2Array = []
 var _sway := 0.0
 var _motes: Array = []            ## ortam parçacıkları (polen, kar, köz…)
 var _keep_clear: Array = []       ## [{konum, yaricap}] süs konulmayacak alanlar
-var _prop_layer: Node2D = null    ## süsler yolun ÜSTÜNDE çizilir
+var _prop_layer: Node2D = null    ## süsler ayrı katmanda çizilir
+var prop_layer_z := 0             ## bkz. PROP_LAYER_Z_BATTLE
 
 
 func _ready() -> void:
-	# Süs katmanı yol katmanının (z=1) üstünde olmalı.
 	_prop_layer = _PropLayer.new()
 	_prop_layer.scenery = self
-	_prop_layer.z_index = PROP_LAYER_Z
+	_prop_layer.z_index = prop_layer_z
 	add_child(_prop_layer)
 	z_index = 0
 
@@ -314,9 +314,11 @@ func _vignette() -> void:
 ## Süs yüksekliği yordamsal ağaçla aynı ölçüde (74 piksel); böylece sprite'a
 ## geçince manzaranın yoğunluğu değişmiyor.
 const PROP_HEIGHT := 74.0
-## Süs katmanının z değeri: yol (1) ve yuvaların (2) üstünde, düşmanların (5)
-## altında. Manzaranın çocuğu olduğu için değer manzaranınkine eklenir.
-const PROP_LAYER_Z := 3
+## Süs katmanının varsayılan z değeri 0'dır: manzara menü arka planı olarak da
+## kullanılıyor ve orada süslerin arayüzün üstüne çıkmaması gerekir. Savaş
+## alanı bunu 3'e çekerek süsleri yolun (z=1) üstüne alır — orada tabanı yolun
+## altında kalan ağacın tepesi yol tarafından kesiliyordu.
+const PROP_LAYER_Z_BATTLE := 3
 
 ## Her süs kendi doğal boyunda olmalı. Sprite sayfasında hepsi aynı yükseklikte
 ## çizildiği için hepsini aynı boya sığdırınca kaya ağaçtan, mantar çalıdan
