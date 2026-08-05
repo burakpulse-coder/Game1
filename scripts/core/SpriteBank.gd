@@ -17,6 +17,8 @@ extends RefCounted
 ## Yol üzerinden `preload` bu kayıttan bağımsızdır, her zaman çalışır.
 
 const ENEMY_PATH := "res://assets/sprites/dusman/%s.png"
+const WALK_PATH := "res://assets/sprites/dusman/%s_yurume.png"
+const WALK_FRAMES := 4       ## yürüyüş şeridindeki eşit hücre sayısı
 const ENEMY_HEIGHT := 2.65   ## sprite yüksekliği / oyun yarıçapı oranı
 const ENEMY_HEAD := 1.85     ## sprite tepesi (yarıçap katı); üst süsler bunun üstüne
 
@@ -30,6 +32,12 @@ static func enemy(type_id: String) -> Texture2D:
 
 static func has_enemy(type_id: String) -> bool:
 	return enemy(type_id) != null
+
+
+## Düşmanın yürüyüş şeridi (WALK_FRAMES eşit hücreli tek sıra); yoksa null.
+## Şerit yoksa çağıran tek kareli sprite'a, o da yoksa ProcArt'a düşer.
+static func enemy_walk(type_id: String) -> Texture2D:
+	return _load(WALK_PATH % type_id)
 
 
 static func _load(path: String) -> Texture2D:
@@ -58,8 +66,11 @@ static func _load(path: String) -> Texture2D:
 ##
 ## Sprite'ın tepesi `-ENEMY_HEAD * radius` hizasındadır; can çubuğu gibi üst
 ## süslerin nereye konacağını çağıran buradan öğrenir.
+## Yatay çevirmeyi ÇAĞIRAN yapar (bkz. Enemy._draw). Burada Rect2'ye negatif
+## genişlik vermek işe yaramıyor: Godot dokuyu çevirmek yerine kendi genişliği
+## kadar sağa kaydırıyor — sağa yürüyen düşmanlar yolun yanında görünüyordu.
 static func draw_enemy(canvas: CanvasItem, texture: Texture2D, radius: float,
-		facing: float, flash: float, walk: float = 0.0) -> void:
+		flash: float, walk: float = 0.0) -> void:
 	var box_height := radius * ENEMY_HEIGHT
 	var source := texture.get_size()
 	var box_width := box_height * source.x / maxf(source.y, 1.0)
@@ -68,9 +79,24 @@ static func draw_enemy(canvas: CanvasItem, texture: Texture2D, radius: float,
 	var bob := sin(walk * 2.0) * radius * 0.07
 	var rect := Rect2(-box_width * 0.5, radius * 0.92 - box_height - absf(bob),
 		box_width, box_height + absf(bob) * 0.5)
-	if facing > 0.0:
-		# Negatif genişlik dokuyu yatay çevirir.
-		rect = Rect2(rect.position.x + box_width, rect.position.y, -box_width, box_height)
 	# Vuruşta 1'in üstüne çıkan modulate dokuyu beyaza doğru parlatır.
 	var glow := 1.0 + flash * 1.15
 	canvas.draw_texture_rect(texture, rect, false, Color(glow, glow, glow))
+
+
+## Yürüyüş şeridinden tek kare çizer. Kareler eşit genişlikte olduğu için
+## hücre sınırı bölmeyle bulunur; şeridi `tools/kes_yurume.py` böyle üretir.
+##
+## Burada zıplama YOK: hareket karelerin kendisinde. Tek kareli sprite'ta
+## eklediğimiz yapay zıplama burada üst üste binip titremeye yol açıyordu.
+static func draw_enemy_frame(canvas: CanvasItem, sheet: Texture2D, radius: float,
+		flash: float, frame: int) -> void:
+	var cell_width := float(sheet.get_width()) / float(WALK_FRAMES)
+	var cell_height := float(sheet.get_height())
+	var box_height := radius * ENEMY_HEIGHT
+	var box_width := box_height * cell_width / maxf(cell_height, 1.0)
+	var rect := Rect2(-box_width * 0.5, radius * 0.92 - box_height, box_width, box_height)
+	var source := Rect2(cell_width * float(posmod(frame, WALK_FRAMES)), 0.0,
+		cell_width, cell_height)
+	var glow := 1.0 + flash * 1.15
+	canvas.draw_texture_rect_region(sheet, rect, source, Color(glow, glow, glow))

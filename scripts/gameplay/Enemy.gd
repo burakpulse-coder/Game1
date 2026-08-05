@@ -14,6 +14,9 @@ const HEALTH_BAR_WIDTH := 54.0
 ## dönüşümü), ama _draw() bu hızda çalışır — düşük cihazlarda ciddi kazanç.
 const REDRAW_HZ := 20.0
 const REDRAW_HZ_LOW := 10.0
+## Yürüyüş karesi ilerleme hızı. `_walk` zaten düşmanın hızıyla artıyor, yani
+## hızlı düşman hızlı adım atar; bu çarpan yalnızca genel tempoyu ayarlar.
+const WALK_FRAME_RATE := 1.0
 const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
 
 
@@ -194,15 +197,27 @@ func _draw() -> void:
 	if _hit_flash > 0.0:
 		tint = tint.lerp(Color.WHITE, _hit_flash * 0.7)
 
-	# Vuruş anında ezilip yayılır (squash & stretch) — darbe hissini verir.
-	if _hit_flash > 0.0:
-		draw_set_transform(Vector2(0, _hit_flash * 3.0), 0.0,
-			Vector2(1.0 + _hit_flash * 0.16, 1.0 - _hit_flash * 0.14))
-
-	# Elle çizilmiş sprite varsa o kullanılır; yoksa yordamsal çizime düşülür.
+	# Üç kademeli çizim: yürüyüş şeridi > tek kare sprite > yordamsal çizim.
+	# Her kademe kendi dosyası olmadan da çalışır, set yarım kalabilir.
+	var walk_sheet := SpriteBank.enemy_walk(type_id)
 	var sprite := SpriteBank.enemy(type_id)
-	if sprite != null:
-		SpriteBank.draw_enemy(self, sprite, r, _facing, _hit_flash, _walk)
+	var has_art := walk_sheet != null or sprite != null
+
+	# Vuruştaki ezilme (squash) ve yön çevirme TEK dönüşümde birleşir: Godot'ta
+	# geçerli çizim dönüşümü okunamıyor, ikisini ayrı kurunca ikincisi
+	# birincisini siliyor. Yordamsal çizim yönü kendi ele aldığı için çevirme
+	# yalnızca sprite kullanılırken uygulanır.
+	var squash := Vector2(1.0 + _hit_flash * 0.16, 1.0 - _hit_flash * 0.14)
+	if has_art and _facing > 0.0:
+		squash.x = -squash.x
+	if _hit_flash > 0.0 or squash.x < 0.0:
+		draw_set_transform(Vector2(0, _hit_flash * 3.0), 0.0, squash)
+
+	if walk_sheet != null:
+		SpriteBank.draw_enemy_frame(self, walk_sheet, r, _hit_flash,
+			int(_walk * WALK_FRAME_RATE))
+	elif sprite != null:
+		SpriteBank.draw_enemy(self, sprite, r, _hit_flash, _walk)
 	elif is_boss:
 		ProcArt.draw_boss(self, r, tint, _walk, _facing, _phase)
 	else:
@@ -213,7 +228,7 @@ func _draw() -> void:
 	if hp < max_hp:
 		var width := HEALTH_BAR_WIDTH * (1.6 if is_boss else 1.0)
 		# Sprite yordamsal çizimden daha uzun; çubuk aksi hâlde başın üstüne biner.
-		var top := -r * (SpriteBank.ENEMY_HEAD if sprite != null else 1.55)
+		var top := -r * (SpriteBank.ENEMY_HEAD if has_art else 1.55)
 		var back := Rect2(-width * 0.5, top, width, 8.0)
 		draw_rect(back, Color(0, 0, 0, 0.55))
 		var fill := back
@@ -223,7 +238,7 @@ func _draw() -> void:
 
 	# Harf çalan düşmanın üstünde uyarı simgesi
 	if stolen_letter >= 0:
-		var head := SpriteBank.ENEMY_HEAD + 0.35 if sprite != null else 2.0
+		var head := SpriteBank.ENEMY_HEAD + 0.35 if has_art else 2.0
 		var badge := Vector2(0, -r * head)
 		ProcArt.filled_circle(self, badge, 13.0, Color("#f4d06a"))
 		draw_arc(badge, 17.0, 0.0, TAU, 16, Color(0.96, 0.82, 0.42, 0.5), 2.0, true)

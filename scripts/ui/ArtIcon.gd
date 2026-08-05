@@ -78,7 +78,7 @@ func _draw() -> void:
 			var sprite := SpriteBank.enemy(id)
 			if sprite != null:
 				draw_set_transform(center + Vector2(0, box * 0.30), 0.0, Vector2.ONE)
-				SpriteBank.draw_enemy(self, sprite, box / SpriteBank.ENEMY_HEIGHT, -1.0, 0.0)
+				SpriteBank.draw_enemy(self, sprite, box / SpriteBank.ENEMY_HEIGHT, 0.0)
 				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 				return
 			var factor := box / (radius * 3.2)

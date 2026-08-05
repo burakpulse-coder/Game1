@@ -32,6 +32,8 @@ func _ready() -> void:
 	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
 	await _run_async("Arayüz çizim sırası", _test_ui_layering)
 	await _run_async("Harf çarkı yerleşimi (telefon oranları)", _test_wheel_layout)
+	await _run_async("Yürüyüş animasyonu", _test_walk_animation)
+	await _run_async("Sprite yön çevirme", _test_sprite_flip)
 	await _run_async("Bölüm haritası", _test_kingdom_map)
 	await _run_async("Tüm ekranlar açılıyor", _test_screens_open)
 
@@ -612,6 +614,134 @@ func _test_ui_layering() -> void:
 
 	battle.queue_free()
 	await get_tree().process_frame
+
+
+
+## Yürüyüş şeritlerinin geçerliliği ve karelerin gerçekten ilerlediği.
+## "Testler geçiyor" tek başına animasyonun aktığını göstermez: şerit eşit
+## hücrelere bölünemiyorsa ya da kare indeksi hep aynı kalıyorsa düşman yine
+## sabit görünür, üstelik hiçbir hata da vermez.
+func _test_walk_animation() -> void:
+	var SB := preload("res://scripts/core/SpriteBank.gd")
+	var sheets := 0
+	for type_id in GameConfig.ENEMIES:
+		var sheet: Texture2D = SB.enemy_walk(type_id)
+		if sheet == null:
+			continue
+		sheets += 1
+		_check(sheet.get_width() % SB.WALK_FRAMES == 0,
+			"%s şeridi %d eşit hücreye bölünüyor (genişlik %d)"
+				% [type_id, SB.WALK_FRAMES, sheet.get_width()])
+		# Hücre dikeyden daha geniş olmamalı; olursa kesim kaymış demektir.
+		var cell := sheet.get_width() / SB.WALK_FRAMES
+		_check(cell < sheet.get_height(),
+			"%s hücresi makul oranda (%dx%d)" % [type_id, cell, sheet.get_height()])
+	_check(sheets >= 5, "en az beş düşmanın yürüyüş şeridi var (%d)" % sheets)
+
+	# Kare indeksi bir tam döngüde dört değerin hepsini görmeli.
+	SceneRouter.pending_level_id = 1
+	var battle: Node = load("res://scenes/Oyun.tscn").instantiate()
+	add_child(battle)
+	for i in 3:
+		await get_tree().process_frame
+
+	var enemy := Enemy.new()
+	battle.battlefield.add_child(enemy)
+	enemy.configure("goblin", battle.battlefield.track, 1.0)
+	var seen := {}
+	for step in 40:
+		enemy._walk += 0.25
+		seen[posmod(int(enemy._walk * Enemy.WALK_FRAME_RATE), SB.WALK_FRAMES)] = true
+	_check(seen.size() == SB.WALK_FRAMES,
+		"kare indeksi dört karenin hepsini geziyor (%d)" % seen.size())
+	enemy.queue_free()
+	battle.queue_free()
+	await get_tree().process_frame
+
+
+## Sağa yürüyen düşman kendi konumunda aynalanmalı.
+##
+## Bu testin sebebi gerçek bir hata: Rect2'ye negatif genişlik vermek Godot'ta
+## dokuyu çevirmiyor, kendi genişliği kadar sağa kaydırıyor. Sağa giden
+## düşmanlar yolun yanında yürüyordu ve hiçbir hata mesajı çıkmıyordu — ancak
+## piksel ölçerek yakalanabildi.
+##
+## Çizim gerektirdiği için başsız (--headless) koşuda atlanır; ekranlı koşuda
+## (xvfb) çalışır.
+func _test_sprite_flip() -> void:
+	if DisplayServer.get_name() == "headless":
+		print("      (başsız koşu — çizim ölçümü atlandı)")
+		return
+
+	var SB := preload("res://scripts/core/SpriteBank.gd")
+	var sheet: Texture2D = SB.enemy_walk("goblin")
+	if sheet == null:
+		_check(false, "goblin yürüyüş şeridi yüklendi")
+		return
+
+	var canvas := _FlipCanvas.new()
+	canvas.sheet = sheet
+	add_child(canvas)
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	var shot := get_viewport().get_texture().get_image()
+
+	var boxes := []
+	for center in _FlipCanvas.CENTERS:
+		var x0 := 1 << 30
+		var x1 := -1
+		for y in range(300, 900, 2):
+			for x in range(int(center) - 200, int(center) + 200):
+				if _differs(shot, x, y):
+					x0 = mini(x0, x)
+					x1 = maxi(x1, x)
+		boxes.append([x0, x1])
+	canvas.queue_free()
+	await get_tree().process_frame
+
+	_check(boxes[0][1] > boxes[0][0], "sola bakan sprite çizildi")
+	_check(boxes[1][1] > boxes[1][0], "sağa bakan sprite çizildi")
+	if boxes[0][1] <= boxes[0][0] or boxes[1][1] <= boxes[1][0]:
+		return
+
+	var width_left: int = boxes[0][1] - boxes[0][0]
+	var width_right: int = boxes[1][1] - boxes[1][0]
+	_check(absi(width_left - width_right) <= 2,
+		"iki yön aynı genişlikte (%d / %d)" % [width_left, width_right])
+	for i in 2:
+		var middle: float = (boxes[i][0] + boxes[i][1]) * 0.5
+		_check(absf(middle - _FlipCanvas.CENTERS[i]) <= 6.0,
+			"sprite kendi konumunda (%d: merkez %.1f, beklenen %.1f)"
+				% [i, middle, _FlipCanvas.CENTERS[i]])
+
+
+func _differs(img: Image, x: int, y: int) -> bool:
+	if x < 0 or y < 0 or x >= img.get_width() or y >= img.get_height():
+		return false
+	var c := img.get_pixel(x, y)
+	var background := Color(0.078, 0.086, 0.129)
+	return absf(c.r - background.r) + absf(c.g - background.g) \
+		+ absf(c.b - background.b) > 0.12
+
+
+## Testin ölçeceği iki sprite'ı çizen geçici tuval. Enemy._draw ile aynı kalıbı
+## kullanır: çevirme dış dönüşümde, SpriteBank pozitif dikdörtgenle çizer.
+class _FlipCanvas extends Node2D:
+	const CENTERS := [270.0, 810.0]
+	const RADIUS := 60.0
+	var sheet: Texture2D
+
+	func _draw() -> void:
+		if sheet == null:
+			return
+		var bank := preload("res://scripts/core/SpriteBank.gd")
+		for i in 2:
+			var scale := Vector2(1.0, 1.0)
+			if i == 1:
+				scale.x = -1.0
+			draw_set_transform(Vector2(CENTERS[i], 700.0), 0.0, scale)
+			bank.draw_enemy_frame(self, sheet, RADIUS, 0.0, 0)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Çarkın üstündeki ilerleme şeridi ile taşlar üst üste binmemeli; taşlar da
