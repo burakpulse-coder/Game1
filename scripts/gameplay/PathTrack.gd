@@ -1,6 +1,8 @@
 class_name PathTrack
 extends Node2D
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Düşmanların izlediği yol. Yol noktaları savaş alanı dikdörtgenine göre
 ## oranlı tanımlanır, böylece her en-boy oranında aynı tasarım korunur.
 ##
@@ -95,6 +97,10 @@ func _draw() -> void:
 	draw_polyline(baked, edge, PATH_WIDTH + 8.0, true)
 	draw_polyline(baked, fill, PATH_WIDTH, true)
 
+	# Elle çizilmiş yol dokusu varsa parke çizimi yerine o döşenir.
+	if _draw_textured(baked):
+		return
+
 	# Parke taşları: yol boyunca sıralanan, yönüne dik yerleşmiş taşlar.
 	# Düz kahverengi şerit yerine dokulu bir yola dönüştürür.
 	var total := length()
@@ -121,3 +127,40 @@ func _draw() -> void:
 
 	# Yürüyüş yönü ipucu
 	draw_polyline(baked, DASH_COLOR, 3.0, true)
+
+
+## Yol dokusunu şerit boyunca döşer. Tek bir çokgen kullanılamıyor: kıvrılan
+## şerit dışbükey değil ve üçgenlemesi bozuluyor. Bunun yerine her parça için
+## bir dörtgen çizilir; köşelerde oluşabilecek küçük boşlukları altta duran
+## düz renk şerit kapatır.
+##
+## Dokusu yoksa false döner ve çağıran parke çizimine devam eder.
+func _draw_textured(baked: PackedVector2Array) -> bool:
+	var texture: Texture2D = SpriteBank.road(str(region_theme.get("id", "")))
+	if texture == null:
+		return false
+	# UV birden büyük olduğu için doku tekrarı açık olmalı.
+	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+
+	var half := PATH_WIDTH * 0.5
+	var tile := PATH_WIDTH        # dokunun bir kenarının kapladığı yol uzunluğu
+	var travelled := 0.0
+	for i in baked.size() - 1:
+		var from: Vector2 = baked[i]
+		var to: Vector2 = baked[i + 1]
+		var forward := to - from
+		var length := forward.length()
+		if length <= 0.01:
+			continue
+		forward /= length
+		var side := Vector2(-forward.y, forward.x) * half
+		var v0 := travelled / tile
+		var v1 := (travelled + length) / tile
+		draw_colored_polygon(
+			PackedVector2Array([from - side, from + side, to + side, to - side]),
+			Color.WHITE,
+			PackedVector2Array([Vector2(0.0, v0), Vector2(1.0, v0),
+				Vector2(1.0, v1), Vector2(0.0, v1)]),
+			texture)
+		travelled += length
+	return true

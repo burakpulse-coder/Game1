@@ -1,6 +1,8 @@
 class_name UiKit
 extends RefCounted
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Ortak arayüz bileşenleri ve renk paleti.
 ##
 ## Ekranlar kod içinde kurulur; bu sınıf tüm ekranların aynı tipografiyi,
@@ -99,6 +101,19 @@ static func button(text: String, accent: Color = GOLD, size: int = FONT_BODY) ->
 	node.focus_mode = Control.FOCUS_NONE
 	node.add_theme_font_size_override("font_size", size)
 
+	# Elle çizilmiş düğme zemini varsa dokuz dilim olarak esnetilir; yoksa
+	# yordamsal kabartma kutuya düşülür.
+	var skin := _button_skin(accent)
+	if skin != null:
+		node.add_theme_stylebox_override("normal", skin)
+		node.add_theme_stylebox_override("hover", _tinted(skin, Color(1.12, 1.12, 1.12)))
+		node.add_theme_stylebox_override("pressed", _tinted(skin, Color(0.84, 0.84, 0.84)))
+		node.add_theme_stylebox_override("focus", skin)
+		var off := _button_texture_style("mor_pasif")
+		node.add_theme_stylebox_override("disabled",
+			off if off != null else _tinted(skin, Color(0.6, 0.6, 0.6)))
+		return node
+
 	var normal := panel_style(accent, Color(0, 0, 0, 0), RADIUS)
 	normal.content_margin_left = 34
 	normal.content_margin_right = 34
@@ -130,6 +145,50 @@ static func button(text: String, accent: Color = GOLD, size: int = FONT_BODY) ->
 	node.add_theme_color_override("font_pressed_color", ink)
 	node.add_theme_color_override("font_disabled_color", Color(ink.r, ink.g, ink.b, 0.45))
 	return node
+
+
+## Düğme dokusunu vurgu rengine göre seçer: altın vurgu altın zemin, geri
+## kalanı mor panel zemini.
+static func _button_skin(accent: Color) -> StyleBoxTexture:
+	return _button_texture_style("altin" if accent.is_equal_approx(GOLD) else "mor")
+
+
+static func _button_texture_style(state: String) -> StyleBoxTexture:
+	var texture := SpriteBank.button(state)
+	if texture == null:
+		return null
+	var style := StyleBoxTexture.new()
+	style.texture = texture
+	# Yuvarlak uçlar sabit kalmalı, yalnızca orta esnemeli.
+	style.texture_margin_left = texture.get_width() * 0.17
+	style.texture_margin_right = texture.get_width() * 0.17
+	style.texture_margin_top = texture.get_height() * 0.34
+	style.texture_margin_bottom = texture.get_height() * 0.34
+	style.content_margin_left = 34
+	style.content_margin_right = 34
+	style.content_margin_top = 18
+	style.content_margin_bottom = 18
+	return style
+
+
+static func _tinted(style: StyleBoxTexture, color: Color) -> StyleBoxTexture:
+	var copy := style.duplicate() as StyleBoxTexture
+	copy.modulate_color = color
+	return copy
+
+
+## Düğmeye simge ekler; simge dosyası yoksa düğme yalnız metinle kalır.
+## Duraklat gibi yalnız simgeli düğmelerde metin kaldırılır.
+static func set_button_icon(node: Button, icon_name: String, keep_text := true) -> void:
+	var texture := SpriteBank.icon(icon_name)
+	if texture == null:
+		return
+	node.icon = texture
+	node.expand_icon = true
+	node.add_theme_constant_override("icon_max_width", 46)
+	node.add_theme_constant_override("h_separation", 12)
+	if not keep_text:
+		node.text = ""
 
 
 static func ghost_button(text: String, accent: Color = INK_SOFT) -> Button:
@@ -257,11 +316,25 @@ static func top_bar(title_text: String, on_back: Callable, show_currency: bool =
 
 
 ## Para göstergesi. EconomyManager sinyaline kendisi abone olur.
+## Para simgesi: elle çizilmiş varsa doku, yoksa metin karakteri.
+static func _currency_icon(kind: String) -> Control:
+	var texture := SpriteBank.icon("elmas" if kind == "elmas" else "altin")
+	if texture == null:
+		return label("◆" if kind == "elmas" else "●", FONT_BODY,
+			GEM if kind == "elmas" else GOLD)
+	var rect := TextureRect.new()
+	rect.texture = texture
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.custom_minimum_size = Vector2(40, 40)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return rect
+
+
 static func currency_chip(kind: String) -> Control:
 	var chip := panel(BG_PANEL_SOFT)
 	var row := hbox(10)
-	var icon := label("◆" if kind == "elmas" else "●", FONT_BODY,
-		GEM if kind == "elmas" else GOLD)
+	var icon: Control = _currency_icon(kind)
 	var amount := label("0", FONT_BODY, INK)
 	amount.name = "Tutar"
 	row.add_child(icon)

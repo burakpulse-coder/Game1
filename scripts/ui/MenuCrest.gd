@@ -1,5 +1,7 @@
 extends Control
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Ana menüdeki kale arması: oyunun ne olduğunu tek bakışta anlatır.
 ## Savaş alanındaki kaleyle aynı çizimi kullanır (ProcArt.draw_castle), yani
 ## kozmetik kale seçimi burada da görünür.
@@ -22,6 +24,11 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
+func _skin_id() -> String:
+	var name := EconomyManager.equipped_cosmetic("kale").trim_prefix("kale_")
+	return "tas" if name.is_empty() or name == "varsayilan" else name
+
+
 func _draw() -> void:
 	var box := minf(size.x, size.y * 1.6)
 	if box <= 0.0:
@@ -34,9 +41,16 @@ func _draw() -> void:
 		Vector2(box * 0.36, box * 0.26), Color(0.96, 0.82, 0.42, 0.10), false)
 
 	var factor := minf(size.y / 190.0, box / 320.0)
-	draw_set_transform(center, 0.0, Vector2(factor, factor))
-	ProcArt.draw_castle(self, CASTLE_WIDTH, stone, 1.0)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	# Menüdeki arma savaş alanındaki kaleyle aynı görseli kullanmalı.
+	var sprite := SpriteBank.castle(_skin_id())
+	if sprite != null:
+		var height := CASTLE_WIDTH * 0.86 * factor
+		SpriteBank.draw_fitted(self, sprite, center + Vector2(0, height * 0.46),
+			Vector2(height * 1.2, height))
+	else:
+		draw_set_transform(center, 0.0, Vector2(factor, factor))
+		ProcArt.draw_castle(self, CASTLE_WIDTH, stone, 1.0)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 	# Kalenin iki yanında hafifçe salınan sancaklar. Konum kalenin gerçek
 	# genişliğinden türetilir; kutu genişliğine göre hesaplanınca direkler

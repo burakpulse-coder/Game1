@@ -26,6 +26,10 @@ const TOWER_PATH := "res://assets/sprites/kule/%s_%d.png"
 const CASTLE_PATH := "res://assets/sprites/kale/%s.png"
 const PROP_PATH := "res://assets/sprites/sus/%s.png"
 const SHOT_PATH := "res://assets/sprites/mermi/%s.png"
+const STONE_PATH := "res://assets/sprites/tas/%s.png"
+const ICON_PATH := "res://assets/sprites/simge/%s.png"
+const BUTTON_PATH := "res://assets/sprites/buton/%s.png"
+const ROAD_PATH := "res://assets/sprites/yol/%s.jpg"
 const ENEMY_HEIGHT := 2.65   ## sprite yüksekliği / oyun yarıçapı oranı
 const ENEMY_HEAD := 1.85     ## sprite tepesi (yarıçap katı); üst süsler bunun üstüne
 
@@ -59,6 +63,26 @@ static func prop(kind: String) -> Texture2D:
 ## Kulenin attığı mermi.
 static func shot(type_id: String) -> Texture2D:
 	return _load(SHOT_PATH % type_id)
+
+
+## Harf taşı: "normal", "secili", "kilitli".
+static func stone(state: String) -> Texture2D:
+	return _load(STONE_PATH % state)
+
+
+## Arayüz simgesi (altin, elmas, yildiz_dolu, kilit, ipucu, karistir, ...).
+static func icon(name: String) -> Texture2D:
+	return _load(ICON_PATH % name)
+
+
+## Düğme zemini; dokuz dilim olarak esnetilir.
+static func button(state: String) -> Texture2D:
+	return _load(BUTTON_PATH % state)
+
+
+## Bölgenin yol dokusu (kesintisiz döşenir).
+static func road(region_id: String) -> Texture2D:
+	return _load(ROAD_PATH % region_id)
 
 
 ## Dokuyu en-boy oranını koruyarak kutuya sığdırır ve TABANINDAN hizalar.

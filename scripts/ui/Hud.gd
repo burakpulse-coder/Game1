@@ -71,6 +71,7 @@ func _build_top() -> void:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_top.add_child(row)
 
+	# Duraklat simgesi koyu lacivert; mor düğme zemininde okunmuyor, metin kalıyor.
 	var pause := UiKit.ghost_button("॥")
 	pause.custom_minimum_size = Vector2(88, 88)
 	pause.pressed.connect(func(): pause_pressed.emit())
@@ -151,11 +152,13 @@ func _build_band() -> void:
 	_band.add_child(actions)
 
 	_hint_button = UiKit.ghost_button("İpucu")
+	UiKit.set_button_icon(_hint_button, "ipucu")
 	_hint_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_hint_button.pressed.connect(func(): hint_pressed.emit())
 	actions.add_child(_hint_button)
 
 	var shuffle := UiKit.ghost_button("Karıştır")
+	UiKit.set_button_icon(shuffle, "karistir")
 	shuffle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shuffle.pressed.connect(func(): shuffle_pressed.emit())
 	actions.add_child(shuffle)

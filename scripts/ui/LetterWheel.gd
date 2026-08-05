@@ -1,6 +1,8 @@
 class_name LetterWheel
 extends Control
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Harf çarkı: rünik taş daire üzerinde parmak kaydırarak kelime kurma.
 ##
 ## Etkileşim (Words of Wonders tarzı):
@@ -18,7 +20,9 @@ signal letter_picked(letter: String)
 const STONE_RADIUS := 62.0
 const TOUCH_SLACK := 1.25
 const TRAIL_WIDTH := 12.0
-const SELECTED_SCALE := 1.06   ## seçili taş büyür; yerleşim buna göre yer bırakır
+const SELECTED_SCALE := 1.06
+## Taş sprite'ının çevresinde kenarlık payı var; yarıçapın bu katı çizilir.
+const STONE_SPRITE_SCALE := 1.16   ## seçili taş büyür; yerleşim buna göre yer bırakır
 
 ## İlerleme rozetleri çarkın üst şeridinde durur. Taş dairesi bu şeridi boş
 ## bırakır; yoksa tepedeki taş rozetlerin üstüne biner.
@@ -520,6 +524,24 @@ func _draw_stone(index: int, point: Vector2) -> void:
 		draw_arc(point, radius * 1.16, 0.0, TAU, 28,
 			Color(TRAIL_COLOR.r, TRAIL_COLOR.g, TRAIL_COLOR.b, 0.35), 7.0, true)
 
+	# Elle çizilmiş taş varsa gövde ondan gelir; ipucu/kabul parlaması ve
+	# başarı vurgusu renk çarpanı olarak üstüne biner.
+	var state := "kilitli" if locked else ("secili" if selected else "normal")
+	var sprite := SpriteBank.stone(state)
+	if sprite != null:
+		var box := radius * STONE_SPRITE_SCALE * 2.0
+		var tint := Color.WHITE
+		if not locked and not selected:
+			# fill, ipucu ve kabul dalgasında beyaza kayıyor; onu parlaklığa çevir.
+			var glow := clampf(fill.get_luminance() - STONE_FILL.get_luminance(), 0.0, 1.0)
+			tint = Color(1.0 + glow, 1.0 + glow, 1.0 + glow)
+		draw_texture_rect(sprite, Rect2(point - Vector2(box, box) * 0.5,
+			Vector2(box, box)), false, tint)
+		var ink := TEXT_COLOR if not locked else Color(0.75, 0.72, 0.82, 0.5)
+		_draw_glyph(letters[index], point, 52, ink)
+		_draw_stone_badges(index, point, radius, locked)
+		return
+
 	# Taş gövdesi: degradeli, oyulmuş kenarlı
 	ProcArt.shaded_circle(self, point, radius, fill)
 	# Oyuk iç halka — rün taşı hissi
@@ -537,14 +559,27 @@ func _draw_stone(index: int, point: Vector2) -> void:
 	var text_color := TEXT_COLOR if not locked else Color(0.75, 0.72, 0.82, 0.5)
 	_draw_glyph(letters[index], point, 52, text_color)
 
-	if locked:
-		# Kilit simgesi
+	_draw_stone_badges(index, point, radius, locked)
+
+
+## Kilit simgesi ve kalan saniye. Taş ister sprite ister yordamsal çizilmiş
+## olsun aynı yere gelir, o yüzden ayrı tutulur.
+func _draw_stone_badges(index: int, point: Vector2, radius: float, locked: bool) -> void:
+	if not locked:
+		return
+	var icon := SpriteBank.icon("kilit")
+	var remaining := ceilf(float(_locked[index]))
+	if icon != null:
+		var box := radius * 0.62
+		var size := Vector2(box * icon.get_width() / maxf(icon.get_height(), 1.0), box)
+		draw_texture_rect(icon, Rect2(point - size * 0.5 - Vector2(0, radius * 0.06), size),
+			false)
+	else:
 		var lock_point := point + Vector2(0, -radius * 0.05)
 		ProcArt.rounded_rect(self, Rect2(lock_point.x - 15, lock_point.y - 2, 30, 24), 5.0,
 			Color("#f4d06a"), false)
 		draw_arc(lock_point + Vector2(0, -2), 11.0, PI, TAU, 12, Color("#f4d06a"), 4.0, true)
-		var remaining := ceilf(float(_locked[index]))
-		_draw_glyph("%d" % remaining, point + Vector2(0, radius * 0.62), 26, Color("#f4d06a"))
+	_draw_glyph("%d" % remaining, point + Vector2(0, radius * 0.62), 26, Color("#f4d06a"))
 
 
 func _draw_glyph(text: String, center: Vector2, font_size: int, color: Color) -> void:
