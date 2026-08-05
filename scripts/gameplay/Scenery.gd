@@ -27,6 +27,7 @@ var _props: Array = []            ## [{tip, konum, olcek, sallanma}]
 var _patches: Array = []          ## zemin renk lekeleri
 var _hills: PackedVector2Array = []
 var _sway := 0.0
+var _motes: Array = []            ## ortam parçacıkları (polen, kar, köz…)
 
 
 func _ready() -> void:
@@ -43,16 +44,43 @@ func setup(level_region_theme: Dictionary, rect: Rect2, tracks: Array, slot_posi
 	_build_hills(rng)
 	_build_patches(rng)
 	_build_props(rng, tracks, slot_positions)
+	_build_motes(rng)
 	queue_redraw()
 
 
 func _process(delta: float) -> void:
-	# Yapraklar hafifçe salınır. Tüm manzara tek düğüm olduğu için bu, kare
-	# başına tek bir _draw() demek; düşük cihazlarda salınım kapatılır.
+	# Yapraklar salınır, ortam parçacıkları süzülür. Tüm manzara tek düğüm
+	# olduğu için bu kare başına tek bir _draw() demek; düşük cihazlarda kapalı.
 	if PerfManager.low_quality:
 		return
 	_sway += delta * 0.7
+	for mote in _motes:
+		mote["konum"] += Vector2(
+			sin(_sway * float(mote["salinim"]) + float(mote["faz"])) * 14.0 * delta,
+			float(mote["dusus"]) * delta)
+		# Alanı terk eden parçacık karşı kenardan geri girer.
+		if mote["konum"].y > _rect.end.y:
+			mote["konum"].y = _rect.position.y
+		elif mote["konum"].y < _rect.position.y:
+			mote["konum"].y = _rect.end.y
 	queue_redraw()
+
+
+## Bölgeye göre ortam parçacığı: vadide polen, ormanda ateşböceği yukarı,
+## buzda kar aşağı, ejder kalesinde köz yukarı.
+func _build_motes(rng: RandomNumberGenerator) -> void:
+	_motes.clear()
+	var rises: bool = str(region_theme.get("susler", ["agac"])[0]) in ["cam", "lav"]
+	for i in 26:
+		_motes.append({
+			"konum": Vector2(
+				rng.randf_range(_rect.position.x, _rect.end.x),
+				rng.randf_range(_rect.position.y, _rect.end.y)),
+			"dusus": rng.randf_range(-34.0, -14.0) if rises else rng.randf_range(12.0, 34.0),
+			"salinim": rng.randf_range(0.6, 1.8),
+			"faz": rng.randf() * TAU,
+			"boyut": rng.randf_range(1.8, 4.2),
+		})
 
 
 func _color(key: String, fallback: String) -> Color:
@@ -168,7 +196,15 @@ func _draw() -> void:
 	for prop in _props:
 		_draw_prop(str(prop["tip"]), prop["konum"], float(prop["olcek"]), float(prop["faz"]))
 
-	# 7. Vinyet
+	# 7. Ortam parçacıkları
+	if not PerfManager.low_quality:
+		var mote_color := _color("zerre", "#f6f0a0")
+		for mote in _motes:
+			var alpha := 0.35 + 0.35 * sin(_sway * 1.6 + float(mote["faz"]))
+			draw_circle(mote["konum"], float(mote["boyut"]),
+				Color(mote_color.r, mote_color.g, mote_color.b, alpha))
+
+	# 8. Vinyet
 	_vignette()
 
 

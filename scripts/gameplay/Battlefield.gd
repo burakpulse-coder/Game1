@@ -44,11 +44,13 @@ var _slot_layer: Node2D
 var _tower_layer: Node2D
 var _enemy_layer: Node2D
 var _projectile_layer: Node2D
-var _effect_layer: Node2D
+var effects: EffectLayer = null
 
 var _enemy_pool: ObjectPool
 var _projectile_pool: ObjectPool
-var _bursts: Array = []   ## [{pos, t, radius, color}]
+var _shake_amount := 0.0
+var _shake_time := 0.0
+var _shake_offset := Vector2.ZERO
 var _slot_count := 4
 var _path_count := 1
 var _built := false
@@ -70,7 +72,8 @@ func _ready() -> void:
 	_tower_layer = _make_layer(6)
 	_enemy_layer = _make_layer(5)
 	_projectile_layer = _make_layer(8)
-	_effect_layer = _make_layer(9)
+	effects = EffectLayer.new()
+	add_child(effects)
 
 	_enemy_pool = ObjectPool.new(_enemy_layer, _make_enemy, ENEMY_PREWARM, 160)
 	_projectile_pool = ObjectPool.new(_projectile_layer, _make_projectile, PROJECTILE_PREWARM, 200)
@@ -308,7 +311,16 @@ func enemies_in_range(point: Vector2, radius: float) -> Array:
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
-	add_burst(enemy.position, enemy.radius() * 1.6, Color(enemy.data.get("renk", "#ffffff")))
+	var tint := Color(enemy.data.get("renk", "#ffffff"))
+	effects.corpse(enemy.type_id, enemy.position, enemy.radius(), tint, enemy._facing)
+	effects.sparks(enemy.position, 14 if not enemy.is_boss else 40, tint,
+		240.0 if not enemy.is_boss else 420.0)
+	effects.ring(enemy.position, enemy.radius() * 1.7, tint, 0.4, 4.0)
+	if enemy.gold > 0:
+		effects.floating_text(enemy.position + Vector2(0, -enemy.radius()),
+			"+%d" % enemy.gold, Color("#f4d06a"), 26)
+	if enemy.is_boss:
+		shake(14.0, 0.6)
 	AudioManager.play_sfx("dusman_olum", randf_range(0.92, 1.08))
 	enemy_died.emit(enemy)
 	_enemy_pool.release(enemy)
@@ -346,18 +358,30 @@ func apply_damage(point: Vector2, amount: float, tower_type: String, splash: flo
 		primary: Enemy) -> void:
 	if splash > 0.0:
 		add_burst(point, splash, Color(GameConfig.TOWERS.get(tower_type, {}).get("renk", "#ffffff")))
+		effects.sparks(point, 9, Color(GameConfig.TOWERS.get(tower_type, {}).get("renk", "#ffffff")),
+			200.0)
 		for enemy in enemies_in_range(point, splash):
 			# Merkezden uzaklaştıkça hasar azalır.
 			var falloff: float = 1.0 - 0.45 * ((enemy as Enemy).position.distance_to(point) / maxf(splash, 1.0))
 			(enemy as Enemy).take_damage(amount * falloff, tower_type)
 	elif primary != null and primary.alive:
-		primary.take_damage(amount, tower_type)
+		var dealt := primary.take_damage(amount, tower_type)
+		if dealt > 0.0:
+			effects.sparks(point, 5, Color("#ffe9a8"), 170.0)
+		else:
+			# Bağışıklık: vuruş "sekiyor" — oyuncu neden işe yaramadığını görsün.
+			effects.ring(point, 26.0, Color("#9fb6d9"), 0.3, 3.0)
 
 
 ## Ulti: ekrandaki tüm düşmanlara büyük hasar.
 func cast_ulti(damage: float) -> int:
 	var hits := 0
-	add_burst(Vector2(size.x * 0.5, size.y * 0.5), maxf(size.x, size.y), Color("#f4d06a"))
+	var center := Vector2(size.x * 0.5, size.y * 0.5)
+	for i in 3:
+		effects.ring(center, maxf(size.x, size.y) * (0.6 + i * 0.25), Color("#f4d06a"),
+			0.55 + i * 0.18, 12.0)
+	effects.sparks(center, 60, Color("#ffd98a"), 620.0)
+	shake(22.0, 0.7)
 	for node in _enemy_pool.active().duplicate():
 		var enemy := node as Enemy
 		if not enemy.alive:
@@ -370,7 +394,7 @@ func cast_ulti(damage: float) -> int:
 func clear_all() -> void:
 	_enemy_pool.release_all()
 	_projectile_pool.release_all()
-	_bursts.clear()
+	effects.clear_all()
 	queue_redraw()
 
 
@@ -389,6 +413,10 @@ func place_tower(slot: TowerSlot, tower_type: String) -> Tower:
 	slot.tower = tower
 	slot.set_ready(false)
 	slot.queue_redraw()
+	effects.dust(slot.position + Vector2(0, TowerSlot.RADIUS * 0.5),
+		TowerSlot.RADIUS * 1.6, Color("#d8c9a8"))
+	shake(5.0, 0.18)
+	tower.play_build_animation()
 	AudioManager.play_sfx("kule_insa")
 	return tower
 
@@ -414,27 +442,32 @@ func empty_slot_count() -> int:
 ## --------------------------------------------------------------------------
 
 func add_burst(point: Vector2, radius: float, color: Color) -> void:
-	if PerfManager.low_quality and _bursts.size() > 6:
-		return
-	_bursts.append({"pos": point, "t": 0.0, "radius": radius, "color": color})
+	effects.ring(point, radius, color, 0.45, 5.0)
+
+
+## Savaş alanını kısa süre sarsar (ağır çarpma, ulti).
+func shake(amount: float, duration: float = 0.25) -> void:
+	_shake_amount = maxf(_shake_amount, amount)
+	_shake_time = maxf(_shake_time, duration)
 	set_process(true)
 
 
 func _process(delta: float) -> void:
-	if _bursts.is_empty():
+	if _shake_time <= 0.0:
+		if _shake_offset != Vector2.ZERO:
+			_apply_shake(Vector2.ZERO)
+		set_process(false)
 		return
-	var index := _bursts.size() - 1
-	while index >= 0:
-		_bursts[index]["t"] += delta * 2.4
-		if _bursts[index]["t"] >= 1.0:
-			_bursts.remove_at(index)
-		index -= 1
-	_effect_layer.queue_redraw()
-	queue_redraw()
+	_shake_time -= delta
+	var falloff := _shake_amount * clampf(_shake_time / 0.25, 0.0, 1.0) * PerfManager.effect_scale()
+	_apply_shake(Vector2(randf_range(-falloff, falloff), randf_range(-falloff, falloff)))
 
 
-func _draw() -> void:
-	for burst in _bursts:
-		draw_set_transform(burst["pos"], 0.0, Vector2.ONE)
-		ProcArt.draw_burst(self, burst["t"], burst["radius"], burst["color"])
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+## Sarsıntı yalnızca çizim katmanlarını kaydırır; yuva konumları (dokunma
+## isabeti) yerel uzayda değişmez.
+func _apply_shake(offset: Vector2) -> void:
+	_shake_offset = offset
+	for layer in [scenery, _path_layer, _slot_layer, _tower_layer, _enemy_layer,
+			_projectile_layer, effects]:
+		if layer != null:
+			(layer as Node2D).position = offset

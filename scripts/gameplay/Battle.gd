@@ -128,6 +128,8 @@ func _start_level() -> void:
 	battlefield.castle.setup(EconomyManager.castle_max_hp() * float(level.get("kale_can_carpani", 1.0)))
 	battlefield.castle.health_changed.connect(hud.set_health)
 	battlefield.castle.destroyed.connect(_on_defeat)
+	battlefield.castle.healed.connect(_on_castle_healed)
+	battlefield.castle.damaged.connect(_on_castle_damaged)
 	hud.set_health(battlefield.castle.hp, battlefield.castle.max_hp)
 
 	wheel.set_letters(level.get("harfler", []))
@@ -191,6 +193,11 @@ func _on_word_submitted(raw: String) -> void:
 	AudioManager.play_sfx("kelime_dogru", 1.0 + minf(_combo, 6) * 0.05)
 	Haptics.word_accepted()
 
+	# Kelimenin gücünü savaş alanında da göster: hedef kulede/kalede parıltı.
+	var focus := _battlefield_focus(result.tower_type)
+	battlefield.effects.rising(focus, 6 + int(result.length_multiplier * 3), color, 30.0)
+	battlefield.effects.ring(focus, 60.0 * result.length_multiplier, color, 0.45, 4.0)
+
 	if result.tower_type != "":
 		towers.add_category_word(result.tower_type, result.length_multiplier)
 		var meta: Dictionary = WordEngine.category_meta(result.category)
@@ -205,6 +212,12 @@ func _on_word_submitted(raw: String) -> void:
 			+ GameConfig.ULTI_CHARGE_PER_ANCIENT * EconomyManager.ulti_charge_multiplier())
 		hud.set_ulti(_ulti_charge)
 		hud.toast("KADİM KELİME!", UiKit.GOLD)
+		battlefield.effects.floating_text(
+			Vector2(battlefield.size.x * 0.5, battlefield.size.y * 0.45),
+			TurkishText.to_upper(result.word), UiKit.GOLD, 46)
+		battlefield.effects.ring(Vector2(battlefield.size.x * 0.5, battlefield.size.y * 0.45),
+			260.0, UiKit.GOLD, 0.7, 9.0)
+		battlefield.shake(8.0, 0.35)
 		Haptics.ancient_word()
 		SaveManager.unlock_achievement("kadim_kelime")
 
@@ -223,6 +236,16 @@ func _track_word_stats(result: WordEngine.WordResult) -> void:
 	SaveManager.unlock_achievement("ilk_kelime")
 	if int(stats["bulunan_kelime"]) >= 500:
 		SaveManager.unlock_achievement("kelime_ustasi")
+
+
+## Kelime etkisinin savaş alanındaki odak noktası (kule varsa kule, yoksa kale).
+func _battlefield_focus(tower_type: String) -> Vector2:
+	if tower_type != "":
+		for node in battlefield.towers():
+			var tower := node as Tower
+			if tower.tower_type == tower_type:
+				return tower.position
+	return battlefield.castle.position
 
 
 ## Harflerin uçacağı hedef: o tipteki bir kule, yoksa boş bir yuva, o da yoksa kale.
@@ -277,8 +300,25 @@ func _on_tower_upgraded(tower: Tower, tower_level: int) -> void:
 		SaveManager.unlock_achievement("usta_mimar")
 
 
-func _on_tower_heal(_tower: Tower, amount: float) -> void:
-	battlefield.castle.heal(amount)
+func _on_tower_heal(tower: Tower, amount: float) -> void:
+	var healed := battlefield.castle.heal(amount)
+	if healed > 0.0:
+		battlefield.effects.rising(tower.position, 8, Color("#7fe0a0"), 26.0)
+
+
+func _on_castle_healed(amount: float) -> void:
+	var castle := battlefield.castle
+	battlefield.effects.rising(castle.position + Vector2(0, -20.0), 12, Color("#7fe0a0"), 60.0)
+	battlefield.effects.floating_text(castle.position + Vector2(0, -120.0),
+		"+%d" % ceili(amount), Color("#7fe0a0"), 28)
+
+
+func _on_castle_damaged(amount: float) -> void:
+	var castle := battlefield.castle
+	battlefield.effects.sparks(castle.position + Vector2(0, -40.0), 12, Color("#d1544a"), 260.0)
+	battlefield.effects.floating_text(castle.position + Vector2(0, -140.0),
+		"-%d" % ceili(amount), Color("#ff8a7a"), 30)
+	battlefield.shake(minf(4.0 + amount * 0.35, 16.0), 0.3)
 
 
 ## --------------------------------------------------------------------------

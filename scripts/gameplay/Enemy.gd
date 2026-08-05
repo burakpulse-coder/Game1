@@ -99,7 +99,9 @@ func _process(delta: float) -> void:
 	if not alive or track == null:
 		return
 
-	_hit_flash = maxf(0.0, _hit_flash - delta * 4.0)
+	if _hit_flash > 0.0:
+		_hit_flash = maxf(0.0, _hit_flash - delta * 4.0)
+		queue_redraw()
 	if _slow_until > 0.0:
 		_slow_until -= delta
 		if _slow_until <= 0.0:
@@ -190,10 +192,16 @@ func _draw() -> void:
 	if _hit_flash > 0.0:
 		tint = tint.lerp(Color.WHITE, _hit_flash * 0.7)
 
+	# Vuruş anında ezilip yayılır (squash & stretch) — darbe hissini verir.
+	if _hit_flash > 0.0:
+		draw_set_transform(Vector2(0, _hit_flash * 3.0), 0.0,
+			Vector2(1.0 + _hit_flash * 0.16, 1.0 - _hit_flash * 0.14))
+
 	if is_boss:
 		ProcArt.draw_boss(self, r, tint, _walk, _facing, _phase)
 	else:
 		ProcArt.draw_enemy(self, type_id, r, tint, _walk, _facing)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 	# Can çubuğu — yalnız hasar aldıysa gösterilir, ekran kalabalığı olmasın.
 	if hp < max_hp:

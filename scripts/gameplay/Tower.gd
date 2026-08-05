@@ -21,6 +21,8 @@ var _combo_bonus := 0.0     ## Combo'dan gelen atış hızı bonusu (0.1 = %10 h
 var _energy_bonus := 0.0    ## Kategori dışı kelimelerin verdiği genel güç
 var _muzzle := 0.0
 var _range_flash := 0.0
+var _recoil := 0.0          ## ateşlemede kule geriye seker
+var _build_anim := 0.0      ## yerleştirme sırasında yerden yükselir
 
 
 func _ready() -> void:
@@ -45,8 +47,18 @@ func upgrade() -> bool:
 		return false
 	level += 1
 	_range_flash = 1.0
+	_build_anim = 0.55
+	if _battlefield != null and _battlefield.has_method("get") and _battlefield.effects != null:
+		_battlefield.effects.rising(position, 14, Color("#f4d06a"), SLOT_RADIUS * 0.7)
+		_battlefield.effects.ring(position, SLOT_RADIUS * 2.0, Color("#f4d06a"), 0.5, 6.0)
 	queue_redraw()
 	return true
+
+
+## Yerleştirildiğinde kısa bir "yerden yükselme" animasyonu oynatır.
+func play_build_animation() -> void:
+	_build_anim = 1.0
+	queue_redraw()
 
 
 func level_scale() -> float:
@@ -80,6 +92,12 @@ func add_energy(amount: float) -> void:
 
 func _process(delta: float) -> void:
 	_muzzle = maxf(0.0, _muzzle - delta * 5.0)
+	if _recoil > 0.0:
+		_recoil = maxf(0.0, _recoil - delta * 6.0)
+		queue_redraw()
+	if _build_anim > 0.0:
+		_build_anim = maxf(0.0, _build_anim - delta * 2.4)
+		queue_redraw()
 	if _range_flash > 0.0:
 		_range_flash = maxf(0.0, _range_flash - delta)
 		queue_redraw()
@@ -101,6 +119,7 @@ func _process(delta: float) -> void:
 		return
 	_cooldown = fire_interval()
 	_muzzle = 1.0
+	_recoil = 1.0
 	wants_shot.emit(self, target)
 	queue_redraw()
 
@@ -128,6 +147,17 @@ func _pick_target() -> Enemy:
 
 
 func _draw() -> void:
+	# İnşa/yükseltme animasyonu: aşağıdan yukarı esneyerek oturur.
+	if _build_anim > 0.0:
+		var grow := 1.0 - _build_anim
+		var bounce := 1.0 + sin(grow * PI) * 0.12
+		draw_set_transform(Vector2(0, SLOT_RADIUS * _build_anim * 0.5), 0.0,
+			Vector2(bounce, clampf(grow * 1.3, 0.12, 1.0) * bounce))
+	elif _recoil > 0.0:
+		# Ateşleme geri tepmesi: namlu yönünde küçük bir sarsıntı.
+		draw_set_transform(Vector2(0, _recoil * 4.0), 0.0,
+			Vector2(1.0 + _recoil * 0.05, 1.0 - _recoil * 0.05))
+
 	if _range_flash > 0.0 and attack_range() > 0.0:
 		draw_arc(Vector2.ZERO, attack_range(), 0.0, TAU, 48,
 			Color(tint.r, tint.g, tint.b, 0.28 * _range_flash), 3.0, true)

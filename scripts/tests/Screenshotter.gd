@@ -153,3 +153,18 @@ func _simulate_battle(boss: bool) -> void:
 
 	for i in 30:
 		await get_tree().process_frame
+
+	# Efektler anlıktır; çekimden hemen önce tetiklenip birkaç kare ilerletilir
+	# ki ekran görüntüsünde görünsünler.
+	var field: Battlefield = battle.battlefield
+	var live: Array = field.enemies()
+	for i in mini(2, live.size()):
+		var victim := live[i] as Enemy
+		if victim.alive:
+			victim.take_damage(victim.max_hp * 2.0, "okcu")
+	field.castle.heal(9.0)
+	field.effects.floating_text(Vector2(field.size.x * 0.5, field.size.y * 0.42),
+		"KADİM KELİME!", UiKit.GOLD, 44)
+	field.effects.ring(Vector2(field.size.x * 0.5, field.size.y * 0.42), 240.0, UiKit.GOLD, 0.7, 9.0)
+	for i in 8:
+		await get_tree().process_frame

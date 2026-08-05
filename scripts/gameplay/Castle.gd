@@ -5,6 +5,8 @@ extends Node2D
 
 signal destroyed
 signal health_changed(current: float, maximum: float)
+signal healed(amount: float)
+signal damaged(amount: float)
 
 const WIDTH := 190.0
 
@@ -41,6 +43,7 @@ func take_damage(amount: float) -> void:
 	_shake = 1.0
 	_flash = 1.0
 	health_changed.emit(hp, max_hp)
+	damaged.emit(amount)
 	AudioManager.play_sfx("kale_hasar")
 	queue_redraw()
 	if hp <= 0.0:
@@ -54,6 +57,7 @@ func heal(amount: float) -> float:
 	hp = minf(max_hp, hp + amount)
 	_heal_flash = 1.0
 	health_changed.emit(hp, max_hp)
+	healed.emit(hp - before)
 	queue_redraw()
 	return hp - before
 
