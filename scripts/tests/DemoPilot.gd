@@ -18,7 +18,7 @@ const VARSAYILAN_SEVIYE := 26
 const MAX_SECONDS := 260.0       ## güvenlik: bu süre dolunca çık
 const AFTER_RESULT_SECONDS := 8.0
 const FINGER_SPEED := 2100.0     ## piksel/sn (1080x1920 tuval biriminde)
-const PAUSE_BETWEEN_WORDS := 0.55
+var pause_between_words := 0.55   ## --kelime-hizi ile insan temposuna çekilir
 const START_DELAY := 1.6
 
 enum Phase { HAZIRLIK, DUSUN, KAYDIR, BEKLE, BITTI }
@@ -69,6 +69,12 @@ func _read_args() -> void:
 			level_id = clampi(int(arg.split("=")[1]), 1, GameConfig.TOTAL_LEVELS)
 		elif arg == "--hizli":
 			Engine.time_scale = 5.0
+		elif arg.begins_with("--kelime-hizi="):
+			# Dakikada kaç kelime bulunsun? Bot varsayılanı ~38/dk; gerçek bir
+			# oyuncu 8-15/dk civarında. Denge insan temposunda ölçülmeli.
+			var per_minute := maxf(float(arg.split("=")[1]), 1.0)
+			# Kaydırma süresi ~0.8 sn; kalanı düşünme molası olarak eklenir.
+			pause_between_words = maxf(60.0 / per_minute - 0.8, 0.2)
 		elif arg.begins_with("--yukseltme="):
 			var seviye := int(arg.split("=")[1])
 			for key in GameConfig.UPGRADES:
@@ -217,7 +223,7 @@ func _advance_finger(delta: float) -> void:
 		if _leg >= _points.size():
 			_release(_finger)
 			_phase = Phase.BEKLE
-			_timer = PAUSE_BETWEEN_WORDS
+			_timer = pause_between_words
 		return
 
 	_finger += to_target.normalized() * step

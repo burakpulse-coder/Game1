@@ -57,6 +57,7 @@ var _stolen := {}          ## Enemy -> harf indeksi
 var _pause_menu: Control = null
 var _elapsed := 0.0
 var _continue_used := false
+var _word_totals := {}      ## harf sayısı -> çarktaki toplam kelime
 
 
 func _ready() -> void:
@@ -150,6 +151,7 @@ func _start_level() -> void:
 	hud.set_health(battlefield.castle.hp, battlefield.castle.max_hp)
 
 	wheel.set_letters(level.get("harfler", []))
+	_build_word_totals()
 	towers.setup(battlefield)
 	waves.setup(level.get("dalgalar", []))
 
@@ -163,6 +165,31 @@ func _start_level() -> void:
 		tutorial.finished.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
 	else:
 		waves.start()
+
+
+## Çarktan türetilebilen kelimeleri harf sayısına göre sayar. Oyuncu "burada
+## 4 harfli 6 kelime var" bilgisini görünce ne arayacağını bilir; kelime bulmak
+## bu oyunun asıl zorluğu ve tamamen kör aramak sinir bozucu.
+func _build_word_totals() -> void:
+	_word_totals.clear()
+	for word in level.get("cozum_kelimeler", []):
+		var length := str(word).length()
+		_word_totals[length] = int(_word_totals.get(length, 0)) + 1
+	_refresh_word_progress()
+
+
+func _refresh_word_progress() -> void:
+	var found_by_length := {}
+	for word in _found_words:
+		var length := str(word).length()
+		found_by_length[length] = int(found_by_length.get(length, 0)) + 1
+	var progress := {}
+	for length in _word_totals:
+		progress[length] = {
+			"bulunan": int(found_by_length.get(length, 0)),
+			"toplam": int(_word_totals[length]),
+		}
+	wheel.set_word_progress(progress)
 
 
 func _on_tutorial_finished(step: String) -> void:
@@ -200,6 +227,7 @@ func _on_word_submitted(raw: String) -> void:
 	towers.set_combo_bonus(combo_bonus)
 	hud.set_combo(_combo, combo_bonus)
 	hud.set_found_count(_found_words.size())
+	_refresh_word_progress()
 
 	var target := _wheel_target_for(result.tower_type)
 	var color := UiKit.GOLD

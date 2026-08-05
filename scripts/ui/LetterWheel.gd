@@ -41,6 +41,10 @@ var _center := Vector2.ZERO
 var _radius := 200.0
 var _font: Font
 var _flyers: Array = []      ## doğru kelimenin kuleye uçan harfleri
+var _stone_shake: Array = []  ## taş başına sarsıntı fazı (geçersiz kelimede)
+var _accept_wave := -1.0      ## kabul edilen kelimede taşları sırayla parlatır
+var _progress := {}           ## {harf_sayisi: {"bulunan": n, "toplam": m}}
+var _sparkle := 0.0           ## iz boyunca akan parıltının konumu
 
 
 func _ready() -> void:
@@ -56,6 +60,8 @@ func set_letters(values: Array) -> void:
 		letters.append(TurkishText.to_upper(str(value)))
 	_selection.clear()
 	_locked.clear()
+	_stone_shake.resize(letters.size())
+	_stone_shake.fill(0.0)
 	_layout()
 
 
@@ -122,6 +128,13 @@ func index_of_letter(letter: String) -> int:
 	return -1
 
 
+## Çarkta kaç harfli kaç kelime var, kaçı bulundu? Oyuncunun "burada ne
+## arayacağım" sorusuna cevap verir — kelime bulmak oyunun asıl zorluğu.
+func set_word_progress(progress: Dictionary) -> void:
+	_progress = progress
+	queue_redraw()
+
+
 ## İpucu: kelimenin ilk harfini birkaç saniye vurgular.
 func flash_hint(word: String) -> void:
 	if word.is_empty():
@@ -151,6 +164,9 @@ func shuffle() -> void:
 
 func reject() -> void:
 	_shake = 1.0
+	# Taşlar tek tek, hafif gecikmeli sarsılır: tek parça titremeden daha canlı.
+	for i in _stone_shake.size():
+		_stone_shake[i] = 1.0 + i * 0.12
 	_selection.clear()
 	selection_changed.emit("")
 	queue_redraw()
@@ -159,6 +175,7 @@ func reject() -> void:
 ## Kabul edilen kelimenin harflerini hedefe (kuleye) uçurur.
 func accept(target: Vector2, color: Color) -> void:
 	_success = 1.0
+	_accept_wave = 0.0
 	for index in _selection:
 		_flyers.append({
 			"harf": letters[index],
@@ -270,6 +287,19 @@ func _process(delta: float) -> void:
 	if _success > 0.0:
 		_success = maxf(0.0, _success - delta * 1.8)
 		dirty = true
+	if _accept_wave >= 0.0:
+		_accept_wave += delta * 3.2
+		if _accept_wave > 1.0 + letters.size() * 0.1:
+			_accept_wave = -1.0
+		dirty = true
+	for i in _stone_shake.size():
+		if float(_stone_shake[i]) > 0.0:
+			_stone_shake[i] = maxf(0.0, float(_stone_shake[i]) - delta * 3.0)
+			dirty = true
+	if _dragging or not _selection.is_empty():
+		_sparkle = fmod(_sparkle + delta * 1.6, 1.0)
+		dirty = true
+
 	if _hint_timer > 0.0:
 		_hint_timer -= delta
 		if _hint_timer <= 0.0:
@@ -322,11 +352,30 @@ func _draw() -> void:
 		if _shake > 0.0:
 			color = Color("#d1544a")
 		if trail.size() >= 2:
+			# Üç kat: dışta geniş ve soluk parlama, ortada gövde, içte parlak çekirdek.
+			draw_polyline(trail, Color(color.r, color.g, color.b, 0.18), TRAIL_WIDTH * 2.2, true)
 			draw_polyline(trail, Color(color.r, color.g, color.b, 0.55), TRAIL_WIDTH, true)
+			draw_polyline(trail, Color(1, 1, 1, 0.35), TRAIL_WIDTH * 0.35, true)
+			# İz boyunca akan parıltı
+			var total := 0.0
+			for i in trail.size() - 1:
+				total += trail[i].distance_to(trail[i + 1])
+			var travelled := _sparkle * total
+			for i in trail.size() - 1:
+				var segment := trail[i].distance_to(trail[i + 1])
+				if travelled <= segment:
+					var spot: Vector2 = trail[i].lerp(trail[i + 1], travelled / maxf(segment, 0.01))
+					draw_circle(spot, 9.0, Color(1, 1, 1, 0.5))
+					break
+				travelled -= segment
 
 	# Taşlar
 	for i in _positions.size():
 		_draw_stone(i, _positions[i] + shake_offset)
+
+	# Harf sayısına göre kelime ilerlemesi: "burada 4 harfli 6 kelime var,
+	# 2'sini buldun". Oyuncunun neyi arayacağını bilmesi en büyük yardım.
+	_draw_progress()
 
 	# Uçan harfler
 	for flyer in _flyers:
@@ -340,6 +389,32 @@ func _draw() -> void:
 		ProcArt.filled_circle(self, point, 26.0 * (1.0 - t * 0.4),
 			Color(color.r, color.g, color.b, alpha * 0.85), false)
 		_draw_glyph(str(flyer["harf"]), point, 34, Color(1, 1, 1, alpha))
+
+
+## Çarkın üstünde, her kelime uzunluğu için bulunan/toplam göstergesi.
+func _draw_progress() -> void:
+	if _progress.is_empty() or _font == null:
+		return
+	var lengths := _progress.keys()
+	lengths.sort()
+	var pill_w := 96.0
+	var gap := 10.0
+	var total_w := lengths.size() * pill_w + (lengths.size() - 1) * gap
+	var start_x := (size.x - total_w) * 0.5
+	var y := 14.0
+
+	for i in lengths.size():
+		var key = lengths[i]
+		var entry: Dictionary = _progress[key]
+		var found := int(entry.get("bulunan", 0))
+		var total := int(entry.get("toplam", 0))
+		var done := found >= total and total > 0
+		var rect := Rect2(start_x + i * (pill_w + gap), y, pill_w, 44.0)
+		ProcArt.rounded_rect(self, rect, 12.0,
+			Color(0.96, 0.82, 0.42, 0.85) if done else Color(0.16, 0.14, 0.22, 0.75), false)
+		var label := "%d harf  %d/%d" % [int(key), found, total]
+		_draw_glyph(label, rect.get_center() + Vector2(0, -2), 20,
+			Color("#2e2418") if done else Color("#d8d0e6"))
 
 
 func _draw_stone(index: int, point: Vector2) -> void:
@@ -356,11 +431,39 @@ func _draw_stone(index: int, point: Vector2) -> void:
 	if _success > 0.0 and not locked:
 		fill = fill.lerp(Color.WHITE, _success * 0.25)
 
-	# Gölge + taş gövdesi
-	ProcArt.filled_circle(self, point + Vector2(0, 5), radius, Color(0, 0, 0, 0.28), false)
-	ProcArt.filled_circle(self, point, radius, fill)
-	draw_arc(point, radius * 0.82, 0.0, TAU, 24, Color(STONE_EDGE.r, STONE_EDGE.g, STONE_EDGE.b,
-		0.35 if not locked else 0.15), 2.0, true)
+	# Kabul dalgası: harfler seçildikleri sırayla parlar.
+	if _accept_wave >= 0.0:
+		var order := _selection.find(index)
+		if order >= 0:
+			var local := clampf(_accept_wave - order * 0.1, 0.0, 1.0)
+			fill = fill.lerp(Color.WHITE, sin(local * PI) * 0.6)
+
+	# Taş başına sarsıntı (geçersiz kelime)
+	var own_shake := float(_stone_shake[index]) if index < _stone_shake.size() else 0.0
+	if own_shake > 0.0:
+		point += Vector2(sin(own_shake * 34.0) * 7.0 * minf(own_shake, 1.0), 0)
+
+	# Gölge
+	ProcArt.filled_circle(self, point + Vector2(0, 6), radius, Color(0, 0, 0, 0.30), false)
+
+	# Seçili taşın etrafında parlama halkası
+	if selected:
+		draw_arc(point, radius * 1.16, 0.0, TAU, 28,
+			Color(TRAIL_COLOR.r, TRAIL_COLOR.g, TRAIL_COLOR.b, 0.35), 7.0, true)
+
+	# Taş gövdesi: degradeli, oyulmuş kenarlı
+	ProcArt.shaded_circle(self, point, radius, fill)
+	# Oyuk iç halka — rün taşı hissi
+	draw_arc(point, radius * 0.80, 0.0, TAU, 28,
+		Color(STONE_EDGE.r, STONE_EDGE.g, STONE_EDGE.b, 0.45 if not locked else 0.18), 3.0, true)
+	draw_arc(point, radius * 0.74, 0.0, TAU, 28, Color(1, 1, 1, 0.16), 2.0, true)
+	# Kenara oyulmuş dört çentik
+	if not locked:
+		for i in 4:
+			var angle := PI * 0.25 + TAU * i / 4.0
+			var from := point + Vector2(cos(angle), sin(angle)) * radius * 0.84
+			var to := point + Vector2(cos(angle), sin(angle)) * radius * 0.96
+			draw_line(from, to, Color(STONE_EDGE.r, STONE_EDGE.g, STONE_EDGE.b, 0.4), 3.0, true)
 
 	var text_color := TEXT_COLOR if not locked else Color(0.75, 0.72, 0.82, 0.5)
 	_draw_glyph(letters[index], point, 52, text_color)

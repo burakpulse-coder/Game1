@@ -28,6 +28,11 @@ const FONT_BODY := 34
 const FONT_SMALL := 27
 
 
+## Panel çerçevesi. Düz koyu dikdörtgenler yerine hafif kabartmalı, ince altın
+## çizgili bir çerçeve: ortaçağ hissi verir ve panelin sınırını belirginleştirir.
+const FRAME_LINE := Color(0.83, 0.72, 0.45, 0.28)
+
+
 static func panel_style(fill: Color = BG_PANEL, border: Color = Color(0, 0, 0, 0),
 		radius: float = RADIUS) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -37,9 +42,18 @@ static func panel_style(fill: Color = BG_PANEL, border: Color = Color(0, 0, 0, 0
 	style.content_margin_right = 24
 	style.content_margin_top = 18
 	style.content_margin_bottom = 18
+	# Üstten gelen ışık: panelin üst kenarı açık, alt kenarı koyu.
+	style.bg_color = fill
+	style.shadow_color = Color(0, 0, 0, 0.35)
+	style.shadow_size = 6
+	style.shadow_offset = Vector2(0, 3)
 	if border.a > 0.0:
 		style.set_border_width_all(3)
 		style.border_color = border
+	else:
+		# Görünmez kenarlık yerine ince altın hat: panel zeminden ayrışsın.
+		style.set_border_width_all(2)
+		style.border_color = FRAME_LINE
 	return style
 
 
@@ -88,10 +102,19 @@ static func button(text: String, accent: Color = GOLD, size: int = FONT_BODY) ->
 	var normal := panel_style(accent, Color(0, 0, 0, 0), RADIUS)
 	normal.content_margin_left = 34
 	normal.content_margin_right = 34
+	# Kabartma: üst kenar açık, alt kenar koyu — düğme basılabilir görünür.
+	normal.border_width_top = 3
+	normal.border_width_bottom = 5
+	normal.border_color = accent.lerp(Color.BLACK, 0.35)
+	normal.shadow_size = 8
 	var hover := normal.duplicate() as StyleBoxFlat
 	hover.bg_color = accent.lerp(Color.WHITE, 0.14)
 	var pressed := normal.duplicate() as StyleBoxFlat
 	pressed.bg_color = accent.lerp(Color.BLACK, 0.22)
+	# Basılıyken kabartma tersine döner ve düğme biraz aşağı iner.
+	pressed.border_width_top = 5
+	pressed.border_width_bottom = 3
+	pressed.shadow_size = 2
 	var disabled := normal.duplicate() as StyleBoxFlat
 	disabled.bg_color = accent.lerp(BG_PANEL, 0.7)
 
