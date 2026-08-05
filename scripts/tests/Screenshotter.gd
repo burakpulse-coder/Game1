@@ -20,6 +20,9 @@ var _shots := [
 	["05_oyun_baslangic", "res://scenes/Oyun.tscn", "seviye4"],
 	["06_oyun_savas", "res://scenes/Oyun.tscn", "savas"],
 	["07_oyun_boss", "res://scenes/Oyun.tscn", "boss"],
+	["13_bolge_orman", "res://scenes/Oyun.tscn", "bolge_orman"],
+	["14_bolge_buz", "res://scenes/Oyun.tscn", "bolge_buz"],
+	["15_bolge_ejder", "res://scenes/Oyun.tscn", "bolge_ejder"],
 	["08_sonuc", "res://scenes/SonucEkrani.tscn", "zafer"],
 	["09_yukseltme", "res://scenes/YukseltmeEkrani.tscn", "zengin"],
 	["10_magaza", "res://scenes/Magaza.tscn", "zengin"],
@@ -50,7 +53,7 @@ func _capture(name: String, scene_path: String, setup: String) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	if setup == "savas" or setup == "boss":
+	if setup == "savas" or setup == "boss" or setup.begins_with("bolge_"):
 		await _simulate_battle(setup == "boss")
 
 	# Çizimin tamamlanması için birkaç kare bekle.
@@ -74,6 +77,12 @@ func _prepare(setup: String) -> void:
 			SceneRouter.pending_level_id = 8
 		"boss":
 			SceneRouter.pending_level_id = 15
+		"bolge_orman":
+			SceneRouter.pending_level_id = 22
+		"bolge_buz":
+			SceneRouter.pending_level_id = 36
+		"bolge_ejder":
+			SceneRouter.pending_level_id = 50
 		"zengin":
 			EconomyManager.add_gold(5000)
 			EconomyManager.add_gems(500)

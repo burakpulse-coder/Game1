@@ -190,6 +190,26 @@ static func background(top: Color = Color("#241d38"), bottom: Color = BG) -> Col
 	return rect
 
 
+## Üstten aşağı sönen karartma. Manzara katmanı geldikten sonra HUD yazıları
+## açık gökyüzünün üstünde okunmuyordu; bu şerit metni her bölgede okunur tutar.
+static func scrim(height: float, strength: float = 0.5) -> TextureRect:
+	var gradient := Gradient.new()
+	gradient.set_color(0, Color(0.04, 0.03, 0.07, strength))
+	gradient.set_color(1, Color(0.04, 0.03, 0.07, 0.0))
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill_from = Vector2(0, 0)
+	texture.fill_to = Vector2(0, 1)
+
+	var node := TextureRect.new()
+	node.texture = texture
+	node.stretch_mode = TextureRect.STRETCH_SCALE
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	node.anchor_right = 1.0
+	node.offset_bottom = height
+	return node
+
+
 ## Üst bilgi çubuğu: geri düğmesi + başlık + altın/elmas göstergesi.
 static func top_bar(title_text: String, on_back: Callable, show_currency: bool = true) -> Control:
 	var bar := hbox(20)

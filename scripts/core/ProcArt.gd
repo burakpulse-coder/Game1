@@ -9,8 +9,12 @@ extends RefCounted
 ##   * APK boyutu küçük olur,
 ##   * kozmetik renk değişimi tek parametreyle yapılır.
 ##
-## Stil: düz renkli, koyu konturlu, hafif çizgi film dokusu. Siluetler küçük
-## ekranda okunabilecek kadar sade tutulur.
+## Stil: koyu konturlu, dikey degrade gölgelemeli, hafif çizgi film dokusu.
+## Siluetler küçük ekranda okunabilecek kadar sade tutulur.
+##
+## Hacim hissi `shaded_polygon` ile verilir: Godot'un draw_polygon()'u köşe başına
+## renk kabul ettiği için, şeklin üst köşeleri açık / alt köşeleri koyu boyanır.
+## Ek çizim maliyeti yok — aynı çokgen, farklı köşe renkleriyle.
 
 const OUTLINE := Color("#241f2e")
 const OUTLINE_WIDTH := 3.0
@@ -67,6 +71,15 @@ static func ellipse(canvas: CanvasItem, center: Vector2, size: Vector2, fill: Co
 	filled_polygon(canvas, points, fill, outline)
 
 
+static func _shaded_ellipse(canvas: CanvasItem, center: Vector2, size: Vector2,
+		fill: Color) -> void:
+	var points := PackedVector2Array()
+	for i in 24:
+		var angle := TAU * i / 24.0
+		points.append(center + Vector2(cos(angle) * size.x, sin(angle) * size.y))
+	shaded_polygon(canvas, points, fill, 0.24, 0.28)
+
+
 static func drop_shadow(canvas: CanvasItem, center: Vector2, radius: float) -> void:
 	ellipse(canvas, center, Vector2(radius, radius * 0.35), SHADOW, false)
 
@@ -75,6 +88,73 @@ static func shade(color: Color, amount: float) -> Color:
 	if amount >= 0.0:
 		return color.lerp(Color.WHITE, amount)
 	return color.lerp(Color("#1a1622"), -amount)
+
+
+## Dikey degradeli çokgen: üst köşeler `light` kadar açık, alt köşeler `dark`
+## kadar koyu boyanır. Düz vektör şekli hacimli göstermenin en ucuz yolu.
+static func shaded_polygon(canvas: CanvasItem, points: PackedVector2Array, fill: Color,
+		light: float = 0.22, dark: float = 0.26, outline: bool = true,
+		width: float = OUTLINE_WIDTH) -> void:
+	if points.size() < 3:
+		return
+	var min_y := INF
+	var max_y := -INF
+	for point in points:
+		min_y = minf(min_y, point.y)
+		max_y = maxf(max_y, point.y)
+	var span := maxf(max_y - min_y, 0.001)
+	var colors := PackedColorArray()
+	for point in points:
+		colors.append(shade(fill, lerpf(light, -dark, (point.y - min_y) / span)))
+	canvas.draw_polygon(points, colors)
+	if outline:
+		var closed := points.duplicate()
+		closed.append(points[0])
+		canvas.draw_polyline(closed, OUTLINE, width, true)
+
+
+## Degradeli daire + üstte yumuşak parlama noktası (küresel hacim).
+static func shaded_circle(canvas: CanvasItem, center: Vector2, radius: float, fill: Color,
+		outline: bool = true) -> void:
+	var points := PackedVector2Array()
+	for i in 26:
+		var angle := TAU * i / 26.0
+		points.append(center + Vector2(cos(angle), sin(angle)) * radius)
+	shaded_polygon(canvas, points, fill, 0.26, 0.30, outline)
+	# Üst sol parlama
+	ellipse(canvas, center + Vector2(-radius * 0.28, -radius * 0.34),
+		Vector2(radius * 0.34, radius * 0.24), Color(1, 1, 1, 0.16), false)
+
+
+## Degradeli yuvarlatılmış dikdörtgen.
+static func shaded_rect(canvas: CanvasItem, rect: Rect2, radius: float, fill: Color,
+		outline: bool = true) -> void:
+	var points := PackedVector2Array()
+	var corners := [
+		[Vector2(rect.position.x + radius, rect.position.y + radius), PI, PI * 1.5],
+		[Vector2(rect.end.x - radius, rect.position.y + radius), PI * 1.5, TAU],
+		[Vector2(rect.end.x - radius, rect.end.y - radius), 0.0, PI * 0.5],
+		[Vector2(rect.position.x + radius, rect.end.y - radius), PI * 0.5, PI],
+	]
+	for corner in corners:
+		var center: Vector2 = corner[0]
+		var from: float = corner[1]
+		var to: float = corner[2]
+		for i in 7:
+			var angle: float = lerpf(from, to, i / 6.0)
+			points.append(center + Vector2(cos(angle), sin(angle)) * radius)
+	shaded_polygon(canvas, points, fill, 0.20, 0.24, outline)
+
+
+## Taş dokusu: gövdeye yatay derz çizgileri ve seyrek blok ayrımları.
+static func stone_courses(canvas: CanvasItem, rect: Rect2, color: Color, rows: int = 4) -> void:
+	var line := Color(color.r, color.g, color.b, 0.0).lerp(shade(color, -0.35), 0.55)
+	for i in range(1, rows):
+		var y := rect.position.y + rect.size.y * i / float(rows)
+		canvas.draw_line(Vector2(rect.position.x + 2.0, y), Vector2(rect.end.x - 2.0, y), line, 2.0)
+		# Şaşırtmalı dikey derz
+		var x := rect.position.x + rect.size.x * (0.35 if i % 2 == 0 else 0.65)
+		canvas.draw_line(Vector2(x, y), Vector2(x, y - rect.size.y / float(rows)), line, 2.0)
 
 
 ## --------------------------------------------------------------------------
@@ -93,33 +173,44 @@ static func draw_castle(canvas: CanvasItem, width: float, stone: Color, hp_ratio
 
 	# Ana sur
 	var wall_top := top + height * 0.32
-	rounded_rect(canvas, Rect2(-half, wall_top, width, bottom - wall_top), 4.0, stone)
+	var wall_rect := Rect2(-half, wall_top, width, bottom - wall_top)
+	shaded_rect(canvas, wall_rect, 4.0, stone)
+	stone_courses(canvas, wall_rect, stone, 4)
 
 	# Mazgallar
 	var merlon_w := width / 7.0
 	for i in 4:
 		var x := -half + i * merlon_w * 1.75
-		rounded_rect(canvas, Rect2(x, wall_top - merlon_w * 0.6, merlon_w, merlon_w * 0.7),
+		shaded_rect(canvas, Rect2(x, wall_top - merlon_w * 0.6, merlon_w, merlon_w * 0.7),
 			2.0, shade(stone, 0.08))
 
 	# Yan kuleler
 	for side in [-1.0, 1.0]:
 		var tower_w := width * 0.24
 		var tower_x: float = side * (half - tower_w * 0.5) - tower_w * 0.5
-		rounded_rect(canvas, Rect2(tower_x, top + height * 0.12, tower_w, height * 0.88),
-			4.0, shade(stone, -0.08))
-		# Konik çatı
-		filled_polygon(canvas, PackedVector2Array([
+		var tower_rect := Rect2(tower_x, top + height * 0.12, tower_w, height * 0.88)
+		shaded_rect(canvas, tower_rect, 4.0, shade(stone, -0.08))
+		stone_courses(canvas, tower_rect, stone, 6)
+		# Konik çatı — degrade ile hacim
+		shaded_polygon(canvas, PackedVector2Array([
 			Vector2(tower_x - 4, top + height * 0.12),
 			Vector2(tower_x + tower_w * 0.5, top - height * 0.06),
 			Vector2(tower_x + tower_w + 4, top + height * 0.12),
-		]), Color("#8c3f3f"))
+		]), Color("#a04a4a"), 0.30, 0.34)
+		# Mazgal deliği
+		filled_circle(canvas, Vector2(tower_x + tower_w * 0.5, top + height * 0.34),
+			tower_w * 0.13, Color("#2b2233"), false)
 
-	# Kapı
+	# Kapı: kemerli girinti + demir kuşaklar
 	var gate_w := width * 0.26
 	var gate_h := height * 0.42
 	var gate_rect := Rect2(-gate_w * 0.5, bottom - gate_h, gate_w, gate_h)
-	rounded_rect(canvas, gate_rect, gate_w * 0.45, Color("#4a3524"))
+	shaded_rect(canvas, gate_rect.grow(4.0), gate_w * 0.5, shade(stone, -0.22))
+	shaded_rect(canvas, gate_rect, gate_w * 0.45, Color("#5a4029"))
+	for i in 2:
+		var y := gate_rect.position.y + gate_rect.size.y * (0.42 + i * 0.28)
+		canvas.draw_line(Vector2(gate_rect.position.x + 3, y), Vector2(gate_rect.end.x - 3, y),
+			Color("#3a2a1c"), 3.0)
 
 	# Bayrak — can azaldıkça yeşilden kırmızıya döner
 	var flag := Color("#4fbf6a").lerp(Color("#c94a3f"), 1.0 - clampf(hp_ratio, 0.0, 1.0))
@@ -148,19 +239,28 @@ static func draw_tower(canvas: CanvasItem, tower_type: String, level: int, radiu
 	var base_h := radius * 1.7 * scale
 	drop_shadow(canvas, Vector2(0, base_h * 0.5 + 4), base_w * 0.6)
 
-	# Taş gövde: aşağı doğru genişleyen yamuk
-	filled_polygon(canvas, PackedVector2Array([
+	# Taş gövde: aşağı doğru genişleyen yamuk, dikey degradeli
+	shaded_polygon(canvas, PackedVector2Array([
 		Vector2(-base_w * 0.38, -base_h * 0.5),
 		Vector2(base_w * 0.38, -base_h * 0.5),
 		Vector2(base_w * 0.5, base_h * 0.5),
 		Vector2(-base_w * 0.5, base_h * 0.5),
-	]), tint)
+	]), tint, 0.24, 0.28)
+	# Taş derzleri
+	stone_courses(canvas, Rect2(-base_w * 0.42, -base_h * 0.5, base_w * 0.84, base_h), tint, 5)
+	# Sağ yüzde koyu kenar — ışık sol üstten geliyormuş gibi
+	canvas.draw_colored_polygon(PackedVector2Array([
+		Vector2(base_w * 0.22, -base_h * 0.5),
+		Vector2(base_w * 0.38, -base_h * 0.5),
+		Vector2(base_w * 0.5, base_h * 0.5),
+		Vector2(base_w * 0.3, base_h * 0.5),
+	]), Color(0, 0, 0, 0.14))
 
 	# Seviye kuşakları
 	for i in range(1, level):
 		var y := base_h * 0.5 - i * base_h * 0.26
 		canvas.draw_line(Vector2(-base_w * 0.44, y), Vector2(base_w * 0.44, y),
-			shade(tint, -0.25), 2.5)
+			shade(tint, -0.3), 3.0)
 
 	# Tip rengini taşıyan bir kuşak: küçük ekranda kule tipini anında ayırt ettirir.
 	canvas.draw_line(Vector2(-base_w * 0.46, -base_h * 0.5 + 6.0),
@@ -280,10 +380,13 @@ static func draw_enemy(canvas: CanvasItem, enemy_type: String, radius: float, ti
 			center + Vector2(side * radius * 0.28 + swing, radius * 0.95),
 			shade(tint, -0.35), radius * 0.22, true)
 	# Gövde
-	ellipse(canvas, center, Vector2(radius * 0.62, radius * 0.68), tint)
+	_shaded_ellipse(canvas, center, Vector2(radius * 0.62, radius * 0.68), tint)
+	# Karın vurgusu
+	ellipse(canvas, center + Vector2(0, radius * 0.12),
+		Vector2(radius * 0.34, radius * 0.3), shade(tint, 0.16), false)
 	# Kafa
 	var head := center + Vector2(0, -radius * 0.72)
-	filled_circle(canvas, head, radius * 0.46, shade(tint, 0.1))
+	shaded_circle(canvas, head, radius * 0.46, shade(tint, 0.1))
 	# Gözler
 	_draw_eyes(canvas, head, radius, facing, Color("#2a1c14"))
 	# Kulaklar (goblin/ork siluetini ayırt eder)
@@ -337,14 +440,14 @@ static func _draw_armored(canvas: CanvasItem, center: Vector2, radius: float, ti
 		canvas.draw_line(center + Vector2(side * radius * 0.3, radius * 0.35),
 			center + Vector2(side * radius * 0.3 + swing, radius * 0.95),
 			shade(tint, -0.4), radius * 0.26, true)
-	ellipse(canvas, center, Vector2(radius * 0.74, radius * 0.72), tint)
+	_shaded_ellipse(canvas, center, Vector2(radius * 0.74, radius * 0.72), tint)
 	# Zırh plakaları — mancınığın parçaladığı katman
 	for i in 3:
 		var y := center.y - radius * 0.3 + i * radius * 0.3
 		canvas.draw_line(Vector2(center.x - radius * 0.6, y), Vector2(center.x + radius * 0.6, y),
 			shade(tint, 0.25), radius * 0.12, true)
 	var head := center + Vector2(0, -radius * 0.76)
-	filled_circle(canvas, head, radius * 0.4, shade(tint, -0.1))
+	shaded_circle(canvas, head, radius * 0.4, shade(tint, -0.1))
 	# Miğfer siperliği
 	canvas.draw_line(head + Vector2(-radius * 0.34, 0), head + Vector2(radius * 0.34, 0),
 		Color("#2a2f38"), radius * 0.16, true)
@@ -358,9 +461,9 @@ static func _draw_thief(canvas: CanvasItem, center: Vector2, radius: float, tint
 		canvas.draw_line(center + Vector2(side * radius * 0.22, radius * 0.3),
 			center + Vector2(side * radius * 0.22 + swing, radius * 0.95),
 			shade(tint, -0.35), radius * 0.18, true)
-	ellipse(canvas, center, Vector2(radius * 0.5, radius * 0.6), tint)
+	_shaded_ellipse(canvas, center, Vector2(radius * 0.5, radius * 0.6), tint)
 	var head := center + Vector2(0, -radius * 0.68)
-	filled_circle(canvas, head, radius * 0.4, shade(tint, 0.12))
+	shaded_circle(canvas, head, radius * 0.4, shade(tint, 0.12))
 	# Kukuleta
 	filled_polygon(canvas, PackedVector2Array([
 		head + Vector2(-radius * 0.44, 0),

@@ -69,8 +69,8 @@ func _build_layout() -> void:
 	# HUD düğmeleri) kendileri alır.
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	var background := UiKit.background(Color("#2b3d2a"), Color("#171425"))
-	add_child(background)
+	var level_theme := GameConfig.theme_of_level(level_id)
+	add_child(UiKit.background(Color(level_theme.get("gok_ust", "#2b3d2a")), Color("#171425")))
 
 	battlefield = Battlefield.new()
 	battlefield.anchor_right = 1.0
@@ -123,6 +123,7 @@ func _build_layout() -> void:
 
 
 func _start_level() -> void:
+	battlefield.region_theme = GameConfig.theme_of_level(level_id)
 	battlefield.build(int(level.get("yol_sayisi", 1)), int(level.get("slot_sayisi", 4)))
 	battlefield.castle.setup(EconomyManager.castle_max_hp() * float(level.get("kale_can_carpani", 1.0)))
 	battlefield.castle.health_changed.connect(hud.set_health)

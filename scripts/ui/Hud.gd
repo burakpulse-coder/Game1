@@ -56,6 +56,9 @@ func set_band(top_ratio: float, bottom_ratio: float) -> void:
 ## --------------------------------------------------------------------------
 
 func _build_top() -> void:
+	# Yazılar açık gökyüzünün üstünde de okunsun diye önce karartma şeridi.
+	add_child(UiKit.scrim(260.0, 0.55))
+
 	_top = UiKit.vbox(8)
 	_top.anchor_right = 1.0
 	_top.offset_left = 24

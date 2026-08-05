@@ -166,6 +166,47 @@ const REGIONS := [
 	{"id": "buz_daglari", "ad": "Buz Dağları", "renk": "#7fb6d6", "gereken_yildiz": 55, "boss": "boss_buz"},
 	{"id": "ejder_kalesi", "ad": "Ejder Kalesi", "renk": "#a3452f", "gereken_yildiz": 92, "boss": "boss_ejder"},
 ]
+## Bölge görsel temaları. Dört bölge oynanışta farklıydı ama ekranda tıpatıp
+## aynı görünüyordu; manzara katmanı (Scenery) rengini ve süslerini buradan alır.
+const REGION_THEMES := {
+	"yesil_vadi": {
+		"gok_ust": "#6f9fc4", "gok_alt": "#a8c98a",
+		"zemin": "#5f9b45", "zemin_alt": "#3d6b2e",
+		"leke": "#6fae4a", "ufuk": "#3f6b3a", "uzak_tepe": "#7fa86a",
+		"yol": "#b09166", "yol_kenar": "#8a6f45",
+		"susler": ["agac", "cali", "kaya"],
+		"yaprak": "#3e7a34", "govde": "#5a4029", "tas": "#8a8f7a",
+		"zerre": "#f6f0a0",
+	},
+	"karanlik_orman": {
+		"gok_ust": "#2e3550", "gok_alt": "#3f5d4a",
+		"zemin": "#2f4a30", "zemin_alt": "#1d3020",
+		"leke": "#3a5a38", "ufuk": "#1a2a1e", "uzak_tepe": "#2a4030",
+		"yol": "#6a5a44", "yol_kenar": "#4a3d2c",
+		"susler": ["cam", "mantar", "kutuk"],
+		"yaprak": "#25452c", "govde": "#3a2b1e", "tas": "#4a4a52",
+		"zerre": "#8ad6a0",
+	},
+	"buz_daglari": {
+		"gok_ust": "#7aa8cf", "gok_alt": "#cfe4f2",
+		"zemin": "#c3d9e6", "zemin_alt": "#8fb0c6",
+		"leke": "#d8e9f4", "ufuk": "#6f93b0", "uzak_tepe": "#a6c4da",
+		"yol": "#9aa8b4", "yol_kenar": "#75838f",
+		"susler": ["buz", "kaya", "kutuk"],
+		"yaprak": "#8fc4d8", "govde": "#5b5a62", "tas": "#9aa4ae",
+		"zerre": "#ffffff",
+	},
+	"ejder_kalesi": {
+		"gok_ust": "#4a2230", "gok_alt": "#8c4230",
+		"zemin": "#4a3330", "zemin_alt": "#2b1c1e",
+		"leke": "#5a3a32", "ufuk": "#2a1618", "uzak_tepe": "#5c3028",
+		"yol": "#6b4f42", "yol_kenar": "#452f28",
+		"susler": ["kaya", "lav", "kutuk"],
+		"yaprak": "#6b3226", "govde": "#33241f", "tas": "#57505a",
+		"zerre": "#ffab5c",
+	},
+}
+
 const LEVELS_PER_REGION := 15
 const TOTAL_LEVELS := 60
 
@@ -244,6 +285,12 @@ static func length_multiplier(word_length: int) -> float:
 	if LENGTH_MULTIPLIERS.has(word_length):
 		return LENGTH_MULTIPLIERS[word_length]
 	return LENGTH_MULTIPLIER_MAX if word_length >= 6 else 0.0
+
+
+## Seviyenin bölge teması (Scenery ve PathTrack buradan renk alır).
+static func theme_of_level(level_id: int) -> Dictionary:
+	var region: Dictionary = REGIONS[region_of_level(level_id)]
+	return REGION_THEMES.get(region["id"], REGION_THEMES["yesil_vadi"])
 
 
 static func region_of_level(level_id: int) -> int:

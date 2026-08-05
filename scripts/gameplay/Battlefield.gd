@@ -34,6 +34,7 @@ static func shortest_attack_range() -> float:
 const ENEMY_PREWARM := 24
 const PROJECTILE_PREWARM := 24
 
+var scenery: Scenery = null
 var tracks: Array[PathTrack] = []
 var slots: Array[TowerSlot] = []
 var castle: Castle = null
@@ -58,6 +59,11 @@ func _ready() -> void:
 	# Yuva dokunuşları buradan çözülür; savaş alanında başka etkileşimli
 	# öğe yok, bu yüzden alan tüm dokunuşları alabilir.
 	mouse_filter = Control.MOUSE_FILTER_STOP
+
+	# Manzara en altta: yolların ve her şeyin arkasında.
+	scenery = Scenery.new()
+	scenery.z_index = 0
+	add_child(scenery)
 
 	_path_layer = _make_layer(1)
 	_slot_layer = _make_layer(2)
@@ -98,6 +104,10 @@ func _make_projectile() -> Node:
 ## --------------------------------------------------------------------------
 ## Kurulum
 ## --------------------------------------------------------------------------
+
+## Bölge teması: Scenery ve PathTrack renklerini buradan alır.
+var region_theme := {}
+
 
 func build(path_count: int, slot_count: int) -> void:
 	_path_count = clampi(path_count, 1, PathTrack.TEMPLATES.size())
@@ -140,6 +150,18 @@ func _layout() -> void:
 	var positions := _pick_slot_positions(rect)
 	for i in slots.size():
 		slots[i].position = positions[i % positions.size()]
+
+	for track in tracks:
+		track.region_theme = region_theme
+		track.queue_redraw()
+
+	if scenery != null:
+		var slot_points: Array = []
+		for slot in slots:
+			slot_points.append(slot.position)
+		# Tohum yol/yuva düzeninden türetilir: aynı seviye her açılışta aynı görünür.
+		scenery.setup(region_theme, rect, tracks, slot_points,
+			int(rect.size.x) * 31 + tracks.size() * 7919 + slots.size() * 104729)
 
 
 ## Yuva konumları: ızgara adaylarından yola ve kaleye yeterince uzak olanlar

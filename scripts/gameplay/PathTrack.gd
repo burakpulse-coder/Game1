@@ -21,6 +21,7 @@ const TEMPLATES := [
 		Vector2(0.22, 0.62), Vector2(0.22, 0.84), Vector2(0.10, 0.84)],
 ]
 
+var region_theme := {}
 var index := 0
 var curve := Curve2D.new()
 var _points := PackedVector2Array()
@@ -80,15 +81,37 @@ func _draw() -> void:
 	if curve.point_count < 2:
 		return
 	var baked := curve.get_baked_points()
-	# Kenarlık + zemin: iki kat çizgi ile taş döşeli yol görünümü
-	draw_polyline(baked, EDGE_COLOR, PATH_WIDTH + 10.0, true)
-	draw_polyline(baked, FILL_COLOR, PATH_WIDTH, true)
-	# Yön çizgileri
+	var fill := Color(region_theme.get("yol", FILL_COLOR.to_html()))
+	var edge := Color(region_theme.get("yol_kenar", EDGE_COLOR.to_html()))
+
+	# Toprak kenar + zemin
+	draw_polyline(baked, ProcArt.shade(edge, -0.25), PATH_WIDTH + 16.0, true)
+	draw_polyline(baked, edge, PATH_WIDTH + 8.0, true)
+	draw_polyline(baked, fill, PATH_WIDTH, true)
+
+	# Parke taşları: yol boyunca sıralanan, yönüne dik yerleşmiş taşlar.
+	# Düz kahverengi şerit yerine dokulu bir yola dönüştürür.
 	var total := length()
-	var step := 46.0
+	var step := 34.0
 	var travelled := step * 0.5
+	var row := 0
 	while travelled < total:
-		var from := position_at(travelled)
-		var to := position_at(minf(travelled + 16.0, total))
-		draw_line(from, to, DASH_COLOR, 4.0, true)
+		var here := position_at(travelled)
+		var ahead := position_at(minf(travelled + 6.0, total))
+		var forward := (ahead - here).normalized()
+		var side := Vector2(-forward.y, forward.x)
+		var offset := (-1.0 if row % 2 == 0 else 1.0) * PATH_WIDTH * 0.16
+		for lane: float in [-1.0, 0.0, 1.0]:
+			var center: Vector2 = here + side * (lane * PATH_WIDTH * 0.3 + offset)
+			var tone := ProcArt.shade(fill, 0.06 if (row + int(lane)) % 2 == 0 else -0.07)
+			draw_colored_polygon(PackedVector2Array([
+				center + side * -11.0 + forward * -8.0,
+				center + side * 11.0 + forward * -8.0,
+				center + side * 11.0 + forward * 8.0,
+				center + side * -11.0 + forward * 8.0,
+			]), tone)
 		travelled += step
+		row += 1
+
+	# Yürüyüş yönü ipucu
+	draw_polyline(baked, DASH_COLOR, 3.0, true)
