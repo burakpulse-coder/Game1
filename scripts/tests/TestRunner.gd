@@ -32,6 +32,7 @@ func _ready() -> void:
 	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
 	await _run_async("Arayüz çizim sırası", _test_ui_layering)
 	await _run_async("Bölüm haritası", _test_kingdom_map)
+	await _run_async("Tüm ekranlar açılıyor", _test_screens_open)
 
 	print("\n=== Sonuç: %d başarılı, %d başarısız ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -700,3 +701,39 @@ func _test_kingdom_map() -> void:
 
 	map.queue_free()
 	await get_tree().process_frame
+
+
+## --------------------------------------------------------------------------
+## Ekran duman testi
+## --------------------------------------------------------------------------
+
+## Her ekran hatasız kurulup ekranı kaplıyor mu? Ekranlar kod içinde
+## kurulduğu için bir yazım hatası ancak o ekran açılınca ortaya çıkıyor;
+## bu test hepsini tek koşuda dolaşır.
+func _test_screens_open() -> void:
+	SceneRouter.pending_level_id = 4
+	SceneRouter.last_result = {
+		"zafer": true, "seviye": 4, "yildiz": 3, "altin": 120,
+		"kelime": 9, "kadim": 1, "oldurulen": 20, "can_orani": 0.9,
+		"ilk_gecis": true, "sure": 75.0,
+	}
+
+	for key in SceneRouter.SCENES:
+		var path: String = SceneRouter.SCENES[key]
+		var scene: PackedScene = load(path)
+		_check(scene != null, "sahne yüklendi: %s" % key)
+		if scene == null:
+			continue
+		var instance := scene.instantiate()
+		add_child(instance)
+		await get_tree().process_frame
+		await get_tree().process_frame
+
+		var control := instance as Control
+		_check(control != null, "%s bir Control" % key)
+		if control != null:
+			_check(control.size.x > 0.0 and control.size.y > 0.0,
+				"%s ekranı kaplıyor (%s)" % [key, control.size])
+			_check(control.get_child_count() > 0, "%s içerik kurdu" % key)
+		instance.queue_free()
+		await get_tree().process_frame

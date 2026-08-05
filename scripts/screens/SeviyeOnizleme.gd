@@ -6,9 +6,11 @@ extends Control
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(UiKit.background(Color("#2b2a44"), Color("#12101c")))
-
 	var level_id := SceneRouter.pending_level_id
+	var backdrop := Backdrop.new()
+	add_child(backdrop)
+	backdrop.setup(GameConfig.theme_of_level(level_id), level_id * 97)
+	backdrop.set_veil(0.66)
 	var level := LevelDB.get_level(level_id)
 	if level.is_empty():
 		SceneRouter.go_to("harita")
@@ -53,12 +55,13 @@ func _wheel_preview(level: Dictionary) -> Control:
 	var column := UiKit.vbox(10)
 	box.add_child(column)
 
-	var letters: Array = level.get("harfler", [])
-	var upper: Array = []
-	for letter in letters:
-		upper.append(TurkishText.to_upper(str(letter)))
 	column.add_child(UiKit.label("Çark harfleri", UiKit.FONT_SMALL, UiKit.INK_SOFT))
-	column.add_child(UiKit.label("  ".join(upper), UiKit.FONT_HEAD, UiKit.GOLD))
+	# Harfleri düz metin yerine oyundaki rün taşlarıyla göster.
+	var stones := UiKit.hbox(8)
+	stones.alignment = BoxContainer.ALIGNMENT_CENTER
+	for letter in level.get("harfler", []):
+		stones.add_child(ArtIcon.stone(str(letter), 84.0))
+	column.add_child(stones)
 	column.add_child(UiKit.paragraph(
 		"Bu çarktan %d geçerli kelime türetilebilir." % int(level.get("cozum_sayisi", 0))))
 	return box
@@ -77,10 +80,15 @@ func _tower_block(level_id: int, level: Dictionary) -> Control:
 		var config: Dictionary = GameConfig.TOWERS[tower_type]
 		var category := WordEngine.category_for_tower(tower_type)
 		var meta: Dictionary = WordEngine.category_meta(category)
-		var row := UiKit.vbox(2)
-		row.add_child(UiKit.label("%s  ←  %s kelimeleri" % [config["ad"], meta.get("ad", category)],
+		var row := UiKit.hbox(12)
+		row.add_child(ArtIcon.tower(tower_type, 2, 88.0))
+		var text := UiKit.vbox(2)
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		text.add_child(UiKit.label("%s  ←  %s kelimeleri" % [config["ad"], meta.get("ad", category)],
 			UiKit.FONT_SMALL, Color(config["renk"])))
-		row.add_child(UiKit.paragraph(str(config["aciklama"]), 22))
+		text.add_child(UiKit.paragraph(str(config["aciklama"]), 22))
+		row.add_child(text)
 		column.add_child(row)
 
 	var counts: Dictionary = level.get("kategori_kelimeler", {})
@@ -104,9 +112,14 @@ func _enemy_block(level_id: int) -> Control:
 		var data: Dictionary = GameConfig.ENEMIES.get(enemy_type, {})
 		if data.is_empty():
 			continue
-		var row := UiKit.vbox(2)
-		row.add_child(UiKit.label(str(data["ad"]), UiKit.FONT_SMALL, Color(data["renk"])))
-		row.add_child(UiKit.paragraph(str(data.get("aciklama", "")), 22))
+		var row := UiKit.hbox(12)
+		row.add_child(ArtIcon.enemy(enemy_type, 88.0))
+		var text := UiKit.vbox(2)
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		text.add_child(UiKit.label(str(data["ad"]), UiKit.FONT_SMALL, Color(data["renk"])))
+		text.add_child(UiKit.paragraph(str(data.get("aciklama", "")), 22))
+		row.add_child(text)
 		column.add_child(row)
 
 	column.add_child(UiKit.paragraph("Toplam %d düşman, %d dalga" % [

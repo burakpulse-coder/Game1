@@ -10,8 +10,12 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_result = SceneRouter.last_result
 	var win := bool(_result.get("zafer", false))
-	add_child(UiKit.background(
-		Color("#2c3a26") if win else Color("#3a2429"), Color("#12101c")))
+	var level_id := int(_result.get("seviye", 1))
+	var backdrop := Backdrop.new()
+	add_child(backdrop)
+	backdrop.setup(GameConfig.theme_of_level(level_id), level_id * 131)
+	# Yenilgide manzara daha çok karartılır: ekranın tonu sonucu anlatsın.
+	backdrop.set_veil(0.60 if win else 0.78)
 
 	var margin := UiKit.margin(40)
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -30,10 +34,10 @@ func _ready() -> void:
 	column.add_child(UiKit.title("ZAFER!" if win else "KALE DÜŞTÜ"))
 
 	if win:
-		var stars := int(_result.get("yildiz", 0))
-		var star_label := UiKit.label("★".repeat(stars) + "☆".repeat(3 - stars),
-			92, UiKit.GOLD, HORIZONTAL_ALIGNMENT_CENTER)
-		column.add_child(star_label)
+		var stars := StarRow.new()
+		stars.earned = int(_result.get("yildiz", 0))
+		stars.custom_minimum_size = Vector2(0, 150)
+		column.add_child(stars)
 	else:
 		column.add_child(UiKit.paragraph("Kuleler yeterli değildi. Daha uzun kelimeler dene!",
 			UiKit.FONT_BODY, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER))

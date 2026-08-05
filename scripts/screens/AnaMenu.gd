@@ -5,7 +5,11 @@ extends Control
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(UiKit.background(Color("#2a2140"), Color("#12101c")))
+	# Menü de savaşla aynı görsel dili konuşsun: Yeşil Vadi manzarası.
+	var backdrop := Backdrop.new()
+	add_child(backdrop)
+	backdrop.setup(GameConfig.REGION_THEMES["yesil_vadi"], 4242)
+	backdrop.set_veil(0.62)
 	AudioManager.play_music("menu")
 
 	var margin := UiKit.margin(46)
@@ -21,7 +25,17 @@ func _ready() -> void:
 	bar.add_child(UiKit.currency_chip("elmas"))
 	column.add_child(bar)
 
-	column.add_child(UiKit.spacer(30))
+	column.add_child(UiKit.spacer(16))
+
+	# Başlığın üstünde kalenin kendisi: oyunun ne olduğunu tek bakışta anlatır.
+	var crest := ArtIcon.new()
+	crest.kind = ArtIcon.Kind.TOWER
+	crest.id = "okcu"
+	crest.level = 3
+	crest.custom_minimum_size = Vector2(0, 190)
+	crest.set_script(preload("res://scripts/ui/MenuCrest.gd"))
+	column.add_child(crest)
+
 	column.add_child(UiKit.title("KELİME KALESİ"))
 
 	var stars := SaveManager.total_stars()

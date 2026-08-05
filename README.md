@@ -48,7 +48,7 @@ godot --headless --path . --export-release "Linux"   build/linux/KelimeKalesi.x8
 # Godot 4.3 ile projeyi aç
 godot --path .
 
-# Testleri çalıştır (641 doğrulama; başarısızlıkta çıkış kodu 1)
+# Testleri çalıştır (677 doğrulama; başarısızlıkta çıkış kodu 1)
 godot --headless --path . scenes/Testler.tscn
 
 # Her ekranın PNG görüntüsünü üret (görsel denetim için)
@@ -97,6 +97,9 @@ scripts/
     Hud              Oyun içi arayüz
     TutorialOverlay  İlk 3 seviyenin interaktif öğreticisi
     KingdomMap       Krallık haritası: kıvrılan yol, bölge temaları, sis
+    Backdrop         Menülerde manzara arka planı (Scenery'yi yeniden kullanır)
+    ArtIcon          Kule/düşman/harf taşı simgesi (ProcArt ile çizilir)
+    StarRow          Sonuç ekranında sırayla beliren yıldızlar
   screens/         Menü, harita, önizleme, sonuç, yükseltme, mağaza, ayarlar, başarımlar
 ```
 
@@ -209,7 +212,7 @@ tonlar tek dosyadan ayarlanır. Toplam 1,3 MB.
 godot --headless --path . scenes/Testler.tscn
 ```
 
-641 doğrulama; başarısızlıkta çıkış kodu 1 (CI'da kullanılabilir). Kapsam:
+677 doğrulama; başarısızlıkta çıkış kodu 1 (CI'da kullanılabilir). Kapsam:
 
 * **Türkçe harf dönüşümü** — `i↔İ`, `I↔ı`, düzeltme işareti katlama, alfabe sıralaması
 * **Trie sözlük** — bilinen kelimeler var, uydurma kelimeler yok, ön ek sorgusu
@@ -236,6 +239,9 @@ godot --headless --path . scenes/Testler.tscn
 * **Bölüm haritası** — 60 düğüm, kilitlerin kayıt durumuyla uyumu, düğümlerin
   dokunma yarıçapından yakın olmaması, boss yerleşimi ve gerçek dokunmayla
   açık/kilitli düğüm davranışı
+* **Ekran duman testi** — dokuz ekranın tamamı hatasız kuruluyor, ekranı
+  kaplıyor ve içerik üretiyor mu (ekranlar kod içinde kurulduğu için bir yazım
+  hatası ancak o ekran açılınca ortaya çıkardı)
 
 Görsel denetim için `scenes/EkranGoruntusu.tscn` her ekranın PNG'sini üretir.
 
