@@ -34,6 +34,9 @@ func _ready() -> void:
 	await _run_async("Harf çarkı yerleşimi (telefon oranları)", _test_wheel_layout)
 	await _run_async("Yürüyüş animasyonu", _test_walk_animation)
 	await _run_async("Sprite yön çevirme", _test_sprite_flip)
+	await _run_async("Bölüme özgü saha yerleşimi", _test_level_layout)
+	await _run_async("Yol şeridi delik bırakmıyor", _test_road_strip)
+	await _run_async("Altmış bölümde yuva menzili", _test_slot_coverage)
 	await _run_async("Bölüm haritası", _test_kingdom_map)
 	await _run_async("Tüm ekranlar açılıyor", _test_screens_open)
 
@@ -659,6 +662,103 @@ func _test_walk_animation() -> void:
 	await get_tree().process_frame
 
 
+## Üretilen yol, kule yuvalarını menzil dışında bırakmamalı.
+##
+## Bu oynanabilirliğin can damarı: yuvalar yola uzak kalırsa kuleler hiçbir
+## düşmanı vuramaz ve bölüm kazanılamaz. Yol artık bölüme göre üretildiği için
+## altmış bölümün HEPSİ tek tek denetlenir — örnekleme yetmez, tek bir kötü
+## tohum bir bölümü oynanamaz yapar.
+func _test_slot_coverage() -> void:
+	var field := Battlefield.new()
+	field.size = Vector2(1080, 1000)
+	add_child(field)
+	await get_tree().process_frame
+
+	var worst_level := 0
+	var worst_ratio := 0.0
+	var failures := 0
+	for level_id in range(1, GameConfig.TOTAL_LEVELS + 1):
+		var level := LevelDB.get_level(level_id)
+		field.region_theme = GameConfig.theme_of_level(level_id)
+		field.layout_seed = level_id
+		field.build(int(level.get("yol_sayisi", 1)), int(level.get("slot_sayisi", 4)))
+		await get_tree().process_frame
+
+		var reach := field.shortest_attack_range() * Battlefield.RELAXED_RANGE_RATIO
+		for slot in field.slots:
+			var nearest := INF
+			for track in field.tracks:
+				nearest = minf(nearest, track.distance_to_path(slot.position))
+			var ratio := nearest / maxf(reach, 1.0)
+			if ratio > worst_ratio:
+				worst_ratio = ratio
+				worst_level = level_id
+			if nearest > reach:
+				failures += 1
+
+	print("      en uzak yuva: seviye %d, menzilin %.2f katı" % [worst_level, worst_ratio])
+	_check(failures == 0,
+		"her bölümde bütün yuvalar menzil içinde (%d yuva dışarıda)" % failures)
+	field.queue_free()
+	await get_tree().process_frame
+
+
+## Her bölümün kendi yolu ve yuva yerleşimi olmalı; aynı bölüm ise her
+## açılışta aynısını vermeli.
+##
+## Bölge içindeki 15 bölüm önceden aynı şablonu kullanıyordu — hepsi birebir
+## aynı sahada oynanıyordu ve bu hiçbir teste takılmıyordu.
+func _test_level_layout() -> void:
+	var rect := Rect2(0, 0, 1080, 1000)
+	var shapes := {}
+	for level_id in [1, 2, 3, 8, 15, 22, 30, 41, 52, 60]:
+		var track := PathTrack.new()
+		add_child(track)
+		track.setup(0, rect, level_id)
+		shapes[level_id] = _path_signature(track)
+		# Aynı bölüm iki kez kurulunca aynı yolu vermeli.
+		track.setup(0, rect, level_id)
+		_check(_path_signature(track) == shapes[level_id],
+			"seviye %d yolu kararlı (aynı tohum aynı yol)" % level_id)
+		track.queue_free()
+	await get_tree().process_frame
+
+	var unique := {}
+	for key in shapes:
+		unique[shapes[key]] = true
+	_check(unique.size() >= 8,
+		"on bölümün en az sekizi farklı yol veriyor (%d)" % unique.size())
+
+	# Uzunluk bandı: yol uzunluğu düşmanın kaleye varma süresini belirliyor,
+	# serbest bırakılırsa zorluk bölümden bölüme rastgele kayar.
+	var reference := 0.0
+	var template := PathTrack.new()
+	add_child(template)
+	template.setup(0, rect, 0)
+	reference = template.length()
+	template.queue_free()
+	await get_tree().process_frame
+
+	for level_id in [1, 8, 15, 22, 30, 41, 52, 60]:
+		var track := PathTrack.new()
+		add_child(track)
+		track.setup(0, rect, level_id)
+		var ratio := track.length() / maxf(reference, 1.0)
+		_check(ratio > 0.75 and ratio < 1.30,
+			"seviye %d yol uzunluğu bandın içinde (%.2fx)" % [level_id, ratio])
+		track.queue_free()
+	await get_tree().process_frame
+
+
+## Yolun köşe noktalarından kısa bir imza; iki yolu karşılaştırmak için.
+func _path_signature(track: PathTrack) -> String:
+	var parts: PackedStringArray = []
+	for i in range(0, int(track.length()), 120):
+		var point := track.position_at(float(i))
+		parts.append("%d,%d" % [int(point.x / 12.0), int(point.y / 12.0)])
+	return ",".join(parts)
+
+
 ## Sağa yürüyen düşman kendi konumunda aynalanmalı.
 ##
 ## Bu testin sebebi gerçek bir hata: Rect2'ye negatif genişlik vermek Godot'ta
@@ -782,6 +882,83 @@ func _differs(img: Image, x: int, y: int) -> bool:
 	var background := Color(0.078, 0.086, 0.129)
 	return absf(c.r - background.r) + absf(c.g - background.g) \
 		+ absf(c.b - background.b) > 0.12
+
+
+## Dokulu yol şeridi köşelerde delik bırakmamalı.
+##
+## Ölçülmüş hata: şerit parça parça dörtgenlerle çiziliyor ve köşelerde ardışık
+## örnek noktalar ~3 piksel aralıkla gelirken yanal normal 45° dönüyor; dörtgen
+## kendi üstüne katlanıyor. `draw_colored_polygon` böyle bir dörtgeni
+## üçgenleyemeyip HİÇ çizmiyordu — her köşede yolda delik kalıyordu (tek
+## bölümde 6 bin ila 14 bin piksel). Bu test dokulu katmanı tek başına, mor bir
+## zeminin üstüne çizip merkez çizgi boyunca mor arıyor: eski çizim yöntemine
+## dönülürse burada takılır.
+func _test_road_strip() -> void:
+	var bank := preload("res://scripts/core/SpriteBank.gd")
+	var texture: Texture2D = bank.road("yesil_vadi")
+	if texture == null:
+		_check(true, "yol dokusu yok — şerit denetimi atlandı")
+		return
+
+	var viewport := SubViewport.new()
+	viewport.size = _RoadCanvas.SIZE
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
+	var canvas := _RoadCanvas.new()
+	canvas.texture = texture
+	viewport.add_child(canvas)
+
+	var toplam_delik := 0
+	var en_kotu := 0
+	for level_id in [1, 4, 8, 15, 22, 37, 52]:
+		var track := PathTrack.new()
+		add_child(track)
+		track.setup(0, Rect2(Vector2.ZERO, Vector2(_RoadCanvas.SIZE)), level_id)
+		var baked := track.curve.get_baked_points()
+		track.queue_free()
+
+		canvas.baked = baked
+		canvas.queue_redraw()
+		await RenderingServer.frame_post_draw
+		await RenderingServer.frame_post_draw
+		var shot := viewport.get_texture().get_image()
+
+		# Merkez çizgi boyunca örnekle: şerit yarım genişlikte olduğu için
+		# merkezdeki her nokta doku ile örtülmüş olmalı.
+		var delik := 0
+		for i in baked.size():
+			var p := baked[i]
+			var x := clampi(int(p.x), 0, shot.get_width() - 1)
+			var y := clampi(int(p.y), 0, shot.get_height() - 1)
+			var c := shot.get_pixel(x, y)
+			if c.r > 0.75 and c.g < 0.25 and c.b > 0.75:
+				delik += 1
+		toplam_delik += delik
+		en_kotu = maxi(en_kotu, delik)
+	viewport.queue_free()
+	await get_tree().process_frame
+
+	_check(toplam_delik == 0,
+		"yol şeridi köşelerde delik bırakmıyor (%d örnek nokta açıkta, en kötü bölümde %d)"
+			% [toplam_delik, en_kotu])
+
+
+## Yol dokusunu tek başına mor zemine çizen geçici tuval.
+class _RoadCanvas extends Node2D:
+	const SIZE := Vector2i(1080, 1000)
+	## Delik rengi: dokuda bulunmayan bir ton.
+	const HOLE := Color(1, 0, 1)
+	var baked := PackedVector2Array()
+	var texture: Texture2D
+
+	func _ready() -> void:
+		# PathTrack ile aynı: UV'ler 1'i aşıyor.
+		texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+
+	func _draw() -> void:
+		draw_rect(Rect2(Vector2.ZERO, Vector2(SIZE)), HOLE)
+		if texture != null and baked.size() >= 2:
+			PathTrack.draw_road_strip(self, baked, texture)
 
 
 ## Testin ölçeceği iki sprite'ı çizen geçici tuval. Enemy._draw ile aynı kalıbı

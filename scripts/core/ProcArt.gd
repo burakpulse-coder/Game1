@@ -345,21 +345,39 @@ static func _draw_fountain_top(canvas: CanvasItem, w: float, h: float, accent: C
 
 
 ## Boş kule yuvası: kesik çizgili daire + yerleştirme ipucu.
+## Kule yuvası işareti.
+##
+## Önceki hâli tek kat, %28 saydam beyaz kesikli halkaydı; elle çizilmiş
+## zeminler gelince açık ve kalabalık bölgelerde kayboluyordu. Şimdi altta
+## koyu bir disk var, halka çift katlı (koyu taban + açık üst) ve artı işareti
+## her durumda görünüyor — oyuncu buraya kule dikilebileceğini boşken de
+## anlamalı.
 static func draw_slot(canvas: CanvasItem, radius: float, highlight: bool, pulse: float) -> void:
-	var color := Color("#f4d06a") if highlight else Color(1, 1, 1, 0.28)
+	# Zeminden bağımsız taban: işaret her manzarada okunur.
+	canvas.draw_circle(Vector2.ZERO, radius * 0.96, Color(0, 0, 0, 0.32))
+
+	var ring := Color("#f4d06a") if highlight else Color(0.94, 0.92, 1.0, 0.85)
+	var shadow := Color(0.02, 0.02, 0.05, 0.55)
 	var segments := 16
 	for i in segments:
 		if i % 2 == 1:
 			continue
 		var from := TAU * i / segments
 		var to := TAU * (i + 1) / segments
-		canvas.draw_arc(Vector2.ZERO, radius, from, to, 4, color, 3.0, true)
+		canvas.draw_arc(Vector2.ZERO, radius, from, to, 6, shadow, 7.0, true)
+		canvas.draw_arc(Vector2.ZERO, radius, from, to, 6, ring, 3.5, true)
+
 	if highlight:
-		var alpha := 0.18 + 0.12 * sin(pulse * 4.0)
-		canvas.draw_circle(Vector2.ZERO, radius * 0.92, Color(0.96, 0.82, 0.42, alpha))
-		# Artı işareti
-		canvas.draw_line(Vector2(-radius * 0.3, 0), Vector2(radius * 0.3, 0), color, 3.0)
-		canvas.draw_line(Vector2(0, -radius * 0.3), Vector2(0, radius * 0.3), color, 3.0)
+		var alpha := 0.20 + 0.14 * sin(pulse * 4.0)
+		canvas.draw_circle(Vector2.ZERO, radius * 0.9, Color(0.96, 0.82, 0.42, alpha))
+		canvas.draw_arc(Vector2.ZERO, radius * (1.12 + 0.05 * sin(pulse * 4.0)), 0.0, TAU, 32,
+			Color(0.96, 0.82, 0.42, 0.35), 4.0, true)
+
+	# Artı işareti her zaman: boş yuva da "buraya kurulabilir" demeli.
+	var arm := radius * 0.34
+	for step: Array in [[shadow, 8.0], [ring, 4.0]]:
+		canvas.draw_line(Vector2(-arm, 0), Vector2(arm, 0), step[0], step[1], true)
+		canvas.draw_line(Vector2(0, -arm), Vector2(0, arm), step[0], step[1], true)
 
 
 ## --------------------------------------------------------------------------

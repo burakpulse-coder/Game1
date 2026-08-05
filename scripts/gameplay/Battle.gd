@@ -142,6 +142,8 @@ func _build_layout() -> void:
 
 func _start_level() -> void:
 	battlefield.region_theme = GameConfig.theme_of_level(level_id)
+	# Her bölüm kendi yolunu ve yuva yerleşimini alsın.
+	battlefield.layout_seed = level_id
 	battlefield.build(int(level.get("yol_sayisi", 1)), int(level.get("slot_sayisi", 4)))
 	battlefield.castle.setup(EconomyManager.castle_max_hp() * float(level.get("kale_can_carpani", 1.0)))
 	battlefield.castle.health_changed.connect(hud.set_health)

@@ -117,6 +117,10 @@ func _make_projectile() -> Node:
 ## Bölge teması: Scenery ve PathTrack renklerini buradan alır.
 var region_theme := {}
 
+## Yol ve yuva yerleşiminin tohumu: bölüm numarası. Aynı bölüm her açılışta
+## aynı sahayı verir, farklı bölümler farklı saha alır. 0 = sabit şablon.
+var layout_seed := 0
+
 
 func build(path_count: int, slot_count: int) -> void:
 	_path_count = clampi(path_count, 1, PathTrack.TEMPLATES.size())
@@ -148,11 +152,10 @@ func _layout() -> void:
 	if not _built or size.x <= 0.0 or size.y <= 0.0:
 		return
 	var rect := Rect2(Vector2.ZERO, size)
-	for track in tracks:
-		track.setup(track.index if track.index > 0 else tracks.find(track), rect)
-	# PathTrack.setup index'i kendi belirlemez; sırayı burada garanti et.
+	# Tek geçiş: yol sırası dizideki sıradır. Önceden ikinci bir geçiş daha
+	# vardı ve tohumu geçirmiyordu — ürettiğimiz yolu şablonla eziyordu.
 	for i in tracks.size():
-		tracks[i].setup(i, rect)
+		tracks[i].setup(i, rect, layout_seed)
 
 	# Kale yolun tam ucuna konunca son düzlükteki düşmanlar kalenin gövdesinin
 	# üstüne biniyordu. Kaleyi geliş yönünde biraz ileri alıyoruz: yol artık
@@ -241,6 +244,18 @@ func _pick_slot_positions(rect: Rect2) -> Array:
 			fallback.append(rect.position + Vector2(rect.size.x * 0.9,
 				TOP_UI_CLEARANCE + usable * (i + 1.0) / (_slot_count + 1.0)))
 		return fallback
+
+	# Adaylar bölüm tohumuna göre karıştırılır: aynı yolda bile yuvalar
+	# bölümden bölüme farklı yerlere düşsün. Karıştırma tohumlu, yani bölüm
+	# her açılışta aynı yerleşimi verir.
+	if layout_seed > 0 and candidates.size() > 1:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = layout_seed * 6151 + 17
+		for i in range(candidates.size() - 1, 0, -1):
+			var j := rng.randi_range(0, i)
+			var swap = candidates[i]
+			candidates[i] = candidates[j]
+			candidates[j] = swap
 
 	var chosen: Array = [candidates.pop_front()]
 	while chosen.size() < _slot_count and not candidates.is_empty():
