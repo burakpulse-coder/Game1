@@ -23,6 +23,19 @@ const BAND_TOP := 0.535
 const BAND_BOTTOM := 0.685
 const WHEEL_TOP := 0.685
 
+## Çizim sırası. Savaş alanının iç katmanları z_index 1..9 kullanıyor ve
+## Godot'ta z_index kardeşler arasındaki ağaç sırasını ezer; arayüze açıkça
+## daha yüksek z verilmezse yol, kule, düşman ve efektler HUD'un, öğreticinin
+## ve duraklatma perdesinin ÜSTÜNE çiziliyordu.
+## Çocukların z_index'i varsayılan olarak GÖRELİdir (z_as_relative), yani iç içe
+## katmanlarda değerler toplanır: düşman katmanı (5) içindeki düşman (5) etkin
+## olarak 10'a çıkar. Bu yüzden arayüz değerleri geniş payla ayrılır.
+const Z_BATTLEFIELD := 0
+const Z_WHEEL := 100
+const Z_HUD := 200
+const Z_TUTORIAL := 300
+const Z_OVERLAY := 400
+
 var level_id := 1
 var level := {}
 
@@ -73,22 +86,26 @@ func _build_layout() -> void:
 	add_child(UiKit.background(Color(level_theme.get("gok_ust", "#2b3d2a")), Color("#171425")))
 
 	battlefield = Battlefield.new()
+	battlefield.z_index = Z_BATTLEFIELD
 	battlefield.anchor_right = 1.0
 	battlefield.anchor_bottom = BATTLE_RATIO
 	battlefield.offset_bottom = 0
 	add_child(battlefield)
 
 	wheel = LetterWheel.new()
+	wheel.z_index = Z_WHEEL
 	wheel.anchor_top = WHEEL_TOP
 	wheel.anchor_right = 1.0
 	wheel.anchor_bottom = 1.0
 	add_child(wheel)
 
 	hud = Hud.new()
+	hud.z_index = Z_HUD
 	add_child(hud)
 	hud.set_band(BAND_TOP, BAND_BOTTOM)
 
 	tutorial = TutorialOverlay.new()
+	tutorial.z_index = Z_TUTORIAL
 	add_child(tutorial)
 
 	waves = WaveManager.new()
@@ -437,8 +454,9 @@ func _toggle_pause() -> void:
 
 func _show_pause_menu() -> void:
 	var overlay := ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.72)
+	overlay.color = Color(0, 0, 0, 0.78)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = Z_OVERLAY
 	overlay.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 
 	var box := UiKit.vbox(20)
@@ -565,8 +583,9 @@ func _finish(result: Dictionary) -> void:
 ## kaldığı yerden devam etme teklifi. Seviye başına tek kez sunulur.
 func _show_continue_offer() -> void:
 	var overlay := ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.78)
+	overlay.color = Color(0, 0, 0, 0.82)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = Z_OVERLAY
 
 	var box := UiKit.vbox(20)
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)

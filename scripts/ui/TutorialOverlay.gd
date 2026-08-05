@@ -93,6 +93,14 @@ func _ready() -> void:
 
 
 func _build() -> void:
+	# Öğretici metni savaş alanının üstünde durur; arkasını karartmazsak
+	# yol, düşman ve efektler metnin okunmasını zorlaştırıyor.
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.55)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(dim)
+
 	_panel = UiKit.panel(UiKit.BG_PANEL, UiKit.GOLD)
 	_panel.anchor_left = 0.05
 	_panel.anchor_right = 0.95

@@ -30,6 +30,7 @@ func _ready() -> void:
 	await _run_async("Savaş turu (uçtan uca)", _test_battle)
 	await _run_async("Gerçek dokunma girdisi", _test_touch_input)
 	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
+	await _run_async("Arayüz çizim sırası", _test_ui_layering)
 
 	print("\n=== Sonuç: %d başarılı, %d başarısız ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -564,3 +565,60 @@ func _move(control: Control, local_point: Vector2) -> void:
 	event.button_mask = MOUSE_BUTTON_MASK_LEFT
 	event.position = _to_window(control, local_point)
 	Input.parse_input_event(event)
+
+
+## --------------------------------------------------------------------------
+## Çizim sırası
+## --------------------------------------------------------------------------
+
+## Godot'ta z_index kardeş düğümler arasındaki ağaç sırasını ezer. Savaş alanı
+## iç katmanları için z_index 1..9 kullanıyor; arayüze açıkça daha yüksek z
+## verilmezse yol, kule, düşman ve efektler HUD'un, öğreticinin ve duraklatma
+## perdesinin üstüne çiziliyor (menü ve öğretici yazıları görünmüyordu).
+func _test_ui_layering() -> void:
+	SceneRouter.pending_level_id = 4
+	var battle: Node = load("res://scenes/Oyun.tscn").instantiate()
+	add_child(battle)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var deepest := _max_z(battle.battlefield)
+	_check(deepest > 0, "savaş alanı iç katmanları z_index kullanıyor (%d)" % deepest)
+	_check(battle.wheel.z_index > deepest,
+		"harf çarkı savaş alanının üstünde (%d > %d)" % [battle.wheel.z_index, deepest])
+	_check(battle.hud.z_index > battle.wheel.z_index,
+		"HUD çarkın üstünde (%d > %d)" % [battle.hud.z_index, battle.wheel.z_index])
+	_check(battle.tutorial.z_index > battle.hud.z_index,
+		"öğretici HUD'un üstünde (%d > %d)" % [battle.tutorial.z_index, battle.hud.z_index])
+
+	# Duraklatma perdesi her şeyin üstünde olmalı ve ekranı tam kaplamalı.
+	battle._toggle_pause()
+	await get_tree().process_frame
+	var overlay: Control = null
+	for child in battle.get_children():
+		if child is ColorRect and (child as ColorRect).color.a > 0.5:
+			overlay = child
+	_check(overlay != null, "duraklatma perdesi oluşturuldu")
+	if overlay != null:
+		_check(overlay.z_index > battle.tutorial.z_index,
+			"duraklatma perdesi en üstte (%d)" % overlay.z_index)
+		_check(overlay.size.x >= battle.size.x and overlay.size.y >= battle.size.y,
+			"duraklatma perdesi ekranı tam kaplıyor (%s)" % overlay.size)
+	battle._toggle_pause()
+	get_tree().paused = false
+
+	battle.queue_free()
+	await get_tree().process_frame
+
+
+## Ağaçtaki en yüksek ETKİN z_index. z_as_relative açıkken çocuğun z'si
+## ebeveyninkine eklenir; ham değerlere bakmak yanıltıcı olur.
+func _max_z(node: Node, inherited: int = 0) -> int:
+	var own := inherited
+	if node is CanvasItem:
+		var item := node as CanvasItem
+		own = (inherited + item.z_index) if item.z_as_relative else item.z_index
+	var best := own
+	for child in node.get_children():
+		best = maxi(best, _max_z(child, own))
+	return best
