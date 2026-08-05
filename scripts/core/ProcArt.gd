@@ -157,6 +157,17 @@ static func stone_courses(canvas: CanvasItem, rect: Rect2, color: Color, rows: i
 		canvas.draw_line(Vector2(x, y), Vector2(x, y - rect.size.y / float(rows)), line, 2.0)
 
 
+## Beş köşeli yıldız. Bölüm haritasında ve sonuç ekranında kullanılır.
+static func star(canvas: CanvasItem, center: Vector2, radius: float, fill: Color,
+		outline: bool = true) -> void:
+	var points := PackedVector2Array()
+	for i in 10:
+		var angle := -PI * 0.5 + PI * i / 5.0
+		var reach := radius if i % 2 == 0 else radius * 0.44
+		points.append(center + Vector2(cos(angle), sin(angle)) * reach)
+	filled_polygon(canvas, points, fill, outline, 2.0)
+
+
 ## --------------------------------------------------------------------------
 ## Kale
 ## --------------------------------------------------------------------------

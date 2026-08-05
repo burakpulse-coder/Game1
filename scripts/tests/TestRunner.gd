@@ -31,6 +31,7 @@ func _ready() -> void:
 	await _run_async("Gerçek dokunma girdisi", _test_touch_input)
 	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
 	await _run_async("Arayüz çizim sırası", _test_ui_layering)
+	await _run_async("Bölüm haritası", _test_kingdom_map)
 
 	print("\n=== Sonuç: %d başarılı, %d başarısız ===" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
@@ -622,3 +623,80 @@ func _max_z(node: Node, inherited: int = 0) -> int:
 	for child in node.get_children():
 		best = maxi(best, _max_z(child, own))
 	return best
+
+
+## --------------------------------------------------------------------------
+## Bölüm haritası
+## --------------------------------------------------------------------------
+
+## Harita düğümleri ayrı Button değil; isabet _gui_input içinde en yakın
+## düğüme bakılarak çözülüyor. Bu yüzden dokunma yolu ve kilit kuralları
+## gerçek olayla sınanır.
+func _test_kingdom_map() -> void:
+	SaveManager.reset_progress()
+	# İlk üç bölümü geç ki hem açık hem kilitli düğüm bulunsun.
+	for level_id in [1, 2, 3]:
+		SaveManager.record_level_result(level_id, 3, 1.0)
+
+	var map := KingdomMap.new()
+	map.custom_minimum_size = Vector2(1080, 0)
+	map.size = Vector2(1080, 6000)
+	add_child(map)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	_equal(map._nodes.size(), GameConfig.TOTAL_LEVELS, "60 bölüm düğümü oluşturuldu")
+
+	# Kilit durumu kayıt sistemiyle tutarlı olmalı.
+	var mismatched := 0
+	for node in map._nodes:
+		var level_id := int(node["id"])
+		var should_lock := not SaveManager.is_level_unlocked(level_id) \
+			or SaveManager.total_stars() < int(GameConfig.REGIONS[int(node["bolge"])]["gereken_yildiz"])
+		if bool(node["kilitli"]) != should_lock:
+			mismatched += 1
+	_equal(mismatched, 0, "düğüm kilitleri kayıt durumuyla uyumlu")
+
+	# Düğümler dokunma yarıçapından daha yakın olmamalı, yoksa yanlış bölüm açılır.
+	var too_close := 0
+	for i in map._nodes.size():
+		for j in range(i + 1, map._nodes.size()):
+			var a: Vector2 = map._nodes[i]["konum"]
+			var b: Vector2 = map._nodes[j]["konum"]
+			if a.distance_to(b) < KingdomMap.NODE_TOUCH:
+				too_close += 1
+	_equal(too_close, 0, "hiçbir düğüm çifti dokunma yarıçapından yakın değil")
+
+	# Boss düğümleri her 15. bölümde olmalı.
+	var boss_count := 0
+	for node in map._nodes:
+		if bool(node["boss"]):
+			boss_count += 1
+			_equal(int(node["id"]) % GameConfig.LEVELS_PER_REGION, 0,
+				"boss düğümü bölge sonunda (%d)" % int(node["id"]))
+	_equal(boss_count, GameConfig.REGIONS.size(), "her bölgede bir boss düğümü")
+
+	# Gerçek dokunma: açık bir düğüm sinyal yaymalı.
+	var picked := [0]
+	map.level_selected.connect(func(id): picked[0] = id)
+	var open_node: Dictionary = {}
+	var locked_node: Dictionary = {}
+	for node in map._nodes:
+		if not bool(node["kilitli"]) and open_node.is_empty():
+			open_node = node
+		if bool(node["kilitli"]) and locked_node.is_empty():
+			locked_node = node
+	_check(not open_node.is_empty(), "açık düğüm var")
+	_check(not locked_node.is_empty(), "kilitli düğüm var")
+
+	_touch(map, open_node["konum"], true)
+	await get_tree().process_frame
+	_equal(picked[0], int(open_node["id"]), "açık düğüme dokunmak bölümü seçti")
+
+	picked[0] = 0
+	_touch(map, locked_node["konum"], true)
+	await get_tree().process_frame
+	_equal(picked[0], 0, "kilitli düğüme dokunmak hiçbir şey yapmadı")
+
+	map.queue_free()
+	await get_tree().process_frame
