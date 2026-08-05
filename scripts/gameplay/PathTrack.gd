@@ -84,6 +84,12 @@ func _draw() -> void:
 	var fill := Color(region_theme.get("yol", FILL_COLOR.to_html()))
 	var edge := Color(region_theme.get("yol_kenar", EDGE_COLOR.to_html()))
 
+	# Paletten bağımsız koyu dış hat. Bölge renkleri zemine göre ayarlanmıştı;
+	# elle çizilmiş zeminler gelince açık bölgelerde (buz) yol zemine karışıyordu.
+	# Sabit koyu bir hale her zeminde yolu ayırır, koyu bölgelerde ise fark
+	# edilmeyecek kadar hafif kalır.
+	draw_polyline(baked, Color(0, 0, 0, 0.30), PATH_WIDTH + 26.0, true)
+
 	# Toprak kenar + zemin
 	draw_polyline(baked, ProcArt.shade(edge, -0.25), PATH_WIDTH + 16.0, true)
 	draw_polyline(baked, edge, PATH_WIDTH + 8.0, true)

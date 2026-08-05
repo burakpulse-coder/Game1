@@ -170,6 +170,7 @@ const REGIONS := [
 ## aynı görünüyordu; manzara katmanı (Scenery) rengini ve süslerini buradan alır.
 const REGION_THEMES := {
 	"yesil_vadi": {
+		"id": "yesil_vadi",
 		"gok_ust": "#6f9fc4", "gok_alt": "#a8c98a",
 		"zemin": "#5f9b45", "zemin_alt": "#3d6b2e",
 		"leke": "#6fae4a", "ufuk": "#3f6b3a", "uzak_tepe": "#7fa86a",
@@ -179,6 +180,7 @@ const REGION_THEMES := {
 		"zerre": "#f6f0a0",
 	},
 	"karanlik_orman": {
+		"id": "karanlik_orman",
 		"gok_ust": "#2e3550", "gok_alt": "#3f5d4a",
 		"zemin": "#2f4a30", "zemin_alt": "#1d3020",
 		"leke": "#3a5a38", "ufuk": "#1a2a1e", "uzak_tepe": "#2a4030",
@@ -188,15 +190,17 @@ const REGION_THEMES := {
 		"zerre": "#8ad6a0",
 	},
 	"buz_daglari": {
+		"id": "buz_daglari",
 		"gok_ust": "#7aa8cf", "gok_alt": "#cfe4f2",
 		"zemin": "#c3d9e6", "zemin_alt": "#8fb0c6",
 		"leke": "#d8e9f4", "ufuk": "#6f93b0", "uzak_tepe": "#a6c4da",
-		"yol": "#9aa8b4", "yol_kenar": "#75838f",
+		"yol": "#8494a4", "yol_kenar": "#59656f",
 		"susler": ["buz", "kaya", "kutuk"],
 		"yaprak": "#8fc4d8", "govde": "#5b5a62", "tas": "#9aa4ae",
 		"zerre": "#ffffff",
 	},
 	"ejder_kalesi": {
+		"id": "ejder_kalesi",
 		"gok_ust": "#4a2230", "gok_alt": "#8c4230",
 		"zemin": "#4a3330", "zemin_alt": "#2b1c1e",
 		"leke": "#5a3a32", "ufuk": "#2a1618", "uzak_tepe": "#5c3028",

@@ -82,18 +82,29 @@ func _build_top() -> void:
 	hp_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hp_bar = UiKit.progress_bar(UiKit.SUCCESS, 26.0)
 	_hp_bar.value = 1.0
-	_hp_label = UiKit.label("Kale 100 / 100", 24, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_LEFT, false)
+	_hp_label = UiKit.label("Kale 100 / 100", 24, UiKit.INK, HORIZONTAL_ALIGNMENT_LEFT, false)
+	_strengthen(_hp_label)
 	hp_box.add_child(_hp_bar)
 	hp_box.add_child(_hp_label)
 	row.add_child(hp_box)
 
 	_wave_label = UiKit.label("Dalga 1/3", 26, UiKit.INK, HORIZONTAL_ALIGNMENT_RIGHT, false)
+	_strengthen(_wave_label)
 	_wave_label.custom_minimum_size = Vector2(170, 0)
 	_wave_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_wave_label)
 
 	_break_label = UiKit.label("", 30, UiKit.GOLD, HORIZONTAL_ALIGNMENT_CENTER, false)
+	_strengthen(_break_label)
 	_top.add_child(_break_label)
+
+
+## Savaş alanının üstünde duran yazılar her zemin üstünde okunmalı. Elle
+## çizilmiş bölge zeminleri gelince açık bölgelerde (buz, yeşil vadi) varsayılan
+## ince kontur yetmez oldu.
+func _strengthen(node: Label) -> void:
+	node.add_theme_constant_override("outline_size", 12)
+	node.add_theme_color_override("font_outline_color", Color(0.02, 0.02, 0.05, 0.85))
 
 
 ## --------------------------------------------------------------------------
@@ -202,6 +213,7 @@ func _build_toast() -> void:
 	center.add_child(pill)
 
 	_toast = UiKit.label("", 34, UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER)
+	_strengthen(_toast)
 	pill.add_child(_toast)
 	_toast_root = center
 	_toast_root.modulate.a = 0.0

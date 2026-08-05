@@ -19,6 +19,9 @@ extends RefCounted
 const ENEMY_PATH := "res://assets/sprites/dusman/%s.png"
 const WALK_PATH := "res://assets/sprites/dusman/%s_yurume.png"
 const WALK_FRAMES := 4       ## yürüyüş şeridindeki eşit hücre sayısı
+## Bölge zeminleri JPEG: saydamlık gerekmiyor ve PNG bu boyutta paketi
+## megabaytlarca şişiriyordu.
+const REGION_PATH := "res://assets/sprites/bolge/%s.jpg"
 const ENEMY_HEIGHT := 2.65   ## sprite yüksekliği / oyun yarıçapı oranı
 const ENEMY_HEAD := 1.85     ## sprite tepesi (yarıçap katı); üst süsler bunun üstüne
 
@@ -32,6 +35,11 @@ static func enemy(type_id: String) -> Texture2D:
 
 static func has_enemy(type_id: String) -> bool:
 	return enemy(type_id) != null
+
+
+## Bölgenin savaş alanı zemini; yoksa null (Scenery yordamsal manzaraya döner).
+static func region(region_id: String) -> Texture2D:
+	return _load(REGION_PATH % region_id)
 
 
 ## Düşmanın yürüyüş şeridi (WALK_FRAMES eşit hücreli tek sıra); yoksa null.

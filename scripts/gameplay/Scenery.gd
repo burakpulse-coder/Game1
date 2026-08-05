@@ -1,6 +1,8 @@
 class_name Scenery
 extends Node2D
 
+const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
+
 ## Savaş alanının manzara katmanı.
 ##
 ## Önceden savaş alanı düz tek renk bir dikdörtgendi ve dört bölge birbirinin
@@ -164,6 +166,12 @@ func _draw() -> void:
 		return
 	var horizon := _rect.position.y + _rect.size.y * HORIZON_RATIO
 
+	# Elle çizilmiş bölge zemini varsa gökyüzü/tepe/zemin/leke katmanlarının
+	# yerini alır; süsler, parçacıklar ve vinyet üstüne gelmeye devam eder.
+	if _draw_region_art():
+		_draw_overlay()
+		return
+
 	# 1. Gökyüzü
 	_gradient_quad(Rect2(_rect.position, Vector2(_rect.size.x, horizon - _rect.position.y)),
 		_color("gok_ust", "#6f9fc4"), _color("gok_alt", "#a8c98a"))
@@ -192,11 +200,14 @@ func _draw() -> void:
 	_gradient_quad(Rect2(_rect.position.x, horizon - 6.0, _rect.size.x, 54.0),
 		fog, Color(fog.r, fog.g, fog.b, 0.0))
 
-	# 6. Süsler
+	_draw_overlay()
+
+
+## Zeminin üstündeki ortak katmanlar: süsler, parçacıklar, vinyet.
+func _draw_overlay() -> void:
 	for prop in _props:
 		_draw_prop(str(prop["tip"]), prop["konum"], float(prop["olcek"]), float(prop["faz"]))
 
-	# 7. Ortam parçacıkları
 	if not PerfManager.low_quality:
 		var mote_color := _color("zerre", "#f6f0a0")
 		for mote in _motes:
@@ -204,8 +215,32 @@ func _draw() -> void:
 			draw_circle(mote["konum"], float(mote["boyut"]),
 				Color(mote_color.r, mote_color.g, mote_color.b, alpha))
 
-	# 8. Vinyet
 	_vignette()
+
+
+## Bölge zeminini alanı TAM dolduracak şekilde çizer; dosya yoksa false döner.
+##
+## Ölçek yerine kaynak kırpma kullanılır: görsel yatay, savaş alanı cihaza göre
+## dikey. Esnetmek buz dağlarını ve bulutları eziyordu. Kırpma yatayda
+## ortalanır, dikeyde üstten başlar — ufuk her telefonda görünsün.
+func _draw_region_art() -> bool:
+	var region_id := str(region_theme.get("id", ""))
+	if region_id.is_empty():
+		return false
+	var texture: Texture2D = SpriteBank.region(region_id)
+	if texture == null:
+		return false
+
+	var source_size := texture.get_size()
+	var target_ratio := _rect.size.x / maxf(_rect.size.y, 1.0)
+	var crop_width := source_size.x
+	var crop_height := crop_width / maxf(target_ratio, 0.001)
+	if crop_height > source_size.y:
+		crop_height = source_size.y
+		crop_width = crop_height * target_ratio
+	var source := Rect2((source_size.x - crop_width) * 0.5, 0.0, crop_width, crop_height)
+	draw_texture_rect_region(texture, _rect, source)
+	return true
 
 
 ## Dikey degradeli dörtgen (köşe renkleriyle, ek doku gerekmez).
