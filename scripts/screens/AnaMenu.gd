@@ -28,12 +28,8 @@ func _ready() -> void:
 	column.add_child(UiKit.spacer(16))
 
 	# Başlığın üstünde kalenin kendisi: oyunun ne olduğunu tek bakışta anlatır.
-	var crest := ArtIcon.new()
-	crest.kind = ArtIcon.Kind.TOWER
-	crest.id = "okcu"
-	crest.level = 3
+	var crest: Control = preload("res://scripts/ui/MenuCrest.gd").new()
 	crest.custom_minimum_size = Vector2(0, 190)
-	crest.set_script(preload("res://scripts/ui/MenuCrest.gd"))
 	column.add_child(crest)
 
 	column.add_child(UiKit.title("KELİME KALESİ"))
