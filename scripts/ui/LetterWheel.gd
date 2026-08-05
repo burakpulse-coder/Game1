@@ -19,6 +19,13 @@ const STONE_RADIUS := 62.0
 const TOUCH_SLACK := 1.25
 const TRAIL_WIDTH := 12.0
 
+## İlerleme rozetleri çarkın üst şeridinde durur. Taş dairesi bu şeridi boş
+## bırakır; yoksa tepedeki taş rozetlerin üstüne biner.
+const PROGRESS_TOP := 8.0
+const PROGRESS_HEIGHT := 40.0
+const PROGRESS_GAP := 12.0
+const PROGRESS_MIN_FONT := 13
+
 const STONE_FILL := Color("#cdbb96")
 const STONE_EDGE := Color("#6c5a3c")
 const STONE_LOCKED := Color("#5b5468")
@@ -39,6 +46,7 @@ var _shake := 0.0
 var _success := 0.0
 var _center := Vector2.ZERO
 var _radius := 200.0
+var _stone_radius := STONE_RADIUS   ## dar ekranlarda STONE_RADIUS'tan küçülür
 var _font: Font
 var _flyers: Array = []      ## doğru kelimenin kuleye uçan harfleri
 var _stone_shake: Array = []  ## taş başına sarsıntı fazı (geçersiz kelimede)
@@ -66,11 +74,16 @@ func set_letters(values: Array) -> void:
 
 
 func _layout() -> void:
-	_center = size * 0.5
+	# Üstteki ilerleme şeridi taşlara ayrılmış alanın dışında kalır.
+	var reserved := 0.0
+	if not _progress.is_empty():
+		reserved = PROGRESS_TOP + PROGRESS_HEIGHT + PROGRESS_GAP
+	var usable := maxf(size.y - reserved, STONE_RADIUS * 2.0)
+	_center = Vector2(size.x * 0.5, reserved + usable * 0.5)
 	# Taşlar (yarıçapı STONE_RADIUS) hiçbir kenardan taşmamalı; çember yarıçapı
 	# bu yüzden en dar kenara göre sınırlanır.
 	var margin := STONE_RADIUS * 1.18
-	_radius = minf(size.x * 0.5 - margin, size.y * 0.5 - margin)
+	_radius = minf(size.x * 0.5 - margin, usable * 0.5 - margin)
 	_radius = maxf(_radius, STONE_RADIUS * 0.6)
 	_positions = PackedVector2Array()
 	var count := letters.size()
@@ -78,6 +91,13 @@ func _layout() -> void:
 		# -PI/2: ilk harf tepede başlasın.
 		var angle := -PI * 0.5 + TAU * i / maxf(count, 1)
 		_positions.append(_center + Vector2(cos(angle), sin(angle)) * _radius)
+
+	# Taşlar birbirine de binmemeli. Basık ekranlarda 8 harflik çarkın komşu
+	# taşları arasındaki kiriş taş çapından kısa kalıyor; o zaman taşı küçültürüz.
+	_stone_radius = STONE_RADIUS
+	if count >= 2:
+		var chord := 2.0 * _radius * sin(PI / float(count))
+		_stone_radius = clampf(chord * 0.46, 26.0, STONE_RADIUS)
 	queue_redraw()
 
 
@@ -131,7 +151,11 @@ func index_of_letter(letter: String) -> int:
 ## Çarkta kaç harfli kaç kelime var, kaçı bulundu? Oyuncunun "burada ne
 ## arayacağım" sorusuna cevap verir — kelime bulmak oyunun asıl zorluğu.
 func set_word_progress(progress: Dictionary) -> void:
+	var was_empty := _progress.is_empty()
 	_progress = progress
+	# Şerit ilk kez dolduğunda taş dairesinin ona yer açması gerekir.
+	if was_empty != _progress.is_empty():
+		_layout()
 	queue_redraw()
 
 
@@ -267,7 +291,8 @@ func _try_add(point: Vector2) -> void:
 
 
 func _letter_at(point: Vector2) -> int:
-	var reach := STONE_RADIUS * TOUCH_SLACK
+	# Dokunma alanı taş küçülse de parmak boyunun altına inmesin.
+	var reach := maxf(_stone_radius * TOUCH_SLACK, 44.0)
 	for i in _positions.size():
 		if point.distance_to(_positions[i]) <= reach:
 			return i
@@ -337,8 +362,8 @@ func _draw() -> void:
 		shake_offset = Vector2(sin(_shake * 42.0) * 10.0 * _shake, 0)
 
 	# Rünik zemin dairesi
-	draw_circle(_center + shake_offset, _radius + STONE_RADIUS * 0.95, Color(0, 0, 0, 0.22))
-	draw_arc(_center + shake_offset, _radius + STONE_RADIUS * 0.8, 0.0, TAU, 64,
+	draw_circle(_center + shake_offset, _radius + _stone_radius * 0.95, Color(0, 0, 0, 0.22))
+	draw_arc(_center + shake_offset, _radius + _stone_radius * 0.8, 0.0, TAU, 64,
 		Color(0.85, 0.75, 0.5, 0.22), 3.0, true)
 
 	# Seçim izi
@@ -392,36 +417,73 @@ func _draw() -> void:
 
 
 ## Çarkın üstünde, her kelime uzunluğu için bulunan/toplam göstergesi.
+##
+## Rozet genişliği yazıya göre ölçülür ve satır ekrana sığmazsa önce punto,
+## sonra etiket biçimi küçülür. Sabit genişlikte yazı rozetin dışına taşıyordu.
 func _draw_progress() -> void:
 	if _progress.is_empty() or _font == null:
 		return
 	var lengths := _progress.keys()
 	lengths.sort()
-	var pill_w := 96.0
-	var gap := 10.0
-	var total_w := lengths.size() * pill_w + (lengths.size() - 1) * gap
-	var start_x := (size.x - total_w) * 0.5
-	var y := 14.0
 
-	for i in lengths.size():
-		var key = lengths[i]
-		var entry: Dictionary = _progress[key]
+	var labels := _progress_labels(lengths, true)
+	var available := size.x - 24.0
+	var font_size := 20
+	var widths := _pill_widths(labels, font_size)
+	while _row_width(widths) > available and font_size > PROGRESS_MIN_FONT:
+		font_size -= 1
+		widths = _pill_widths(labels, font_size)
+	if _row_width(widths) > available:
+		labels = _progress_labels(lengths, false)
+		widths = _pill_widths(labels, font_size)
+
+	var x := (size.x - _row_width(widths)) * 0.5
+	for i in labels.size():
+		var entry: Dictionary = _progress[lengths[i]]
 		var found := int(entry.get("bulunan", 0))
 		var total := int(entry.get("toplam", 0))
 		var done := found >= total and total > 0
-		var rect := Rect2(start_x + i * (pill_w + gap), y, pill_w, 44.0)
-		ProcArt.rounded_rect(self, rect, 12.0,
-			Color(0.96, 0.82, 0.42, 0.85) if done else Color(0.16, 0.14, 0.22, 0.75), false)
-		var label := "%d harf  %d/%d" % [int(key), found, total]
-		_draw_glyph(label, rect.get_center() + Vector2(0, -2), 20,
-			Color("#2e2418") if done else Color("#d8d0e6"))
+		var rect := Rect2(x, PROGRESS_TOP, widths[i], PROGRESS_HEIGHT)
+		var fill := Color(0.96, 0.82, 0.42, 0.85) if done else Color(0.16, 0.14, 0.22, 0.75)
+		var ink := Color("#2e2418") if done else Color("#d8d0e6")
+		ProcArt.rounded_rect(self, rect, 12.0, fill, false)
+		_draw_glyph(labels[i], rect.get_center() + Vector2(0, -2), font_size, ink)
+		x += widths[i] + PROGRESS_GAP
+
+
+func _progress_labels(lengths: Array, verbose: bool) -> PackedStringArray:
+	var labels := PackedStringArray()
+	for key in lengths:
+		var entry: Dictionary = _progress[key]
+		var found := int(entry.get("bulunan", 0))
+		var total := int(entry.get("toplam", 0))
+		if verbose:
+			labels.append("%d harf  %d/%d" % [int(key), found, total])
+		else:
+			labels.append("%d: %d/%d" % [int(key), found, total])
+	return labels
+
+
+func _pill_widths(labels: PackedStringArray, font_size: int) -> PackedFloat32Array:
+	var widths := PackedFloat32Array()
+	for label in labels:
+		var measured := _font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+		widths.append(maxf(measured.x + 22.0, 56.0))
+	return widths
+
+
+func _row_width(widths: PackedFloat32Array) -> float:
+	var total := 0.0
+	for w in widths:
+		total += w
+	return total + PROGRESS_GAP * maxf(widths.size() - 1, 0)
 
 
 func _draw_stone(index: int, point: Vector2) -> void:
 	var locked := _locked.has(index)
 	var selected := _selection.has(index)
 	var fill := STONE_LOCKED if locked else STONE_FILL
-	var radius := STONE_RADIUS
+	var radius := _stone_radius
 
 	if selected:
 		fill = TRAIL_COLOR

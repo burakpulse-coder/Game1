@@ -31,6 +31,7 @@ func _ready() -> void:
 	await _run_async("Gerçek dokunma girdisi", _test_touch_input)
 	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
 	await _run_async("Arayüz çizim sırası", _test_ui_layering)
+	await _run_async("Harf çarkı yerleşimi (telefon oranları)", _test_wheel_layout)
 	await _run_async("Bölüm haritası", _test_kingdom_map)
 	await _run_async("Tüm ekranlar açılıyor", _test_screens_open)
 
@@ -609,6 +610,98 @@ func _test_ui_layering() -> void:
 	battle._toggle_pause()
 	get_tree().paused = false
 
+	battle.queue_free()
+	await get_tree().process_frame
+
+
+## Çarkın üstündeki ilerleme şeridi ile taşlar üst üste binmemeli; taşlar da
+## birbirine ve çarkın kenarlarına taşmamalı. Farklı telefon en/boy oranlarında
+## kontrol edilir, çünkü stretch "expand" ile tuval yüksekliği cihaza göre değişir.
+func _test_wheel_layout() -> void:
+	var wheel := LetterWheel.new()
+	add_child(wheel)
+	await get_tree().process_frame
+
+	# 4:3 tablet en basık hâl, 21:9 en uzun telefon.
+	var aspects := {
+		"4:3 tablet": 4.0 / 3.0,
+		"16:9": 16.0 / 9.0,
+		"18:9": 2.0,
+		"19.5:9": 19.5 / 9.0,
+		"20:9": 20.0 / 9.0,
+		"21:9": 21.0 / 9.0,
+	}
+	var progress := {3: {"bulunan": 0, "toplam": 7}, 4: {"bulunan": 0, "toplam": 11},
+		5: {"bulunan": 1, "toplam": 3}, 6: {"bulunan": 0, "toplam": 2}}
+
+	# Çarkın ekranda kapladığı şerit Battle ile aynı oranda hesaplanmalı.
+	var wheel_top: float = preload("res://scripts/gameplay/Battle.gd").WHEEL_TOP
+	for aspect_name in aspects:
+		var canvas_height: float = 1080.0 * float(aspects[aspect_name])
+		var band_height: float = canvas_height * (1.0 - wheel_top)
+		for count in [5, 6, 7, 8]:
+			wheel.size = Vector2(1080.0, band_height)
+			var letters: Array = []
+			for i in count:
+				letters.append("ABCDEFGH"[i])
+			wheel.set_letters(letters)
+			wheel.set_word_progress(progress)
+			wheel._layout()
+
+			var label := "%s / %d harf" % [aspect_name, count]
+			var band_bottom: float = LetterWheel.PROGRESS_TOP + LetterWheel.PROGRESS_HEIGHT
+
+			# 1) Hiçbir taş ilerleme şeridine girmemeli.
+			var highest := INF
+			for point in wheel._positions:
+				highest = minf(highest, point.y - wheel._stone_radius)
+			_check(highest >= band_bottom,
+				"%s: taşlar ilerleme şeridinin altında (üst kenar %.1f >= %.1f)"
+					% [label, highest, band_bottom])
+
+			# 2) Taşlar birbirine binmemeli.
+			var closest := INF
+			for i in wheel._positions.size():
+				var next: Vector2 = wheel._positions[(i + 1) % wheel._positions.size()]
+				closest = minf(closest, wheel._positions[i].distance_to(next))
+			_check(closest >= wheel._stone_radius * 2.0 - 0.5,
+				"%s: komşu taşlar ayrık (mesafe %.1f >= çap %.1f)"
+					% [label, closest, wheel._stone_radius * 2.0])
+
+			# 3) Taşlar çarkın dışına taşmamalı.
+			var inside := true
+			for point in wheel._positions:
+				if point.x - wheel._stone_radius < 0.0 or point.x + wheel._stone_radius > wheel.size.x \
+						or point.y + wheel._stone_radius > wheel.size.y:
+					inside = false
+			_check(inside, "%s: taşlar çarkın içinde kalıyor" % label)
+
+			# 4) Rozet satırı ekran genişliğine sığmalı.
+			var labels := wheel._progress_labels(progress.keys(), true)
+			var row := wheel._row_width(wheel._pill_widths(labels, 20))
+			if row > wheel.size.x - 24.0:
+				labels = wheel._progress_labels(progress.keys(), false)
+				row = wheel._row_width(wheel._pill_widths(labels, LetterWheel.PROGRESS_MIN_FONT))
+			_check(row <= wheel.size.x - 24.0,
+				"%s: rozet satırı sığıyor (%.1f <= %.1f)" % [label, row, wheel.size.x - 24.0])
+
+	wheel.queue_free()
+	await get_tree().process_frame
+
+	# Sentetik ölçüler doğru olsa da gerçek sahnede çarkın boyutu çapalardan
+	# gelir ve ilerleme Battle tarafından doldurulur; aynı kuralı orada da sına.
+	SceneRouter.pending_level_id = 4
+	var battle: Node = load("res://scenes/Oyun.tscn").instantiate()
+	add_child(battle)
+	for i in 3:
+		await get_tree().process_frame
+	var live: LetterWheel = battle.wheel
+	_check(not live._progress.is_empty(), "gerçek sahnede ilerleme şeridi dolu")
+	var top_edge := INF
+	for point in live._positions:
+		top_edge = minf(top_edge, point.y - live._stone_radius)
+	_check(top_edge >= LetterWheel.PROGRESS_TOP + LetterWheel.PROGRESS_HEIGHT,
+		"gerçek sahnede taşlar şeridin altında (%.1f)" % top_edge)
 	battle.queue_free()
 	await get_tree().process_frame
 
