@@ -36,6 +36,7 @@ func _ready() -> void:
 	await _run_async("Sprite yön çevirme", _test_sprite_flip)
 	await _run_async("Bölüme özgü saha yerleşimi", _test_level_layout)
 	await _run_async("Yol şeridi delik bırakmıyor", _test_road_strip)
+	await _run_async("Yol zeminden ayırt ediliyor", _test_road_contrast)
 	await _run_async("Kalabalık çarkta parmak yolu", _test_swipe_routing)
 	await _run_async("Altmış bölümde yuva menzili", _test_slot_coverage)
 	await _run_async("Bölüm haritası", _test_kingdom_map)
@@ -883,6 +884,68 @@ func _differs(img: Image, x: int, y: int) -> bool:
 	var background := Color(0.078, 0.086, 0.129)
 	return absf(c.r - background.r) + absf(c.g - background.g) \
 		+ absf(c.b - background.b) > 0.12
+
+
+## Yol, her bölgede zeminden ayırt edilebilmeli.
+##
+## Ölçülmüş hata: elle çizilen yol dokuları bölge zeminleriyle aynı paletten
+## geldiği için buz ve ejder bölgelerinde yol zemine karışıyordu — doku ile
+## zemin dosyalarının ortalama renk farkı 765 ölçeğinde 15 ve 2. Ekranda yol
+## bir patika değil, ince gri çizgilerden oluşan bir labirent gibi
+## görünüyordu. Bu test sahayı gerçekten render edip yolun üstündeki
+## piksellerle yoldan uzak piksellerin farkını ölçer.
+func _test_road_contrast() -> void:
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(1080, 1000)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
+	var field := Battlefield.new()
+	field.size = Vector2(1080, 1000)
+	viewport.add_child(field)
+
+	var en_dusuk := 1000.0
+	var en_dusuk_bolge := ""
+	for level_id in [1, 20, 40, 55]:
+		field.region_theme = GameConfig.theme_of_level(level_id)
+		field.layout_seed = level_id
+		field.build(1, 4)
+		await RenderingServer.frame_post_draw
+		await RenderingServer.frame_post_draw
+		var shot := viewport.get_texture().get_image()
+
+		var track: PathTrack = field.tracks[0]
+		var yol := Color(0, 0, 0, 0)
+		var yol_adet := 0
+		var zemin := Color(0, 0, 0, 0)
+		var zemin_adet := 0
+		# HUD şeridinin altındaki bandı örnekle: üstteki arayüz ölçümü bozmasın.
+		for y in range(int(Battlefield.TOP_UI_CLEARANCE) + 40, 940, 7):
+			for x in range(20, 1060, 7):
+				var uzaklik := track.distance_to_path(Vector2(x, y))
+				if uzaklik < PathTrack.PATH_WIDTH * 0.30:
+					yol += shot.get_pixel(x, y)
+					yol_adet += 1
+				elif uzaklik > PathTrack.PATH_WIDTH * 1.60:
+					zemin += shot.get_pixel(x, y)
+					zemin_adet += 1
+		if yol_adet == 0 or zemin_adet == 0:
+			continue
+		yol /= float(yol_adet)
+		zemin /= float(zemin_adet)
+		var fark := (absf(yol.r - zemin.r) + absf(yol.g - zemin.g)
+			+ absf(yol.b - zemin.b)) * 255.0
+		print("      %s: yol-zemin farkı %.0f" % [field.region_theme.get("id", ""), fark])
+		if fark < en_dusuk:
+			en_dusuk = fark
+			en_dusuk_bolge = str(field.region_theme.get("id", ""))
+	viewport.queue_free()
+	await get_tree().process_frame
+
+	# 60: gözle bakıldığında yolun zeminden ayrıldığı alt sınır. Ölçümden önce
+	# buz 15, ejder 2 idi.
+	_check(en_dusuk >= 60.0,
+		"her bölgede yol zeminden ayırt ediliyor (en zayıfı %s, fark %.0f)"
+			% [en_dusuk_bolge, en_dusuk])
 
 
 ## Kalabalık çarkta parmak yolu, hedef olmayan taşlara değmemeli.

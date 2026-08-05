@@ -228,16 +228,21 @@ func _draw_textured(baked: PackedVector2Array) -> bool:
 	var texture: Texture2D = SpriteBank.road(str(region_theme.get("id", "")))
 	if texture == null or baked.size() < 2:
 		return false
-	draw_road_strip(self, baked, texture)
+	draw_road_strip(self, baked, texture,
+		Color(region_theme.get("yol_tint", "#ffffff")))
 	return true
 
 
 ## Şeridi verilen tuvale çizer. Ayrı bir fonksiyon, çünkü testler dokulu katmanı
 ## tek başına (alttaki düz renk şerit olmadan) çizip deliklerini ölçüyor.
 ##
+## `tint` doku rengiyle çarpılır: elle çizilen yol dokuları bölge zeminleriyle
+## aynı paletten geldiği için buz ve ejder bölgelerinde yol zemine karışıyordu
+## (bkz. GameConfig.REGION_THEMES).
+##
 ## Tuvalin `texture_repeat` ayarı ENABLED olmalı; UV'ler 1'i aşıyor.
 static func draw_road_strip(canvas: CanvasItem, baked: PackedVector2Array,
-		texture: Texture2D) -> void:
+		texture: Texture2D, tint: Color = Color.WHITE) -> void:
 	# Her köşe noktası için ORTAK bir yanal kaydırma hesaplanır: gelen ve giden
 	# yönün ortalamasına dik. Her parçayı kendi yönüne göre kaydırınca komşu
 	# dörtgenler köşelerde ortak kenarı paylaşmıyor ve arada takoz boşluklar
@@ -258,7 +263,7 @@ static func draw_road_strip(canvas: CanvasItem, baked: PackedVector2Array,
 		sides[i] = Vector2(-forward.y, forward.x) * half
 
 	var tile := PATH_WIDTH        # dokunun bir kenarının kapladığı yol uzunluğu
-	var white := PackedColorArray([Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE])
+	var white := PackedColorArray([tint, tint, tint, tint])
 	var travelled := 0.0
 	for i in baked.size() - 1:
 		var length := baked[i].distance_to(baked[i + 1])

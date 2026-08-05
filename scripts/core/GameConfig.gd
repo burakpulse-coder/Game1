@@ -168,6 +168,13 @@ const REGIONS := [
 ]
 ## Bölge görsel temaları. Dört bölge oynanışta farklıydı ama ekranda tıpatıp
 ## aynı görünüyordu; manzara katmanı (Scenery) rengini ve süslerini buradan alır.
+##
+## `yol_tint`: yol dokusunun çarpanı. Elle çizilen dokular zeminleriyle aynı
+## paletten geldiği için son iki bölgede yol zemine karışıyordu — ölçüldü,
+## yol ile zeminin ortalama renkleri arasındaki fark (0-765 ölçeğinde):
+## yeşil vadi 125, karanlık orman 36, buz dağları 15, ejder kalesi 2. Yani
+## buzda ve ejder kalesinde yol yalnızca koyu dış hattından seçiliyordu.
+## Tint dokuyu zeminden uzaklaştırır; TestRunner bunu render edip ölçüyor.
 const REGION_THEMES := {
 	"yesil_vadi": {
 		"id": "yesil_vadi",
@@ -175,6 +182,7 @@ const REGION_THEMES := {
 		"zemin": "#5f9b45", "zemin_alt": "#3d6b2e",
 		"leke": "#6fae4a", "ufuk": "#3f6b3a", "uzak_tepe": "#7fa86a",
 		"yol": "#b09166", "yol_kenar": "#8a6f45",
+		"yol_tint": "#ffffff",  ## yol dokusu zemine göre yeterince koyu ve sıcak: dokunma
 		"susler": ["agac", "cali", "kaya"],
 		"yaprak": "#3e7a34", "govde": "#5a4029", "tas": "#8a8f7a",
 		"zerre": "#f6f0a0",
@@ -185,6 +193,7 @@ const REGION_THEMES := {
 		"zemin": "#2f4a30", "zemin_alt": "#1d3020",
 		"leke": "#3a5a38", "ufuk": "#1a2a1e", "uzak_tepe": "#2a4030",
 		"yol": "#6a5a44", "yol_kenar": "#4a3d2c",
+		"yol_tint": "#c99a63",  ## ölçülen fark 36; doku toprak tonuna çekilir
 		"susler": ["cam", "mantar", "kutuk"],
 		"yaprak": "#25452c", "govde": "#3a2b1e", "tas": "#4a4a52",
 		"zerre": "#8ad6a0",
@@ -195,6 +204,7 @@ const REGION_THEMES := {
 		"zemin": "#c3d9e6", "zemin_alt": "#8fb0c6",
 		"leke": "#d8e9f4", "ufuk": "#6f93b0", "uzak_tepe": "#a6c4da",
 		"yol": "#8494a4", "yol_kenar": "#59656f",
+		"yol_tint": "#8fa2b8",  ## ölçülen fark 15; kar üstünde kar görünmüyordu
 		"susler": ["buz", "kaya", "kutuk"],
 		"yaprak": "#8fc4d8", "govde": "#5b5a62", "tas": "#9aa4ae",
 		"zerre": "#ffffff",
@@ -205,6 +215,7 @@ const REGION_THEMES := {
 		"zemin": "#4a3330", "zemin_alt": "#2b1c1e",
 		"leke": "#5a3a32", "ufuk": "#2a1618", "uzak_tepe": "#5c3028",
 		"yol": "#6b4f42", "yol_kenar": "#452f28",
+		"yol_tint": "#c2705a",  ## ölçülen fark 2; yol zemine tamamen karışıyordu
 		"susler": ["kaya", "lav", "kutuk"],
 		"yaprak": "#6b3226", "govde": "#33241f", "tas": "#57505a",
 		"zerre": "#ffab5c",
