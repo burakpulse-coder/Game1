@@ -8,18 +8,36 @@ extends RefCounted
 const MIN_WORD_LENGTH := 3
 const ANCIENT_WORD_LENGTH := 7  ## "Kadim Kelime" eşiği
 
-## Kelime uzunluğu -> etki çarpanı (3=1x, 4=1.5x, 5=2x, 6+=3x)
-const LENGTH_MULTIPLIERS := {3: 1.0, 4: 1.5, 5: 2.0}
-const LENGTH_MULTIPLIER_MAX := 3.0
+## Kelime uzunluğu -> etki çarpanı.
+##
+## Eskiden 3=1x, 4=1.5x, 5=2x, 6+=3x idi. Ölçüldüğünde bölümün kaderi tek bir
+## şeye bağlıydı: uzun kelime bulabildin mi? 6 harfli bir kategori kelimesi
+## 48x3=144 puanla tek başına kule veriyor, 4 harfli kategori dışı bir kelime
+## ise kule başına 3.6 puan veriyordu — yaklaşık 40 kat fark. Uzun kelime
+## hâlâ ödüllü ama uçurum kapatıldı.
+const LENGTH_MULTIPLIERS := {3: 1.0, 4: 1.4, 5: 1.8}
+const LENGTH_MULTIPLIER_MAX := 2.3
 
 const COMBO_STEP := 0.10       ## Arka arkaya doğru kelime başına +%10
 const COMBO_MAX := 1.0         ## En fazla +%100
-const GENERAL_ENERGY_RATIO := 0.05  ## Kategori dışı kelime: tüm kulelere %5
+## Kategori dışı geçerli kelimenin her kule tipine kattığı pay.
+##
+## %5 iken kategori dışı kelime pratikte değersizdi: 4 harfli bir kelime kule
+## başına 3.6 puan veriyor, 100 puanlık eşik için ~28 kelime gerekiyordu.
+## Oyuncu kategori kelimelerini bulamazsa hiç kule dikemiyor ve tek düşman
+## öldüremeden kaybediyordu (tarama: kaybedilen bölümlerin çoğunda
+## oldurulen=0). %16 ile ~9 kelime yetiyor: kategori hâlâ açık ara iyi,
+## ama kategori dışı oynamak da bir yere varıyor.
+const GENERAL_ENERGY_RATIO := 0.16
 
 # --- İnşa puanı ---------------------------------------------------------
 ## 3 harfli kelimenin taban katkısı. Geç bölümlerde yuva sayısı 9'a çıktığı için
 ## kuleler zamanında ayağa kalkmıyordu; bu değer savunmanın kurulma hızını belirler.
-const BUILD_POINTS_PER_WORD := 48.0
+##
+## Uzunluk çarpanları düzleştirilince kelime başına ortalama enerji ~%9 düştü
+## ve bıçak sırtındaki bölümler (35) kaybedilir hâle geldi; taban buna göre
+## 48'den yükseltildi.
+const BUILD_POINTS_PER_WORD := 56.0
 const BUILD_POINT_THRESHOLD := 100.0  ## Yeni kule için gereken puan
 const UPGRADE_COST_L2 := 130.0
 const UPGRADE_COST_L3 := 190.0
@@ -84,38 +102,44 @@ const TOWER_LEVEL_SCALE := [1.0, 1.45, 2.0]
 
 # --- Düşman tipleri -----------------------------------------------------
 ## zirh: gelen hasarın çarpanı (0.5 = yarısı) | zayiflik: bu kule tipine karşı çarpan
+##
+## "hasar" = kaleye ulaşan düşmanın verdiği zarar. Hepsi ~%27 düşürüldü.
+## Sebebi ölçüm: sonuçlar iki uçluydu — kule zamanında dikilirse hiçbir şey
+## sızmıyor ve %100 canla 3 yıldız geliyor, dikilemezse kale hızla düşüyordu.
+## Sızan düşmanın maliyeti azalınca kısmi savunma kısmi hasara dönüşüyor;
+## hem kaybedilen bölümlere marj kalıyor hem yıldız dağılımı yayılıyor.
 const ENEMIES := {
 	"goblin": {
 		"ad": "Goblin",
-		"can": 32.0, "hiz": 92.0, "hasar": 5.0, "altin": 3,
+		"can": 32.0, "hiz": 92.0, "hasar": 3.6, "altin": 3,
 		"zirh": 1.0, "zayiflik": {}, "bagisiklik": [],
 		"renk": "#78b04a", "boy": 0.85,
 		"aciklama": "Hızlı ama zayıf. Kalabalık gelir.",
 	},
 	"ork": {
 		"ad": "Ork",
-		"can": 78.0, "hiz": 62.0, "hasar": 11.0, "altin": 5,
+		"can": 78.0, "hiz": 62.0, "hasar": 8.0, "altin": 5,
 		"zirh": 1.0, "zayiflik": {}, "bagisiklik": [],
 		"renk": "#4c7a3a", "boy": 1.0,
 		"aciklama": "Dengeli asker. Orta can, orta hız.",
 	},
 	"zirhli_trol": {
 		"ad": "Zırhlı Trol",
-		"can": 240.0, "hiz": 34.0, "hasar": 26.0, "altin": 12,
+		"can": 240.0, "hiz": 34.0, "hasar": 19.0, "altin": 12,
 		"zirh": 0.5, "zayiflik": {"mancinik": 2.2}, "bagisiklik": [],
 		"renk": "#6b6f7a", "boy": 1.35,
 		"aciklama": "Zırhı hasarı yarıya indirir. Mancınık zırhı parçalar.",
 	},
 	"hayalet": {
 		"ad": "Hayalet",
-		"can": 66.0, "hiz": 78.0, "hasar": 13.0, "altin": 8,
+		"can": 66.0, "hiz": 78.0, "hasar": 9.5, "altin": 8,
 		"zirh": 1.0, "zayiflik": {}, "bagisiklik": ["okcu", "mancinik"],
 		"renk": "#9fb6d9", "boy": 1.0,
 		"aciklama": "Fiziksel saldırılara dokunulmaz; yalnız Büyü Kulesi vurur.",
 	},
 	"harf_hirsizi": {
 		"ad": "Harf Hırsızı",
-		"can": 54.0, "hiz": 118.0, "hasar": 4.0, "altin": 10,
+		"can": 54.0, "hiz": 118.0, "hasar": 3.0, "altin": 10,
 		"zirh": 1.0, "zayiflik": {}, "bagisiklik": [],
 		"renk": "#b45fb0", "boy": 0.9,
 		"calar_harf": true, "calma_suresi": 5.0,
@@ -123,7 +147,7 @@ const ENEMIES := {
 	},
 	"boss_vadi": {
 		"ad": "Yeşil Vadi Devi",
-		"can": 1400.0, "hiz": 30.0, "hasar": 40.0, "altin": 60,
+		"can": 1400.0, "hiz": 30.0, "hasar": 29.0, "altin": 60,
 		"zirh": 0.8, "zayiflik": {}, "bagisiklik": [],
 		"renk": "#3f6b2c", "boy": 1.9, "boss": true,
 		"fazlar": [{"can_orani": 0.6, "hiz_carpani": 1.35}, {"can_orani": 0.25, "hiz_carpani": 1.7, "cagirir": "goblin"}],
@@ -131,7 +155,7 @@ const ENEMIES := {
 	},
 	"boss_orman": {
 		"ad": "Karanlık Orman Cadısı",
-		"can": 2200.0, "hiz": 44.0, "hasar": 46.0, "altin": 90,
+		"can": 2200.0, "hiz": 44.0, "hasar": 33.0, "altin": 90,
 		"zirh": 1.0, "zayiflik": {}, "bagisiklik": ["okcu"],
 		"renk": "#4a2f5e", "boy": 1.8, "boss": true,
 		"fazlar": [{"can_orani": 0.55, "hiz_carpani": 1.3, "cagirir": "hayalet"}, {"can_orani": 0.2, "hiz_carpani": 1.6, "cagirir": "hayalet"}],
@@ -139,7 +163,7 @@ const ENEMIES := {
 	},
 	"boss_buz": {
 		"ad": "Buz Dağları Kadim Devi",
-		"can": 3200.0, "hiz": 32.0, "hasar": 55.0, "altin": 130,
+		"can": 3200.0, "hiz": 32.0, "hasar": 40.0, "altin": 130,
 		"zirh": 0.45, "zayiflik": {"mancinik": 2.0}, "bagisiklik": [],
 		"renk": "#7fc4e0", "boy": 2.1, "boss": true,
 		"fazlar": [{"can_orani": 0.5, "hiz_carpani": 1.25, "cagirir": "zirhli_trol"}, {"can_orani": 0.2, "hiz_carpani": 1.5, "cagirir": "harf_hirsizi"}],
@@ -147,7 +171,7 @@ const ENEMIES := {
 	},
 	"boss_ejder": {
 		"ad": "Ejder Kalesi Efendisi",
-		"can": 4800.0, "hiz": 38.0, "hasar": 70.0, "altin": 200,
+		"can": 4800.0, "hiz": 38.0, "hasar": 51.0, "altin": 200,
 		"zirh": 0.6, "zayiflik": {}, "bagisiklik": [],
 		"renk": "#a63232", "boy": 2.3, "boss": true,
 		"fazlar": [
@@ -227,7 +251,13 @@ const TOTAL_LEVELS := 60
 
 # --- Kale / seviye ------------------------------------------------------
 const BASE_CASTLE_HP := 100.0
-const WAVE_BREAK_SECONDS := 5.0
+## Dalgalar arası mola.
+##
+## 5 saniyeydi. Ortalama bir oyuncu 5-7 saniyede bir kelime buluyor, yani
+## molada tek kelime bile yetişmiyordu; savunma kurulmadan bir sonraki dalga
+## biniyordu. Taramada kaybedilen bölümlerin ortak yanı buydu: az kelime,
+## sıfıra yakın öldürme.
+const WAVE_BREAK_SECONDS := 9.0
 const STAR_THRESHOLDS := [0.0, 0.5, 0.8]  ## kalan can oranı: 1★ / 2★ / 3★
 
 # --- Ekonomi ------------------------------------------------------------

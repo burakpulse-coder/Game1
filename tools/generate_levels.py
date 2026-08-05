@@ -174,12 +174,16 @@ def build_waves(level_id: int, paths: int) -> list[dict]:
     is_boss = level_id % LEVELS_PER_REGION == 0
     pool = unlocked_enemies(level_id)
 
-    wave_count = min(8, 3 + region + step // 5)
+    # Dalga sayısı ve düşman gücü, ortalama bir oyuncunun kelime temposuna
+    # göre ayarlandı. Önceki değerler (min 8 dalga, 0.030 eğim, index//2 artış)
+    # dakikada ~40 kelime bulan bir bota göreydi; insan profilinde 60 bölümün
+    # 43'ü "bot geçiyor, insan geçemiyor" durumundaydı.
+    wave_count = min(7, 3 + region + step // 6)
     # Düşman gücü, oyuncunun ulaşabileceği güçle birlikte artmalı. Oyuncunun
     # tavanı: kule seviyesi 2.0x, kalıcı yükseltme 1.6x, combo 2.0x.
-    # 0.055'lik eğim son bölgede 4.25x'e çıkıyordu ve tam yükseltmeyle bile
-    # bölüm bitirilemiyordu; 0.030 ile son bölüm 2.77x'te kalıyor.
-    strength = 1.0 + 0.030 * (level_id - 1)
+    # 0.055'lik eğim son bölgede 4.25x'e çıkıyordu; 0.030 ile 2.77x oluyordu
+    # ama o da yalnız bot için geçilebilirdi. 0.021 ile son bölüm 2.24x.
+    strength = 1.0 + 0.021 * (level_id - 1)
 
     waves: list[dict] = []
     for index in range(wave_count):
@@ -192,7 +196,7 @@ def build_waves(level_id: int, paths: int) -> list[dict]:
             base_count = 6 if enemy in ("goblin",) else 4
             if enemy in ("zirhli_trol", "harf_hirsizi"):
                 base_count = 2
-            count = base_count + index // 2 + region
+            count = base_count + index // 3 + region
             groups.append({
                 "tip": enemy,
                 "adet": count,
@@ -201,7 +205,11 @@ def build_waves(level_id: int, paths: int) -> list[dict]:
                 "guc": round(strength, 3),
             })
         waves.append({
-            "gecikme": 3.0 if index == 0 else 0.0,  # 0 => dalga arası mola kullanılır
+            # İlk dalgadan önceki hazırlık. 3 saniyeydi: oyuncu tek kelime
+            # bile yazamadan düşman yola çıkıyordu. Ortalama tempoda (5-7
+            # sn/kelime) ilk kule ~6 kelime sürüyor; 14 saniye + düşmanın
+            # yolu kat etme süresi ilk kuleye yetişmeyi mümkün kılıyor.
+            "gecikme": 14.0 if index == 0 else 0.0,  # 0 => dalga arası mola kullanılır
             "gruplar": groups,
         })
 
@@ -362,7 +370,11 @@ def main() -> int:
             "kategori_kelimeler": {c: sorted(v, key=tr_sort_key)[:20] for c, v in cat_words.items()},
             "yol_sayisi": paths,
             "slot_sayisi": slot_count_for(paths),
-            "kale_can_carpani": round(1.0 + 0.012 * (level_id - 1), 3),
+            # Kale canı. 0.012 eğimle 46. bölümde 1.54x kalıyordu ve son iki
+            # bölge bıçak sırtındaydı: aynı bölüm bir koşuda kazanılıp
+            # diğerinde kaybediliyordu (oyunun kendi rastgeleliği sonucu
+            # çeviriyordu). 0.020 ile 46. bölüm 1.90x, 60. bölüm 2.18x.
+            "kale_can_carpani": round(1.0 + 0.020 * (level_id - 1), 3),
             "dalgalar": build_waves(level_id, paths),
             "boss": level_id % LEVELS_PER_REGION == 0,
         }

@@ -154,7 +154,8 @@ func _test_word_engine() -> void:
 	_check(result.valid, "kurt geçerli olmalı")
 	_equal(result.category, "hayvan", "kurt hayvan kategorisinde")
 	_equal(result.tower_type, "okcu", "hayvan -> okçu kulesi")
-	_equal(result.length_multiplier, 1.5, "4 harf -> 1.5x")
+	_equal(result.length_multiplier, GameConfig.length_multiplier(4),
+		"4 harf çarpanı GameConfig ile aynı")
 
 	_equal(WordEngine.submit("dağ").category, "doga", "dağ doğa kategorisinde")
 	_equal(WordEngine.submit("kılıç").tower_type, "mancinik", "nesne -> mancınık")
@@ -164,10 +165,22 @@ func _test_word_engine() -> void:
 	_equal(WordEngine.submit("zzzt").valid, false, "sözlük dışı reddedilir")
 	_equal(WordEngine.submit("kale", ["kale"]).valid, false, "tekrarlanan kelime reddedilir")
 
-	_equal(GameConfig.length_multiplier(3), 1.0, "3 harf 1x")
-	_equal(GameConfig.length_multiplier(5), 2.0, "5 harf 2x")
-	_equal(GameConfig.length_multiplier(6), 3.0, "6+ harf 3x")
-	_equal(GameConfig.length_multiplier(9), 3.0, "9 harf de 3x")
+	# Kesin sayı değil ŞEKİL denetlenir: sayılar denge ayarı, ilişki kural.
+	# Uzun kelime her zaman daha değerli olmalı ve 6 harften sonra tavana
+	# oturmalı; ayrıca uçurum açılmamalı — 3x'ken bölümün kaderi tek bir uzun
+	# kelimeye bağlıydı.
+	_equal(GameConfig.length_multiplier(3), 1.0, "3 harf taban 1x")
+	_check(GameConfig.length_multiplier(4) > GameConfig.length_multiplier(3),
+		"4 harf 3 harften değerli")
+	_check(GameConfig.length_multiplier(5) > GameConfig.length_multiplier(4),
+		"5 harf 4 harften değerli")
+	_check(GameConfig.length_multiplier(6) > GameConfig.length_multiplier(5),
+		"6 harf 5 harften değerli")
+	_equal(GameConfig.length_multiplier(9), GameConfig.length_multiplier(6),
+		"6 harften sonra tavan")
+	_check(GameConfig.length_multiplier(6) <= 2.5,
+		"en uzun kelime en kısanın 2.5 katından fazla etmiyor (%.2f)"
+			% GameConfig.length_multiplier(6))
 
 	var ancient: WordEngine.WordResult = WordEngine.submit("öğretmen")
 	_check(ancient.valid and ancient.is_ancient, "8 harfli kelime Kadim Kelime olmalı")
