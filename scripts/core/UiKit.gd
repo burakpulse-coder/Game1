@@ -21,6 +21,8 @@ const DANGER := Color("#d1544a")
 const SUCCESS := Color("#5ec97a")
 const OUTLINE := Color("#100d1a")
 
+const PRESS_SINK := 8.0     ## basılıyken yazının indiği piksel
+const PRESS_SCALE := 0.965  ## basılıyken düğmenin küçüldüğü oran
 const TOUCH_MIN := 96.0
 const RADIUS := 18.0
 
@@ -107,11 +109,12 @@ static func button(text: String, accent: Color = GOLD, size: int = FONT_BODY) ->
 	if skin != null:
 		node.add_theme_stylebox_override("normal", skin)
 		node.add_theme_stylebox_override("hover", _tinted(skin, Color(1.12, 1.12, 1.12)))
-		node.add_theme_stylebox_override("pressed", _tinted(skin, Color(0.84, 0.84, 0.84)))
+		node.add_theme_stylebox_override("pressed", _pressed_style(skin))
 		node.add_theme_stylebox_override("focus", skin)
 		var off := _button_texture_style("mor_pasif")
 		node.add_theme_stylebox_override("disabled",
 			off if off != null else _tinted(skin, Color(0.6, 0.6, 0.6)))
+		_add_press_feel(node)
 		return node
 
 	var normal := panel_style(accent, Color(0, 0, 0, 0), RADIUS)
@@ -169,6 +172,26 @@ static func _button_texture_style(state: String) -> StyleBoxTexture:
 	style.content_margin_top = 18
 	style.content_margin_bottom = 18
 	return style
+
+
+## Basılı hâl: yazı aşağı kayar ve zemin koyulaşır — düğme yuvasına gömülmüş
+## gibi durur. Yalnızca renk değiştirmek dokunuşu hissettirmiyordu.
+static func _pressed_style(style: StyleBoxTexture) -> StyleBoxTexture:
+	var down := _tinted(style, Color(0.82, 0.82, 0.86))
+	down.content_margin_top = style.content_margin_top + PRESS_SINK
+	down.content_margin_bottom = maxf(style.content_margin_bottom - PRESS_SINK, 4.0)
+	return down
+
+
+## Basarken hafif küçülme. Ölçek yerleşimi etkilemez, yalnızca çizimi;
+## bu yüzden kutu düzeni bozulmadan dokunma geri bildirimi verir.
+static func _add_press_feel(node: Button) -> void:
+	node.resized.connect(func(): node.pivot_offset = node.size * 0.5)
+	node.button_down.connect(func():
+		node.pivot_offset = node.size * 0.5
+		node.scale = Vector2(PRESS_SCALE, PRESS_SCALE))
+	node.button_up.connect(func(): node.scale = Vector2.ONE)
+	node.mouse_exited.connect(func(): node.scale = Vector2.ONE)
 
 
 static func _tinted(style: StyleBoxTexture, color: Color) -> StyleBoxTexture:

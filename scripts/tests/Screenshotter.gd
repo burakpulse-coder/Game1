@@ -23,6 +23,7 @@ var _shots := [
 	["13_bolge_orman", "res://scenes/Oyun.tscn", "bolge_orman"],
 	["14_bolge_buz", "res://scenes/Oyun.tscn", "bolge_buz"],
 	["15_bolge_ejder", "res://scenes/Oyun.tscn", "bolge_ejder"],
+	["16_duraklat", "res://scenes/Oyun.tscn", "duraklat"],
 	["08_sonuc", "res://scenes/SonucEkrani.tscn", "zafer"],
 	["09_yukseltme", "res://scenes/YukseltmeEkrani.tscn", "zengin"],
 	["10_magaza", "res://scenes/Magaza.tscn", "zengin"],
@@ -55,6 +56,10 @@ func _capture(name: String, scene_path: String, setup: String) -> void:
 
 	if setup == "savas" or setup == "boss" or setup.begins_with("bolge_"):
 		await _simulate_battle(setup == "boss")
+	elif setup == "duraklat":
+		await _simulate_battle(false)
+		_current._toggle_pause()
+		await get_tree().process_frame
 
 	# Çizimin tamamlanması için birkaç kare bekle.
 	for i in 4:
@@ -73,7 +78,7 @@ func _prepare(setup: String) -> void:
 				SaveManager.record_level_result(level_id, 2 + level_id % 2, 0.7)
 		"seviye4":
 			SceneRouter.pending_level_id = 4
-		"savas":
+		"savas", "duraklat":
 			SceneRouter.pending_level_id = 8
 		"boss":
 			SceneRouter.pending_level_id = 15

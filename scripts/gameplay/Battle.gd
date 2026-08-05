@@ -482,36 +482,54 @@ func _toggle_pause() -> void:
 
 func _show_pause_menu() -> void:
 	var overlay := ColorRect.new()
-	overlay.color = Color(0, 0, 0, 0.78)
+	overlay.color = Color(0.02, 0.02, 0.05, 0.72)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = Z_OVERLAY
 	overlay.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
 
-	var box := UiKit.vbox(20)
-	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	box.anchor_left = 0.12
-	box.anchor_right = 0.88
-	box.offset_left = 0
-	box.offset_right = 0
-	box.offset_top = -220
-	box.offset_bottom = 220
+	# Serbest duran düğme yığını yerine ortada bir kart: menü savaş alanından
+	# ayrı bir katman gibi dursun.
+	var card := UiKit.panel(Color(0.10, 0.09, 0.15, 0.96))
+	card.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	card.anchor_left = 0.08
+	card.anchor_right = 0.92
+	card.offset_left = 0
+	card.offset_right = 0
+	card.offset_top = -300
+	card.offset_bottom = 300
+
+	var box := UiKit.vbox(16)
+	card.add_child(box)
 
 	box.add_child(UiKit.title("Duraklatıldı"))
-	var resume := UiKit.button("Devam Et", UiKit.SUCCESS)
+
+	# Oyuncu neyi bıraktığını görsün: dalga ve kale canı.
+	var wave_text := "Dalga %d / %d" % [maxi(waves.current_index + 1, 1), waves.wave_count()]
+	var hp_text := "Kale %d%%" % int(round(battlefield.castle.health_ratio() * 100.0))
+	box.add_child(UiKit.label("%s   •   %s" % [wave_text, hp_text],
+		UiKit.FONT_BODY, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER))
+	box.add_child(UiKit.spacer(10))
+
+	var resume := UiKit.button("Devam Et", UiKit.GOLD, UiKit.FONT_HEAD)
+	resume.custom_minimum_size = Vector2(0, 126)
 	resume.pressed.connect(_toggle_pause)
 	box.add_child(resume)
+
 	var restart := UiKit.ghost_button("Yeniden Başla")
+	UiKit.set_button_icon(restart, "karistir")
 	restart.pressed.connect(func():
 		get_tree().paused = false
 		SceneRouter.play_level(level_id))
 	box.add_child(restart)
+
 	var quit := UiKit.ghost_button("Haritaya Dön")
+	UiKit.set_button_icon(quit, "parsomen")
 	quit.pressed.connect(func():
 		get_tree().paused = false
 		SceneRouter.go_to("harita"))
 	box.add_child(quit)
 
-	overlay.add_child(box)
+	overlay.add_child(card)
 	add_child(overlay)
 	_pause_menu = overlay
 
