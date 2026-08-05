@@ -284,24 +284,44 @@ func _choose_word() -> void:
 	_timer = 1.0
 
 
-## Rastgele bir harf dizisi kaydırır — insanın tutmayan denemesi.
-## Gerçekten geçerli bir kelime çıkarsa (nadir) bu da gerçekçi: bazen tutar.
+## Tutmayan bir deneme kaydırır.
+##
+## İnsanın yanlış denemesi rastgele bir zikzak DEĞİLDİR: aklındaki kelimenin
+## yakınında bir şey dener — bir harf eksik ya da bir harf fazla. Bu ayrım
+## ölçülebilir bir fark yaratıyor: rastgele taş dizisi çarkın bir ucundan
+## diğerine dolaşıp bir kelimenin birkaç katı süre harcıyordu ve 20. bölümde
+## hiç kule dikilememesinin tek başına sebebiydi.
+##
+## Sıradaki planlı kelimeyi bozarak deneme yapar; kelime plandan silinmez,
+## oyuncu birazdan doğrusunu yazacaktır.
 func _swipe_guess(locked: Array) -> bool:
 	var wheel: LetterWheel = battle.wheel
-	var free: Array = []
-	for stone in wheel.letters.size():
-		if not locked.has(stone):
-			free.append(stone)
-	if free.size() < 3:
+	var stones: Array = []
+	for word in _pool:
+		if battle._found_words.has(word):
+			continue
+		stones = _stones_for(str(word), locked)
+		if not stones.is_empty():
+			break
+	if stones.size() < 3:
 		return false
-	for i in range(free.size() - 1, 0, -1):
-		var j := _rng.randi_range(0, i)
-		var swap = free[i]
-		free[i] = free[j]
-		free[j] = swap
 
-	var count := _rng.randi_range(3, mini(5, free.size()))
-	_points = swipe_path(wheel, free.slice(0, count))
+	if _rng.randf() < 0.5 and stones.size() > 3:
+		# Bir harf eksik dene.
+		stones = stones.slice(0, stones.size() - 1)
+	else:
+		# Sona uygun olmayan bir harf ekle.
+		var extra := -1
+		for stone in wheel.letters.size():
+			if not locked.has(stone) and not stones.has(stone):
+				extra = stone
+				if _rng.randf() < 0.5:
+					break
+		if extra < 0:
+			return false
+		stones.append(extra)
+
+	_points = swipe_path(wheel, stones)
 	_leg = 0
 	_finger = _points[0]
 	_press(_finger)
