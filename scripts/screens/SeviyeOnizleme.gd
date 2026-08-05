@@ -62,8 +62,14 @@ func _wheel_preview(level: Dictionary) -> Control:
 	for letter in level.get("harfler", []):
 		stones.add_child(ArtIcon.stone(str(letter), 84.0))
 	column.add_child(stones)
+	# Sayı yaygın kelimelerden: sözlükteki her maddeyi saymak yanıltıcı.
+	# Bir çarktan 190 kelime "türetilebilir" ama bunların yarıdan çoğu ağız ya
+	# da eskimiş; oyuncuya ulaşamayacağı bir hedef göstermek istemiyoruz.
+	var hedef := int(level.get("yaygin_sayisi", 0))
+	if hedef <= 0:
+		hedef = int(level.get("cozum_sayisi", 0))
 	column.add_child(UiKit.paragraph(
-		"Bu çarktan %d geçerli kelime türetilebilir." % int(level.get("cozum_sayisi", 0))))
+		"Bu çarktan %d kelime bulmanı bekliyoruz." % hedef))
 	return box
 
 

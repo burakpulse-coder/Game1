@@ -167,3 +167,61 @@ GODOT=/yol/godot tools/denge_taramasi.sh --insan --yukseltme=oto
 GODOT=/yol/godot tools/denge_taramasi.sh --yukseltme=oto
 python3 tools/denge_raporu.py /tmp/kk_denge
 ```
+
+
+---
+
+# GÜNCELLEME — denge elden geçirildikten sonra
+
+Yukarıdaki ölçümler düzeltme ÖNCESİ durumdur; kayıt olarak bırakıldı.
+Aşağıdaki bölüm, kelime listeleri ve denge elden geçirildikten sonraki
+durumu anlatır.
+
+## Yapılanlar
+
+| değişiklik | eski | yeni |
+|---|---|---|
+| kategori dışı kelime payı | %5 | %16 |
+| uzunluk çarpanı (6+ harf) | 3.0x | 2.3x |
+| kelime taban puanı | 48 | 56 |
+| en fazla dalga | 8 | 7 |
+| düşman gücü eğimi | 0.030 (son bölüm 2.77x) | 0.021 (2.24x) |
+| grup başına düşman artışı | index//2 | index//3 |
+| ilk dalga öncesi hazırlık | 3 sn | 14 sn |
+| dalga arası mola | 5 sn | 9 sn |
+| düşmanın kaleye hasarı | — | ~%27 azaltıldı |
+| kale canı eğimi | 0.012 (46. bölüm 1.54x) | 0.020 (1.90x) |
+
+Ayrıca kelime listeleri elden geçti: küfür sözlükten çıkarıldı, çarklar
+"yaygın kelime" oranına göre seçilir oldu ve ilerleme göstergeleri yalnız
+bulunabilir kelimeleri hedef gösteriyor.
+
+## Sonuç
+
+**İnsan profili: 14/60 → 57/60.**
+
+| yıldız | bölüm sayısı |
+|---|---|
+| 3 yıldız | 46 |
+| 2 yıldız | 4 |
+| 1 yıldız | 5 |
+| kaybedildi | 3 |
+
+Kaybedilenler: 37, 54, 56.
+
+Üçü de yapısal olarak bozuk değil, sınırda:
+
+- **37**: üç koşudan birinde kazanıldı (1 yıldız, %2 can).
+- **54 ve 56**: üç koşuda da kaybedildi, ama komşularıyla (53, 55, 57)
+  dalga sayısı, düşman sayısı, güç ve kale canı bakımından neredeyse
+  birebir aynı — 53, 55 ve 57 kazanılıyor. Fark dalga tasarımından değil,
+  o çarkın kelime bileşiminden geliyor.
+
+## Açık kalan gözlem
+
+Yıldız dağılımı hâlâ üst uca yığılı: 60 bölümün 46'sı 3 yıldız. Yıldız
+eşikleri kalan cana bakıyor (`STAR_THRESHOLDS = [0.0, 0.5, 0.8]`) ve
+savunma zamanında kurulduğunda pratikte hiç sızma olmuyor. Eşikleri
+sıkılaştırmak (örneğin 0.65 / 0.92) yıldızı anlamlı kılar ama bölge açma
+gereksinimlerini (22 / 55 / 92 yıldız) de etkiler; ikisi birlikte
+ayarlanmalı. Bu değişiklik YAPILMADI.
