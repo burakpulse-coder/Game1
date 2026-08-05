@@ -38,6 +38,14 @@ static func _load(path: String) -> Texture2D:
 	var texture: Texture2D = null
 	if ResourceLoader.exists(path):
 		texture = load(path) as Texture2D
+	if texture == null:
+		# Godot dokuları yalnızca editör projeyi taradığında içe aktarır; taranmamış
+		# bir kurulumda içe aktarılmış doku (.godot/imported) yoktur ve yüklenemez.
+		# O durumda ham PNG doğrudan okunur. Dışa aktarılmış pakette ilk yol zaten
+		# çalıştığı için buraya düşülmez.
+		var image := Image.new()
+		if image.load(path) == OK:
+			texture = ImageTexture.create_from_image(image)
 	_cache[path] = texture
 	return texture
 
