@@ -272,9 +272,7 @@ func _choose_word() -> void:
 		if stones.is_empty():
 			continue
 		_pool.remove_at(index)
-		_points = []
-		for stone in stones:
-			_points.append(wheel._positions[stone])
+		_points = swipe_path(wheel, stones)
 		_leg = 0
 		_finger = _points[0]
 		_press(_finger)
@@ -303,9 +301,7 @@ func _swipe_guess(locked: Array) -> bool:
 		free[j] = swap
 
 	var count := _rng.randi_range(3, mini(5, free.size()))
-	_points = []
-	for k in count:
-		_points.append(wheel._positions[free[k]])
+	_points = swipe_path(wheel, free.slice(0, count))
 	_leg = 0
 	_finger = _points[0]
 	_press(_finger)
@@ -339,6 +335,73 @@ func _stones_for(word: String, locked: Array) -> Array:
 ## --------------------------------------------------------------------------
 ## Parmak hareketi
 ## --------------------------------------------------------------------------
+
+## Taş dizisini, aradaki taşlara değmeyen bir parmak yoluna çevirir.
+##
+## Ölçülmüş hata: iki taş arasında düz çizgi çizmek 7-8 harfli çarklarda
+## aradaki taşların üstünden geçiyor. LetterWheel._try_add parmağın değdiği
+## HER taşı kelimeye ekliyor, dolayısıyla gönderilen kelime bozuk çıkıyor ve
+## hiçbir kelime kabul edilmiyordu (40. bölümde 55 saniyede 0 kelime).
+##
+## Bu bir hızlandırma yan etkisiyle gizlenmişti: --hizli ile kare başına
+## 175 piksel ilerleyen bot aradaki taşların üstünden ATLIYOR ve sorunu hiç
+## yaşamıyordu. Gerçek oyuncu böyle oynayamaz; o yüzden yol artık gerçek bir
+## oyuncunun yaptığını yapıyor — engel varsa çarkın ortasından dolanıyor.
+static func swipe_path(wheel: LetterWheel, stones: Array) -> Array:
+	if stones.is_empty():
+		return []
+	var path: Array = [wheel._positions[stones[0]]]
+	for i in range(1, stones.size()):
+		var from_index: int = stones[i - 1]
+		var to_index: int = stones[i]
+		var a: Vector2 = wheel._positions[from_index]
+		var b: Vector2 = wheel._positions[to_index]
+		for via in _detour(wheel, a, b, from_index, to_index):
+			path.append(via)
+		path.append(b)
+	return path
+
+
+## a'dan b'ye giderken başka taşa değmemek için gereken ara noktalar.
+static func _detour(wheel: LetterWheel, a: Vector2, b: Vector2,
+		from_index: int, to_index: int) -> Array:
+	if _leg_clear(wheel, a, b, from_index, to_index):
+		return []
+
+	# Çarkın ortası bütün taşlardan yarıçap kadar uzak: en güvenli geçiş.
+	if _leg_clear(wheel, a, wheel._center, from_index, to_index) \
+			and _leg_clear(wheel, wheel._center, b, from_index, to_index):
+		return [wheel._center]
+
+	# Ortası da tutmazsa kirişin dışına doğru kaydırılmış bir nokta denenir.
+	var mid := (a + b) * 0.5
+	var normal := (b - a).normalized().orthogonal()
+	for scale: float in [0.4, 0.7, 1.0]:
+		for side: float in [1.0, -1.0]:
+			var via := mid + normal * (wheel._radius * scale * side)
+			# Nokta çarkın kutusunun dışına çıkmasın: dışarıdaki sürükleme
+			# olayları çarka ulaşmayabilir.
+			if not Rect2(Vector2.ZERO, wheel.size).has_point(via):
+				continue
+			if _leg_clear(wheel, a, via, from_index, to_index) \
+					and _leg_clear(wheel, via, b, from_index, to_index):
+				return [via]
+	# Temiz yol yok: insan da bazen yanlış taşa değer.
+	return []
+
+
+static func _leg_clear(wheel: LetterWheel, a: Vector2, b: Vector2,
+		from_index: int, to_index: int) -> bool:
+	# LetterWheel._letter_at ile aynı yarıçap, biraz emniyet payıyla.
+	var reach := maxf(wheel._stone_radius * LetterWheel.TOUCH_SLACK, 44.0) * 1.15
+	for i in wheel._positions.size():
+		if i == from_index or i == to_index:
+			continue
+		var closest := Geometry2D.get_closest_point_to_segment(wheel._positions[i], a, b)
+		if closest.distance_to(wheel._positions[i]) <= reach:
+			return false
+	return true
+
 
 func _advance_finger(delta: float) -> void:
 	var target: Vector2 = _points[_leg]

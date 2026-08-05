@@ -36,6 +36,7 @@ func _ready() -> void:
 	await _run_async("Sprite yön çevirme", _test_sprite_flip)
 	await _run_async("Bölüme özgü saha yerleşimi", _test_level_layout)
 	await _run_async("Yol şeridi delik bırakmıyor", _test_road_strip)
+	await _run_async("Kalabalık çarkta parmak yolu", _test_swipe_routing)
 	await _run_async("Altmış bölümde yuva menzili", _test_slot_coverage)
 	await _run_async("Bölüm haritası", _test_kingdom_map)
 	await _run_async("Tüm ekranlar açılıyor", _test_screens_open)
@@ -882,6 +883,93 @@ func _differs(img: Image, x: int, y: int) -> bool:
 	var background := Color(0.078, 0.086, 0.129)
 	return absf(c.r - background.r) + absf(c.g - background.g) \
 		+ absf(c.b - background.b) > 0.12
+
+
+## Kalabalık çarkta parmak yolu, hedef olmayan taşlara değmemeli.
+##
+## Ölçülmüş hata: iki taş arasında düz çizgi çizmek 7-8 harfli çarklarda
+## aradaki taşların üstünden geçiyordu. LetterWheel parmağın değdiği HER taşı
+## kelimeye ekliyor, yani gönderilen kelime bozuk çıkıyordu. Bu, otomatik
+## oynatıcının denge taramasını tamamen geçersiz kılmıştı: 40. bölümde
+## 55 saniyede sıfır kelime kabul edilmişti. Hata --hizli kipinde gizlenmişti,
+## çünkü kare başına 175 piksel ilerleyen bot aradaki taşların üstünden
+## atlıyordu; gerçek oyuncu böyle oynayamaz.
+func _test_swipe_routing() -> void:
+	# 8 harfli çark: taşlar birbirine en yakın olduğu durum.
+	var level_id := 0
+	for candidate in range(1, GameConfig.TOTAL_LEVELS + 1):
+		if (LevelDB.get_level(candidate).get("harfler", []) as Array).size() >= 8:
+			level_id = candidate
+			break
+	if level_id == 0:
+		_check(true, "8 harfli çark yok — yönlendirme denetimi atlandı")
+		return
+
+	SceneRouter.pending_level_id = level_id
+	var battle: Node = load("res://scenes/Oyun.tscn").instantiate()
+	add_child(battle)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var wheel: LetterWheel = battle.wheel
+
+	# Karşılıklı iki taş: aradan geçen düz çizgi çarkın ortasındaki taşlara
+	# değil ama komşu taşlara değer; en zorlu durum uzak taş çiftleridir.
+	var pilot := preload("res://scripts/tests/DemoPilot.gd")
+	var worst := 0
+	var checked := 0
+	for a in wheel.letters.size():
+		for b in wheel.letters.size():
+			if a == b:
+				continue
+			checked += 1
+			var path: Array = pilot.swipe_path(wheel, [a, b])
+			# Yol boyunca hangi taşlara değildiğini say.
+			var touched := {}
+			for i in range(1, path.size()):
+				for stone in wheel._positions.size():
+					var closest := Geometry2D.get_closest_point_to_segment(
+						wheel._positions[stone], path[i - 1], path[i])
+					if closest.distance_to(wheel._positions[stone]) \
+							<= maxf(wheel._stone_radius * LetterWheel.TOUCH_SLACK, 44.0):
+						touched[stone] = true
+			touched.erase(a)
+			touched.erase(b)
+			worst = maxi(worst, touched.size())
+	_check(checked > 0, "taş çiftleri denendi (%d)" % checked)
+	_equal(worst, 0, "hiçbir parmak yolu hedef dışı taşa değmiyor")
+
+	# Uçtan uca: yolun gerçekten o kelimeyi ürettiğini dokunma olaylarıyla
+	# doğrula.
+	var word := ""
+	for candidate in LevelDB.get_level(level_id).get("cozum_kelimeler", []):
+		if str(candidate).length() >= 4:
+			word = str(candidate)
+			break
+	var stones: Array = []
+	var upper := TurkishText.to_upper(word)
+	for i in upper.length():
+		for stone in wheel.letters.size():
+			if not stones.has(stone) and wheel.letters[stone] == upper[i]:
+				stones.append(stone)
+				break
+	if stones.size() == upper.length():
+		var path: Array = pilot.swipe_path(wheel, stones)
+		wheel._selection.clear()
+		_touch(wheel, path[0], true)
+		await get_tree().process_frame
+		# Parmağı gerçek adımlarla yürüt: sürükleme olayları arada atlamasın.
+		for i in range(1, path.size()):
+			var from: Vector2 = path[i - 1]
+			var to: Vector2 = path[i]
+			var steps := maxi(2, int(from.distance_to(to) / 12.0))
+			for step in range(1, steps + 1):
+				_drag(wheel, from.lerp(to, float(step) / steps))
+				await get_tree().process_frame
+		_equal(wheel.current_word(), upper, "yol tam olarak hedef kelimeyi üretti")
+		_touch(wheel, path[path.size() - 1], false)
+		await get_tree().process_frame
+	battle.queue_free()
+	await get_tree().process_frame
 
 
 ## Dokulu yol şeridi köşelerde delik bırakmamalı.
