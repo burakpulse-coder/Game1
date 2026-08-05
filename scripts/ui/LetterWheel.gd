@@ -18,6 +18,7 @@ signal letter_picked(letter: String)
 const STONE_RADIUS := 62.0
 const TOUCH_SLACK := 1.25
 const TRAIL_WIDTH := 12.0
+const SELECTED_SCALE := 1.06   ## seçili taş büyür; yerleşim buna göre yer bırakır
 
 ## İlerleme rozetleri çarkın üst şeridinde durur. Taş dairesi bu şeridi boş
 ## bırakır; yoksa tepedeki taş rozetlerin üstüne biner.
@@ -25,6 +26,11 @@ const PROGRESS_TOP := 8.0
 const PROGRESS_HEIGHT := 40.0
 const PROGRESS_GAP := 12.0
 const PROGRESS_MIN_FONT := 13
+
+## Ekranın en altı Android'de sistem hareket şeridine denk gelir; oradan
+## başlayan bir kaydırma "ana ekrana dön" hareketine karışır. En alttaki taş
+## bu şeritten uzak dursun.
+const BOTTOM_SAFE := 48.0
 
 const STONE_FILL := Color("#cdbb96")
 const STONE_EDGE := Color("#6c5a3c")
@@ -78,7 +84,7 @@ func _layout() -> void:
 	var reserved := 0.0
 	if not _progress.is_empty():
 		reserved = PROGRESS_TOP + PROGRESS_HEIGHT + PROGRESS_GAP
-	var usable := maxf(size.y - reserved, STONE_RADIUS * 2.0)
+	var usable := maxf(size.y - reserved - BOTTOM_SAFE, STONE_RADIUS * 2.0)
 	_center = Vector2(size.x * 0.5, reserved + usable * 0.5)
 	# Taşlar (yarıçapı STONE_RADIUS) hiçbir kenardan taşmamalı; çember yarıçapı
 	# bu yüzden en dar kenara göre sınırlanır.
@@ -96,8 +102,9 @@ func _layout() -> void:
 	# taşları arasındaki kiriş taş çapından kısa kalıyor; o zaman taşı küçültürüz.
 	_stone_radius = STONE_RADIUS
 	if count >= 2:
+		# 0.44: seçili taş SELECTED_SCALE kadar büyüdüğü için pay bırakılır.
 		var chord := 2.0 * _radius * sin(PI / float(count))
-		_stone_radius = clampf(chord * 0.46, 26.0, STONE_RADIUS)
+		_stone_radius = clampf(chord * 0.44, 26.0, STONE_RADIUS)
 	queue_redraw()
 
 
@@ -487,7 +494,7 @@ func _draw_stone(index: int, point: Vector2) -> void:
 
 	if selected:
 		fill = TRAIL_COLOR
-		radius *= 1.06
+		radius *= SELECTED_SCALE
 	elif index == _hint_index:
 		fill = fill.lerp(TRAIL_COLOR, 0.45 + 0.2 * sin(_hint_timer * 8.0))
 	if _success > 0.0 and not locked:

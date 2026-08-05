@@ -664,17 +664,24 @@ func _test_wheel_layout() -> void:
 			for i in wheel._positions.size():
 				var next: Vector2 = wheel._positions[(i + 1) % wheel._positions.size()]
 				closest = minf(closest, wheel._positions[i].distance_to(next))
-			_check(closest >= wheel._stone_radius * 2.0 - 0.5,
-				"%s: komşu taşlar ayrık (mesafe %.1f >= çap %.1f)"
-					% [label, closest, wheel._stone_radius * 2.0])
+			# Seçili taş büyüdüğü için çap SELECTED_SCALE ile ölçülür.
+			var widest := wheel._stone_radius * 2.0 * LetterWheel.SELECTED_SCALE
+			_check(closest >= widest - 0.5,
+				"%s: komşu taşlar seçiliyken de ayrık (mesafe %.1f >= çap %.1f)"
+					% [label, closest, widest])
 
-			# 3) Taşlar çarkın dışına taşmamalı.
+			# 3) Taşlar çarkın dışına taşmamalı ve en alttaki taş Android'in
+			#    hareket şeridine girmemeli.
 			var inside := true
+			var lowest := -INF
 			for point in wheel._positions:
-				if point.x - wheel._stone_radius < 0.0 or point.x + wheel._stone_radius > wheel.size.x \
-						or point.y + wheel._stone_radius > wheel.size.y:
+				if point.x - wheel._stone_radius < 0.0 or point.x + wheel._stone_radius > wheel.size.x:
 					inside = false
-			_check(inside, "%s: taşlar çarkın içinde kalıyor" % label)
+				lowest = maxf(lowest, point.y + wheel._stone_radius)
+			_check(inside, "%s: taşlar yanlardan taşmıyor" % label)
+			_check(lowest <= wheel.size.y - LetterWheel.BOTTOM_SAFE,
+				"%s: en alt taş hareket şeridinden uzak (%.1f <= %.1f)"
+					% [label, lowest, wheel.size.y - LetterWheel.BOTTOM_SAFE])
 
 			# 4) Rozet satırı ekran genişliğine sığmalı.
 			var labels := wheel._progress_labels(progress.keys(), true)

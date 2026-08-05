@@ -5,6 +5,7 @@ extends Control
 ## kozmetik kale seçimi burada da görünür.
 
 const SWAY_SPEED := 1.1
+const CASTLE_WIDTH := 220.0
 
 var _time := 0.0
 
@@ -34,14 +35,17 @@ func _draw() -> void:
 
 	var factor := minf(size.y / 190.0, box / 320.0)
 	draw_set_transform(center, 0.0, Vector2(factor, factor))
-	ProcArt.draw_castle(self, 220.0, stone, 1.0)
+	ProcArt.draw_castle(self, CASTLE_WIDTH, stone, 1.0)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
-	# Kalenin iki yanında hafifçe salınan sancaklar.
+	# Kalenin iki yanında hafifçe salınan sancaklar. Konum kalenin gerçek
+	# genişliğinden türetilir; kutu genişliğine göre hesaplanınca direkler
+	# surun üstüne düşüyordu.
 	if PerfManager.low_quality:
 		return
+	var castle_half := CASTLE_WIDTH * 0.5 * factor
 	for side in [-1.0, 1.0]:
-		var base := center + Vector2(side * box * 0.30, -size.y * 0.02)
+		var base := center + Vector2(side * (castle_half + box * 0.09), -size.y * 0.02)
 		draw_line(base, base + Vector2(0, -size.y * 0.34), Color("#3a2b1e"), 4.0, true)
 		var wave := sin(_time * SWAY_SPEED + side) * box * 0.02
 		ProcArt.filled_polygon(self, PackedVector2Array([

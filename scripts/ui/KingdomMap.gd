@@ -220,8 +220,11 @@ func _draw_banner(band: Dictionary, theme: Dictionary) -> void:
 	draw_rect(plate, Color(theme["zerre"]).lerp(Color(0, 0, 0, 0), 0.5), false, 3.0)
 
 	var open := bool(band["acik"])
+	# Bölge rengi doğrudan kullanılınca koyu levhanın üstünde kayboluyordu;
+	# aynı rengin açılmış hâli hem kimliği koruyor hem okunuyor.
+	var title := Color(region["renk"]).lerp(Color(1, 1, 1), 0.45)
 	_draw_text(str(region["ad"]), center + Vector2(0, -12.0), 40,
-		Color(region["renk"]) if open else Color(0.62, 0.60, 0.70))
+		title if open else Color(0.62, 0.60, 0.70))
 
 	var earned := _stars_in_region(int(band["bolge"]))
 	var label := "★ %d / %d" % [earned, GameConfig.LEVELS_PER_REGION * 3]
@@ -286,7 +289,7 @@ func _draw_node(node: Dictionary) -> void:
 		return
 
 	_draw_text(str(node["id"]), point + Vector2(0, -2.0), 34 if not boss else 40,
-		Color("#2a2233"))
+		_ink_on(fill))
 
 	if boss:
 		# Taç: patron bölümü ayırt edilsin.
@@ -326,6 +329,19 @@ func _draw_text(text: String, center: Vector2, font_size: int, color: Color) -> 
 		return
 	var measured := _font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
 	var origin := center - Vector2(measured.x * 0.5, -measured.y * 0.32)
-	draw_string_outline(_font, origin, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 8,
-		Color(0, 0, 0, 0.55))
+	# Kontur yazının tersi olmalı; koyu yazıyı koyu konturla çevreleyince
+	# ikisi birbirine karışıp okunmuyordu.
+	var outline := Color(0, 0, 0, 0.55) if _luma(color) > 0.5 else Color(1, 1, 1, 0.40)
+	draw_string_outline(_font, origin, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 8, outline)
 	draw_string(_font, origin, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+
+static func _luma(color: Color) -> float:
+	return color.r * 0.299 + color.g * 0.587 + color.b * 0.114
+
+
+## Zemine göre okunur mürekkep. Bölge renkleri koyudan açığa geniş bir aralıkta
+## (Karanlık Orman #3f5d3a, Buz Dağları #7fb6d6); sabit bir yazı rengi ikisinde
+## birden okunmuyor.
+static func _ink_on(background: Color) -> Color:
+	return Color("#2a2233") if _luma(background) > 0.52 else Color("#f4f0e4")
