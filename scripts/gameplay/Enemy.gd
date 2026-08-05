@@ -17,6 +17,9 @@ const REDRAW_HZ_LOW := 10.0
 ## Yürüyüş karesi ilerleme hızı. `_walk` zaten düşmanın hızıyla artıyor, yani
 ## hızlı düşman hızlı adım atar; bu çarpan yalnızca genel tempoyu ayarlar.
 const WALK_FRAME_RATE := 1.0
+## Dikey inişte yatay hareket sıfıra düşüyor; yön bu kadar ileri bakılarak
+## bulunur, yoksa düşman dönüşe kadar gideceği yerin tersine bakıyor.
+const FACING_LOOKAHEAD := 150.0
 const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
 
 
@@ -87,6 +90,7 @@ func configure(enemy_type: String, path: PathTrack, power: float) -> void:
 	stolen_letter = -1
 	_redraw_timer = 0.0
 	position = track.position_at(0.0)
+	_update_facing(position)
 	queue_redraw()
 
 
@@ -121,14 +125,27 @@ func _process(delta: float) -> void:
 		reached_castle.emit(self, damage)
 		return
 	position = track.position_at(distance)
-	if not is_equal_approx(position.x, previous.x):
-		_facing = signf(position.x - previous.x)
+	_update_facing(previous)
 	_walk += delta * (6.0 + speed * 0.03)
 
 	_redraw_timer -= delta
 	if _redraw_timer <= 0.0:
 		_redraw_timer = 1.0 / (REDRAW_HZ_LOW if PerfManager.low_quality else REDRAW_HZ)
 		queue_redraw()
+
+
+## Yürüyüş yönü. Yatay hareket varsa ondan; yoksa yolun ilerisine bakılır.
+func _update_facing(previous: Vector2) -> void:
+	var step_x := position.x - previous.x
+	if absf(step_x) > 0.05:
+		_facing = signf(step_x)
+		return
+	if track == null:
+		return
+	var ahead := track.position_at(minf(distance + FACING_LOOKAHEAD, track.length()))
+	var forward_x := ahead.x - position.x
+	if absf(forward_x) > 1.0:
+		_facing = signf(forward_x)
 
 
 func _phase_speed() -> float:

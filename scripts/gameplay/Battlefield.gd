@@ -11,6 +11,10 @@ signal slot_tapped(slot: TowerSlot)
 
 const SLOT_CLEARANCE := PathTrack.PATH_WIDTH * 0.5 + TowerSlot.RADIUS + 14.0
 const CASTLE_CLEARANCE := 150.0
+## Kale yolun bitişinden bu kadar ileri oturur; kapısı yola baksın.
+const CASTLE_GATE_OFFSET := 44.0
+## Kale gövdesinin yarısı kadar kenar payı; taşmasın.
+const CASTLE_EDGE_MARGIN := Vector2(104.0, 96.0)
 ## HUD'un üst şeridi (duraklat düğmesi, kale canı, dalga bilgisi) savaş alanının
 ## üstünü kaplar. Bu şeridin altına yuva konulursa yuvaya dokunmak düğmeye basar;
 ## bu yüzden üst bant yuva yerleşiminden dışlanır.
@@ -148,7 +152,20 @@ func _layout() -> void:
 	for i in tracks.size():
 		tracks[i].setup(i, rect)
 
-	castle.position = tracks[0].end_point()
+	# Kale yolun tam ucuna konunca son düzlükteki düşmanlar kalenin gövdesinin
+	# üstüne biniyordu. Kaleyi geliş yönünde biraz ileri alıyoruz: yol artık
+	# kalenin kapısında bitiyor.
+	var finish: Vector2 = tracks[0].end_point()
+	var approach: Vector2 = finish - tracks[0].position_at(
+		maxf(tracks[0].length() - 60.0, 0.0))
+	if approach.length() > 0.01:
+		finish += approach.normalized() * CASTLE_GATE_OFFSET
+	# Kaydırma kaleyi savaş alanının dışına itebiliyor; kenardan içeride tut.
+	finish.x = clampf(finish.x, rect.position.x + CASTLE_EDGE_MARGIN.x,
+		rect.end.x - CASTLE_EDGE_MARGIN.x)
+	finish.y = clampf(finish.y, rect.position.y + CASTLE_EDGE_MARGIN.y,
+		rect.end.y - CASTLE_EDGE_MARGIN.y)
+	castle.position = finish
 
 	var positions := _pick_slot_positions(rect)
 	for i in slots.size():

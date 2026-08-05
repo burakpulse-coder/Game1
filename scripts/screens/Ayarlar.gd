@@ -27,6 +27,7 @@ func _ready() -> void:
 	list.add_child(_slider_row("Müzik", "muzik"))
 	list.add_child(_slider_row("Ses Efektleri", "ses"))
 	list.add_child(_toggle_row("Titreşim", "titresim"))
+	list.add_child(_toggle_row("Tüm Bölümler (test)", "tum_bolumler", false))
 	list.add_child(_fps_row())
 	list.add_child(_language_row())
 	list.add_child(_play_games_row())
@@ -61,7 +62,7 @@ func _slider_row(title: String, key: String) -> Control:
 	return box
 
 
-func _toggle_row(title: String, key: String) -> Control:
+func _toggle_row(title: String, key: String, default_value := true) -> Control:
 	var box := UiKit.panel(UiKit.BG_PANEL)
 	var row := UiKit.hbox(14)
 	box.add_child(row)
@@ -72,14 +73,14 @@ func _toggle_row(title: String, key: String) -> Control:
 
 	var toggle := UiKit.button("", UiKit.SUCCESS)
 	toggle.custom_minimum_size = Vector2(180, UiKit.TOUCH_MIN)
+	# Düğme zemini artık doku olabildiği için bg_color kullanılamıyor; açık/kapalı
+	# farkı metin ve renk çarpanıyla veriliyor.
 	var apply := func(value: bool):
 		toggle.text = "AÇIK" if value else "KAPALI"
-		var style := toggle.get_theme_stylebox("normal") as StyleBoxFlat
-		if style != null:
-			style.bg_color = UiKit.SUCCESS if value else UiKit.BG_PANEL_SOFT
-	apply.call(bool(SaveManager.get_setting(key, true)))
+		toggle.modulate = Color.WHITE if value else Color(0.62, 0.62, 0.68)
+	apply.call(bool(SaveManager.get_setting(key, default_value)))
 	toggle.pressed.connect(func():
-		var value := not bool(SaveManager.get_setting(key, true))
+		var value := not bool(SaveManager.get_setting(key, default_value))
 		SaveManager.set_setting(key, value)
 		apply.call(value)
 		if key == "titresim" and value:

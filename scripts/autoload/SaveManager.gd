@@ -48,6 +48,7 @@ static func default_progress() -> Dictionary:
 
 static func default_settings() -> Dictionary:
 	return {
+		"tum_bolumler": false,
 		"muzik": 0.7,
 		"ses": 0.9,
 		"titresim": true,
@@ -181,6 +182,10 @@ func level_stars(level_id: int) -> int:
 
 func is_level_unlocked(level_id: int) -> bool:
 	if level_id <= 1:
+		return true
+	# Test kolaylığı: Ayarlar'dan açılan bu anahtar tüm bölümleri erişilebilir
+	# yapar. İlerleme kaydı değişmez; kapatılınca normal kilit geri gelir.
+	if bool(get_setting("tum_bolumler", false)):
 		return true
 	var region := GameConfig.region_of_level(level_id)
 	var needed := int(GameConfig.REGIONS[region]["gereken_yildiz"])

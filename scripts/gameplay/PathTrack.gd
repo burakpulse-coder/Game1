@@ -3,6 +3,11 @@ extends Node2D
 
 const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
 
+
+func _ready() -> void:
+	# UV birden büyük olduğu için doku tekrarı açık olmalı.
+	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
+
 ## Düşmanların izlediği yol. Yol noktaları savaş alanı dikdörtgenine göre
 ## oranlı tanımlanır, böylece her en-boy oranında aynı tasarım korunur.
 ##
@@ -137,27 +142,40 @@ func _draw() -> void:
 ## Dokusu yoksa false döner ve çağıran parke çizimine devam eder.
 func _draw_textured(baked: PackedVector2Array) -> bool:
 	var texture: Texture2D = SpriteBank.road(str(region_theme.get("id", "")))
-	if texture == null:
+	if texture == null or baked.size() < 2:
 		return false
-	# UV birden büyük olduğu için doku tekrarı açık olmalı.
-	texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 
+	# Her köşe noktası için ORTAK bir yanal kaydırma hesaplanır: gelen ve giden
+	# yönün ortalamasına dik. Her parçayı kendi yönüne göre kaydırınca komşu
+	# dörtgenler köşelerde ortak kenarı paylaşmıyor ve arada takoz boşluklar
+	# kalıyordu.
 	var half := PATH_WIDTH * 0.5
+	var sides := PackedVector2Array()
+	sides.resize(baked.size())
+	for i in baked.size():
+		var incoming := Vector2.ZERO
+		var outgoing := Vector2.ZERO
+		if i > 0:
+			incoming = (baked[i] - baked[i - 1]).normalized()
+		if i < baked.size() - 1:
+			outgoing = (baked[i + 1] - baked[i]).normalized()
+		var forward := (incoming + outgoing).normalized()
+		if forward == Vector2.ZERO:
+			forward = outgoing if outgoing != Vector2.ZERO else incoming
+		sides[i] = Vector2(-forward.y, forward.x) * half
+
 	var tile := PATH_WIDTH        # dokunun bir kenarının kapladığı yol uzunluğu
 	var travelled := 0.0
 	for i in baked.size() - 1:
-		var from: Vector2 = baked[i]
-		var to: Vector2 = baked[i + 1]
-		var forward := to - from
-		var length := forward.length()
+		var length := baked[i].distance_to(baked[i + 1])
 		if length <= 0.01:
 			continue
-		forward /= length
-		var side := Vector2(-forward.y, forward.x) * half
 		var v0 := travelled / tile
 		var v1 := (travelled + length) / tile
 		draw_colored_polygon(
-			PackedVector2Array([from - side, from + side, to + side, to - side]),
+			PackedVector2Array([
+				baked[i] - sides[i], baked[i] + sides[i],
+				baked[i + 1] + sides[i + 1], baked[i + 1] - sides[i + 1]]),
 			Color.WHITE,
 			PackedVector2Array([Vector2(0.0, v0), Vector2(1.0, v0),
 				Vector2(1.0, v1), Vector2(0.0, v1)]),

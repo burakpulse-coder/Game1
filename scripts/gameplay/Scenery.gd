@@ -30,16 +30,24 @@ var _patches: Array = []          ## zemin renk lekeleri
 var _hills: PackedVector2Array = []
 var _sway := 0.0
 var _motes: Array = []            ## ortam parçacıkları (polen, kar, köz…)
+var _keep_clear: Array = []       ## [{konum, yaricap}] süs konulmayacak alanlar
+var _prop_layer: Node2D = null    ## süsler yolun ÜSTÜNDE çizilir
 
 
 func _ready() -> void:
+	# Süs katmanı yol katmanının (z=1) üstünde olmalı.
+	_prop_layer = _PropLayer.new()
+	_prop_layer.scenery = self
+	_prop_layer.z_index = PROP_LAYER_Z
+	add_child(_prop_layer)
 	z_index = 0
 
 
 ## `tracks` ve `slot_positions` verilir ki süsler oynanışın üstüne binmesin.
 func setup(level_region_theme: Dictionary, rect: Rect2, tracks: Array, slot_positions: Array,
-		seed_value: int) -> void:
+		seed_value: int, keep_clear: Array = []) -> void:
 	region_theme = level_region_theme
+	_keep_clear = keep_clear
 	_rect = rect
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
@@ -47,6 +55,8 @@ func setup(level_region_theme: Dictionary, rect: Rect2, tracks: Array, slot_posi
 	_build_patches(rng)
 	_build_props(rng, tracks, slot_positions)
 	_build_motes(rng)
+	if _prop_layer != null:
+		_prop_layer.queue_redraw()
 	queue_redraw()
 
 
@@ -154,12 +164,37 @@ func _is_free(point: Vector2, tracks: Array, slot_positions: Array) -> bool:
 	for slot_point in slot_positions:
 		if point.distance_to(slot_point) < SLOT_CLEARANCE:
 			return false
+	for area in _keep_clear:
+		if point.distance_to(area["konum"]) < float(area["yaricap"]):
+			return false
 	return true
 
 
 ## --------------------------------------------------------------------------
 ## Çizim
 ## --------------------------------------------------------------------------
+
+## Süs katmanı manzaranın çocuğu ama z_index'i yol katmanının üstünde.
+## Aksi hâlde tabanı yolun altında kalan bir ağacın tepesi yol tarafından
+## kesiliyordu — yol manzaradan sonra çiziliyor.
+class _PropLayer extends Node2D:
+	var scenery: Node = null
+
+	func _draw() -> void:
+		if scenery != null:
+			scenery.draw_props(self)
+
+
+## Sprite'ı olan süsleri üst katmana çizer (süs katmanı çağırır).
+## Sprite'ı olmayanlar burada atlanır: yordamsal çizimler doğrudan `self`e
+## komut veriyor ve başka bir düğümün `_draw`undan çağrılamaz.
+func draw_props(canvas: CanvasItem) -> void:
+	for prop in _props:
+		var kind := str(prop["tip"])
+		if SpriteBank.prop(kind) == null:
+			continue
+		_draw_prop(canvas, kind, prop["konum"], float(prop["olcek"]), float(prop["faz"]))
+
 
 func _draw() -> void:
 	if _rect.size.x <= 0.0:
@@ -203,10 +238,14 @@ func _draw() -> void:
 	_draw_overlay()
 
 
-## Zeminin üstündeki ortak katmanlar: süsler, parçacıklar, vinyet.
+## Zeminin üstündeki ortak katmanlar: parçacıklar ve vinyet. Süsler ayrı bir
+## katmanda, yolun üstünde çizilir (bkz. _PropLayer).
 func _draw_overlay() -> void:
+	# Sprite'ı olmayan süsler yordamsal çizilir ve manzara katmanında kalır.
 	for prop in _props:
-		_draw_prop(str(prop["tip"]), prop["konum"], float(prop["olcek"]), float(prop["faz"]))
+		var kind := str(prop["tip"])
+		if SpriteBank.prop(kind) == null:
+			_draw_prop(self, kind, prop["konum"], float(prop["olcek"]), float(prop["faz"]))
 
 	if not PerfManager.low_quality:
 		var mote_color := _color("zerre", "#f6f0a0")
@@ -275,6 +314,9 @@ func _vignette() -> void:
 ## Süs yüksekliği yordamsal ağaçla aynı ölçüde (74 piksel); böylece sprite'a
 ## geçince manzaranın yoğunluğu değişmiyor.
 const PROP_HEIGHT := 74.0
+## Süs katmanının z değeri: yol (1) ve yuvaların (2) üstünde, düşmanların (5)
+## altında. Manzaranın çocuğu olduğu için değer manzaranınkine eklenir.
+const PROP_LAYER_Z := 3
 
 ## Her süs kendi doğal boyunda olmalı. Sprite sayfasında hepsi aynı yükseklikte
 ## çizildiği için hepsini aynı boya sığdırınca kaya ağaçtan, mantar çalıdan
@@ -285,15 +327,17 @@ const PROP_SCALE := {
 }
 
 
-func _draw_prop(kind: String, point: Vector2, scale: float, phase: float) -> void:
+func _draw_prop(canvas: CanvasItem, kind: String, point: Vector2, scale: float,
+		phase: float) -> void:
 	var sway := 0.0 if PerfManager.low_quality else sin(_sway + phase) * 3.0 * scale
 
 	var sprite: Texture2D = SpriteBank.prop(kind)
 	if sprite != null:
 		var height := PROP_HEIGHT * scale * float(PROP_SCALE.get(kind, 1.0))
-		_shadow(point, height * 0.30)
+		ProcArt.ellipse(canvas, point, Vector2(height * 0.30, height * 0.09),
+			Color(0, 0, 0, 0.20), false)
 		# Sallanma tepede olmalı, tabanda değil: taban zemine sabit durur.
-		SpriteBank.draw_fitted(self, sprite, point + Vector2(sway * 0.35, 0.0),
+		SpriteBank.draw_fitted(canvas, sprite, point + Vector2(sway * 0.35, 0.0),
 			Vector2(height * 1.7, height))
 		return
 
