@@ -71,6 +71,14 @@ func _draw() -> void:
 			if data.is_empty():
 				return
 			var radius := Enemy.BASE_RADIUS * float(data.get("boy", 1.0))
+			# Sprite varsa simge de onu göstersin; önizlemedeki düşman ile
+			# savaş alanındaki düşman aynı görünmeli.
+			var sprite := SpriteBank.enemy(id)
+			if sprite != null:
+				draw_set_transform(center + Vector2(0, box * 0.30), 0.0, Vector2.ONE)
+				SpriteBank.draw_enemy(self, sprite, box / SpriteBank.ENEMY_HEIGHT, -1.0, 0.0)
+				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+				return
 			var factor := box / (radius * 3.2)
 			draw_set_transform(center + Vector2(0, box * 0.16), 0.0, Vector2(factor, factor))
 			if bool(data.get("boss", false)):

@@ -197,7 +197,11 @@ func _draw() -> void:
 		draw_set_transform(Vector2(0, _hit_flash * 3.0), 0.0,
 			Vector2(1.0 + _hit_flash * 0.16, 1.0 - _hit_flash * 0.14))
 
-	if is_boss:
+	# Elle çizilmiş sprite varsa o kullanılır; yoksa yordamsal çizime düşülür.
+	var sprite := SpriteBank.enemy(type_id)
+	if sprite != null:
+		SpriteBank.draw_enemy(self, sprite, r, _facing, _hit_flash, _walk)
+	elif is_boss:
 		ProcArt.draw_boss(self, r, tint, _walk, _facing, _phase)
 	else:
 		ProcArt.draw_enemy(self, type_id, r, tint, _walk, _facing)
@@ -206,7 +210,8 @@ func _draw() -> void:
 	# Can çubuğu — yalnız hasar aldıysa gösterilir, ekran kalabalığı olmasın.
 	if hp < max_hp:
 		var width := HEALTH_BAR_WIDTH * (1.6 if is_boss else 1.0)
-		var top := -r * 1.55
+		# Sprite yordamsal çizimden daha uzun; çubuk aksi hâlde başın üstüne biner.
+		var top := -r * (SpriteBank.ENEMY_HEAD if sprite != null else 1.55)
 		var back := Rect2(-width * 0.5, top, width, 8.0)
 		draw_rect(back, Color(0, 0, 0, 0.55))
 		var fill := back
@@ -216,6 +221,7 @@ func _draw() -> void:
 
 	# Harf çalan düşmanın üstünde uyarı simgesi
 	if stolen_letter >= 0:
-		var badge := Vector2(0, -r * 2.0)
+		var head := SpriteBank.ENEMY_HEAD + 0.35 if sprite != null else 2.0
+		var badge := Vector2(0, -r * head)
 		ProcArt.filled_circle(self, badge, 13.0, Color("#f4d06a"))
 		draw_arc(badge, 17.0, 0.0, TAU, 16, Color(0.96, 0.82, 0.42, 0.5), 2.0, true)
