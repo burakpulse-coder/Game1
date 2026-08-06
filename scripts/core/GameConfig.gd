@@ -308,6 +308,44 @@ const UPGRADES := {
 const INTERSTITIAL_EVERY_N_LEVELS := 3
 
 ## --------------------------------------------------------------------------
+## Günlük ödül ve kumbara
+## --------------------------------------------------------------------------
+##
+## Rakip analizi: Royal Match, Toon Blast, Wordscapes, Words of Wonders —
+## hepsinde günlük giriş takvimi ve biriken bir kumbara var. İkisi birlikte
+## çalışıyor: takvim ödemeyen oyuncuyu her gün geri getiriyor, kumbara
+## oynadıkça dolup ödeme kararını oyuncunun kendi emeğine bağlıyor.
+##
+## Burada üçüncü bir amaç daha var: destek sistemi (BOOSTERS) elmasla
+## çalışıyor ve ödemeyen oyuncunun düzenli bir elmas/destek kaynağı olmalı,
+## yoksa mağaza baskıcı hissettirir.
+
+## Yedi günlük döngü. Yedinci gün belirgin biçimde büyük olmalı ki oyuncunun
+## seriyi sürdürme sebebi olsun.
+const DAILY_REWARDS := [
+	{"gun": 1, "altin": 150},
+	{"gun": 2, "elmas": 10},
+	{"gun": 3, "destek": "zaman_buzu", "adet": 1},
+	{"gun": 4, "altin": 300},
+	{"gun": 5, "elmas": 20},
+	{"gun": 6, "destek": "hazir_kule", "adet": 1},
+	{"gun": 7, "elmas": 40, "destek": "yildirim", "adet": 1},
+]
+
+## Ödüllü video ile günün ödülü ikiye katlanır (günde bir kez).
+const DAILY_AD_MULTIPLIER := 2
+
+## Kumbara: oyuncu OYNADIKÇA dolar, satın alınarak boşaltılır.
+##
+## Bilerek şeffaf: içine yalnızca oyuncunun kendi kazandığı elmas girer,
+## hiçbir şey kumbaranın arkasına kilitlenmez ve oyun kumbarasız bitirilebilir.
+const PIGGY_CAPACITY := 300
+const PIGGY_PER_LEVEL := 4      ## kazanılan her bölüm
+const PIGGY_PER_STAR := 2       ## her yıldız
+const PIGGY_PER_ANCIENT := 3    ## her Kadim Kelime
+
+
+## --------------------------------------------------------------------------
 ## Destekler (booster)
 ## --------------------------------------------------------------------------
 ##
@@ -388,6 +426,9 @@ const IAP_PRODUCTS := {
 	"destek_sandigi": {"ad": "Destek Sandığı", "elmas": 0, "fiyat": "₺39,99", "tur": "tuketilir",
 		"destekler": {"hazir_kule": 3, "kale_zirhi": 3, "zaman_buzu": 3, "onarim": 3},
 		"aciklama": "12 destek — tek tek almaktan ucuz."},
+	"kumbara": {"ad": "Kumbarayı Kır", "elmas": 0, "fiyat": "₺39,99", "tur": "tuketilir",
+		"kumbara": true,
+		"aciklama": "Oynayarak biriktirdiğin elmasları alırsın."},
 	"baslangic": {"ad": "Başlangıç Paketi", "elmas": 250, "altin": 1500, "fiyat": "₺49,99",
 		"tur": "kalici", "tek_seferlik": true, "rozet": "Tek seferlik",
 		"destekler": {"hazir_kule": 2, "cifte_enerji": 2, "yildirim": 2}},

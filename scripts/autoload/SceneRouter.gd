@@ -13,6 +13,7 @@ const SCENES := {
 	"magaza": "res://scenes/Magaza.tscn",
 	"ayarlar": "res://scenes/Ayarlar.tscn",
 	"basarimlar": "res://scenes/Basarimlar.tscn",
+	"gunluk": "res://scenes/GunlukOdul.tscn",
 }
 
 ## Oyun -> Sonuç ekranına taşınan veri.

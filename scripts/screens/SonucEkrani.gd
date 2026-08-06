@@ -65,6 +65,8 @@ func _stats_block(win: bool) -> Control:
 	]
 	if win:
 		rows.append(["Kazanılan altın", "%d ●" % int(_result.get("altin", 0))])
+		if int(_result.get("kumbara", 0)) > 0:
+			rows.append(["Kumbaraya düşen", "%d ◆" % int(_result.get("kumbara", 0))])
 	for row in rows:
 		var line := UiKit.hbox(10)
 		var name_label := UiKit.label(row[0], UiKit.FONT_SMALL, UiKit.INK_SOFT)

@@ -672,6 +672,8 @@ func _on_victory() -> void:
 	var first_clear := SaveManager.level_stars(level_id) == 0
 	var reward := EconomyManager.level_reward(level_id, stars, _found_words.size(), first_clear)
 	EconomyManager.add_gold(reward)
+	# Kumbara oyuncunun kendi oyunundan dolar; başka hiçbir yerden beslenmez.
+	var kumbara := EconomyManager.fill_piggy_for_level(stars, _ancient_words)
 	SaveManager.record_level_result(level_id, stars, hp_ratio)
 
 	if hp_ratio >= 0.999:
@@ -687,6 +689,7 @@ func _on_victory() -> void:
 		"seviye": level_id,
 		"yildiz": stars,
 		"altin": reward,
+		"kumbara": kumbara,
 		"kelime": _found_words.size(),
 		"kadim": _ancient_words,
 		"oldurulen": _enemies_killed,

@@ -13,6 +13,9 @@ extends Control
 
 var _status: Label
 var _booster_rows := {}
+var _piggy_label: Label
+var _piggy_bar: ProgressBar
+var _piggy_button: Button
 
 
 func _ready() -> void:
@@ -39,7 +42,11 @@ func _ready() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 
-	# Destekler önce: mağazanın asıl işi bu.
+	# Kumbara en üstte: oyuncunun kendi emeğiyle dolduğu için mağazanın en
+	# anlamlı satırı burası.
+	list.add_child(_piggy_row())
+
+	# Destekler: mağazanın asıl işi bu.
 	list.add_child(UiKit.label("Bölüm öncesi destekler", UiKit.FONT_BODY, UiKit.INK))
 	list.add_child(UiKit.paragraph(
 		"Savaş başlamadan takılır. Aynı anda en fazla %d tane."
@@ -56,6 +63,9 @@ func _ready() -> void:
 	list.add_child(UiKit.spacer(10))
 	list.add_child(UiKit.label("Elmas ve paketler", UiKit.FONT_BODY, UiKit.INK))
 	for product_id in GameConfig.IAP_PRODUCTS:
+		# Kumbara kendi satırında gösteriliyor.
+		if bool(GameConfig.IAP_PRODUCTS[product_id].get("kumbara", false)):
+			continue
 		list.add_child(_product_row(str(product_id)))
 
 	IapManager.purchase_completed.connect(_on_purchase_completed)
@@ -63,12 +73,46 @@ func _ready() -> void:
 	IapManager.products_updated.connect(_refresh)
 	EconomyManager.currency_changed.connect(func(_g, _e): _refresh())
 	EconomyManager.boosters_changed.connect(_refresh)
+	EconomyManager.piggy_changed.connect(func(_a): _refresh())
 	_refresh()
 
 
 ## --------------------------------------------------------------------------
 ## Satırlar
 ## --------------------------------------------------------------------------
+
+## Kumbara. Oynadıkça dolar, gerçek parayla boşaltılır.
+##
+## Bilerek şeffaf yazıldı: içine yalnızca oyuncunun kendi kazandığı elmas
+## girer, hiçbir şey kumbaranın arkasına kilitlenmez ve oyun kumbarasız
+## bitirilebilir. Boşken satın alma düğmesi kapalı durur.
+func _piggy_row() -> Control:
+	var box := UiKit.panel(UiKit.BG_PANEL, UiKit.GOLD)
+	var column := UiKit.vbox(8)
+	box.add_child(column)
+
+	var head := UiKit.hbox(12)
+	head.add_child(ArtIcon.booster("elmas", 56.0))
+	var info := UiKit.vbox(2)
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_child(UiKit.label("Kumbara", UiKit.FONT_BODY, UiKit.GOLD))
+	_piggy_label = UiKit.paragraph("", 22)
+	info.add_child(_piggy_label)
+	head.add_child(info)
+	column.add_child(head)
+
+	_piggy_bar = UiKit.progress_bar(UiKit.GOLD, 22.0)
+	column.add_child(_piggy_bar)
+
+	column.add_child(UiKit.paragraph(
+		"Bölüm kazandıkça kendi elmasların burada birikir. Kırmak isteğe "
+		+ "bağlı — oyunun tamamı kumbarasız bitirilebilir.", 20))
+
+	_piggy_button = UiKit.button(IapManager.price_of("kumbara"), UiKit.GOLD)
+	_piggy_button.pressed.connect(func(): IapManager.purchase("kumbara"))
+	column.add_child(_piggy_button)
+	return box
+
 
 func _booster_row(booster_id: String) -> Control:
 	var data: Dictionary = GameConfig.BOOSTERS[booster_id]
@@ -156,6 +200,14 @@ func _product_detail(product_id: String, data: Dictionary) -> String:
 ## --------------------------------------------------------------------------
 
 func _refresh() -> void:
+	if _piggy_label != null:
+		var amount := EconomyManager.piggy_amount()
+		_piggy_label.text = "%d / %d ◆ biriktin" % [amount, GameConfig.PIGGY_CAPACITY]
+		_piggy_bar.value = float(amount) / float(GameConfig.PIGGY_CAPACITY)
+		_piggy_button.disabled = amount <= 0 or not IapManager.is_available()
+		_piggy_button.text = ("Kumbara boş" if amount <= 0
+			else "%s → %d ◆" % [IapManager.price_of("kumbara"), amount])
+
 	for booster_id in _booster_rows:
 		var data: Dictionary = GameConfig.BOOSTERS[booster_id]
 		var refs: Dictionary = _booster_rows[booster_id]

@@ -118,6 +118,9 @@ func _grant(product_id: String) -> void:
 	var product: Dictionary = GameConfig.IAP_PRODUCTS.get(product_id, {})
 	if product.is_empty():
 		return
+	# Kumbara: satın alma biriken elması verir ve kumbarayı sıfırlar.
+	if bool(product.get("kumbara", false)):
+		EconomyManager.break_piggy()
 	if product.has("elmas") and int(product["elmas"]) > 0:
 		EconomyManager.add_gems(int(product["elmas"]))
 	if product.has("altin"):

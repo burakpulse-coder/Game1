@@ -110,6 +110,13 @@ func _actions() -> Control:
 	map.add_theme_color_override("font_color", UiKit.INK)
 	actions.add_child(map)
 
+	# Günlük ödül düğmesi yalnız alınabilirken öne çıkar: her gün geri gelmek
+	# için görünür bir sebep. Alındıysa yine erişilebilir ama sessiz kalır.
+	var daily := _menu_button(_daily_label(), "gunluk", "sandik")
+	if EconomyManager.daily_available():
+		daily.add_theme_color_override("font_color", UiKit.GOLD)
+	actions.add_child(daily)
+
 	# İkincil menüler ikişerli: dört düğme tek sütunda ekranı dolduruyordu.
 	var pairs := [
 		[["Yükseltme", "yukseltme", "savas"], ["Mağaza", "magaza", "sandik"]],
@@ -123,6 +130,13 @@ func _actions() -> Control:
 			row.add_child(button)
 		actions.add_child(row)
 	return actions
+
+
+func _daily_label() -> String:
+	if EconomyManager.daily_available():
+		return "Günlük Ödül  •  HAZIR"
+	var seri := EconomyManager.daily_streak()
+	return "Günlük Ödül  •  %d gün seri" % seri
 
 
 func _menu_button(text: String, target: String, icon_name: String) -> Button:

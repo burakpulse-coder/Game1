@@ -127,6 +127,151 @@ func try_spend_hint() -> bool:
 
 
 ## --------------------------------------------------------------------------
+## Günlük giriş serisi
+## --------------------------------------------------------------------------
+##
+## Yedi günlük döngü. Bir gün kaçırılırsa seri baştan başlar; aynı gün ikinci
+## kez alınamaz. Ödemeyen oyuncunun düzenli elmas/destek kaynağı burasıdır.
+
+signal daily_claimed(day: int, reward: Dictionary)
+
+
+## Bugün ödül alınabilir mi?
+func daily_available() -> bool:
+	var state: Dictionary = SaveManager.progress.get("gunluk", {})
+	return str(state.get("tarih", "")) != SaveManager.today_string()
+
+
+## Bugün hangi gün sırasında? 1..7. Henüz alınmadıysa alınacak günü verir.
+func daily_day() -> int:
+	var state: Dictionary = SaveManager.progress.get("gunluk", {})
+	var last := str(state.get("tarih", ""))
+	var day := int(state.get("gun", 0))
+	if not daily_available():
+		return maxi(day, 1)
+	# Bir günden fazla ara verildiyse döngü baştan başlar.
+	if SaveManager.days_between(last, SaveManager.today_string()) != 1:
+		return 1
+	return (day % GameConfig.DAILY_REWARDS.size()) + 1
+
+
+func daily_streak() -> int:
+	return int(SaveManager.progress.get("gunluk", {}).get("seri", 0))
+
+
+func daily_reward_for(day: int) -> Dictionary:
+	var index := clampi(day - 1, 0, GameConfig.DAILY_REWARDS.size() - 1)
+	return GameConfig.DAILY_REWARDS[index]
+
+
+## Günün ödülünü verir. `multiplier` ödüllü video için 2 olur.
+## Zaten alınmışsa hiçbir şey yapmaz ve boş sözlük döner.
+func claim_daily(multiplier: int = 1) -> Dictionary:
+	if not daily_available():
+		return {}
+	var day := daily_day()
+	var last := str(SaveManager.progress.get("gunluk", {}).get("tarih", ""))
+	var streak := daily_streak()
+	streak = streak + 1 if SaveManager.days_between(last, SaveManager.today_string()) == 1 else 1
+
+	var reward := daily_reward_for(day)
+	var verilen := _grant_reward(reward, multiplier)
+	SaveManager.progress["gunluk"] = {
+		"tarih": SaveManager.today_string(),
+		"gun": day,
+		"seri": streak,
+		"video": multiplier > 1,
+	}
+	SaveManager.mark_dirty()
+	daily_claimed.emit(day, verilen)
+	return verilen
+
+
+## Bugünün ödülü ödüllü videoyla ikiye katlanabilir mi?
+func daily_can_double() -> bool:
+	var state: Dictionary = SaveManager.progress.get("gunluk", {})
+	return str(state.get("tarih", "")) == SaveManager.today_string() \
+		and not bool(state.get("video", false))
+
+
+## Ödül zaten alındıysa videoyla FARKI verir (bir kat daha).
+func double_daily_with_ad() -> Dictionary:
+	if daily_can_double():
+		var reward := daily_reward_for(daily_day())
+		var verilen := _grant_reward(reward, GameConfig.DAILY_AD_MULTIPLIER - 1)
+		SaveManager.progress["gunluk"]["video"] = true
+		SaveManager.mark_dirty()
+		return verilen
+	return {}
+
+
+func _grant_reward(reward: Dictionary, multiplier: int) -> Dictionary:
+	var verilen := {}
+	if reward.has("altin"):
+		var altin := int(reward["altin"]) * multiplier
+		add_gold(altin)
+		verilen["altin"] = altin
+	if reward.has("elmas"):
+		var elmas := int(reward["elmas"]) * multiplier
+		add_gems(elmas)
+		verilen["elmas"] = elmas
+	if reward.has("destek"):
+		var adet := int(reward.get("adet", 1)) * multiplier
+		grant_booster(str(reward["destek"]), adet)
+		verilen["destek"] = reward["destek"]
+		verilen["adet"] = adet
+	return verilen
+
+
+## --------------------------------------------------------------------------
+## Kumbara
+## --------------------------------------------------------------------------
+##
+## Oyuncu OYNADIKÇA dolar, gerçek parayla boşaltılır. Bilerek şeffaf: içine
+## yalnızca oyuncunun kendi kazandığı elmas girer, hiçbir şey arkasına
+## kilitlenmez ve oyun kumbarasız bitirilebilir.
+
+signal piggy_changed(amount: int)
+
+
+func piggy_amount() -> int:
+	return clampi(int(SaveManager.progress.get("kumbara", 0)), 0, GameConfig.PIGGY_CAPACITY)
+
+
+func piggy_full() -> bool:
+	return piggy_amount() >= GameConfig.PIGGY_CAPACITY
+
+
+func add_to_piggy(amount: int) -> int:
+	if amount <= 0 or piggy_full():
+		return 0
+	var eklenen := mini(amount, GameConfig.PIGGY_CAPACITY - piggy_amount())
+	SaveManager.progress["kumbara"] = piggy_amount() + eklenen
+	SaveManager.mark_dirty()
+	piggy_changed.emit(piggy_amount())
+	return eklenen
+
+
+## Bölüm kazanınca kumbaraya düşen pay.
+func fill_piggy_for_level(stars: int, ancient_words: int) -> int:
+	return add_to_piggy(GameConfig.PIGGY_PER_LEVEL
+		+ stars * GameConfig.PIGGY_PER_STAR
+		+ ancient_words * GameConfig.PIGGY_PER_ANCIENT)
+
+
+## Satın alma tamamlandığında çağrılır: biriken elması verir ve sıfırlar.
+func break_piggy() -> int:
+	var amount := piggy_amount()
+	if amount <= 0:
+		return 0
+	SaveManager.progress["kumbara"] = 0
+	add_gems(amount)
+	SaveManager.mark_dirty()
+	piggy_changed.emit(0)
+	return amount
+
+
+## --------------------------------------------------------------------------
 ## Destekler
 ## --------------------------------------------------------------------------
 ##

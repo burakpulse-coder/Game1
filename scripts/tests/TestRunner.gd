@@ -27,6 +27,7 @@ func _ready() -> void:
 	_run("Seviye verisi", _test_levels)
 	_run("Kelime kalitesi (küfür ve yaygınlık)", _test_word_quality)
 	_run("Destekler ve mağaza", _test_boosters)
+	_run("Günlük ödül ve kumbara", _test_daily_and_piggy)
 	_run("Ekonomi ve yükseltmeler", _test_economy)
 	_run("Kayıt sistemi", _test_save)
 	await _run_async("Savaş turu (uçtan uca)", _test_battle)
@@ -989,6 +990,106 @@ func _test_boosters() -> void:
 		"ödüllü videoyla verilen destek tanımlı")
 
 
+## Günlük giriş serisi ve kumbara.
+##
+## İkisi de tarih ve para birimi ile oynadığı için sessizce bozulabilir:
+## aynı gün iki kez ödül alınması ya da kumbaranın kapasiteyi aşması
+## oyuncunun ekonomisini bozar.
+func _test_daily_and_piggy() -> void:
+	var bugun := SaveManager.today_string()
+
+	# Gün farkı hesabı: ay ve yıl sınırını da doğru geçmeli.
+	_equal(SaveManager.days_between("2026-08-05", "2026-08-06"), 1, "ardışık gün farkı 1")
+	_equal(SaveManager.days_between("2026-08-06", "2026-08-06"), 0, "aynı gün farkı 0")
+	_equal(SaveManager.days_between("2026-07-31", "2026-08-01"), 1, "ay sınırı")
+	_equal(SaveManager.days_between("2025-12-31", "2026-01-01"), 1, "yıl sınırı")
+	_check(SaveManager.days_between("", bugun) > 1, "tarih yoksa seri kopmuş sayılır")
+
+	# --- Günlük ödül -------------------------------------------------------
+	SaveManager.progress["gunluk"] = {"tarih": "", "gun": 0, "seri": 0, "video": false}
+	_check(EconomyManager.daily_available(), "hiç alınmamışken ödül alınabilir")
+	_equal(EconomyManager.daily_day(), 1, "ilk gün 1. gün")
+
+	var altin_once := EconomyManager.gold()
+	var verilen := EconomyManager.claim_daily()
+	_check(not verilen.is_empty(), "ödül verildi")
+	_equal(EconomyManager.gold(), altin_once + int(GameConfig.DAILY_REWARDS[0]["altin"]),
+		"1. günün altını eklendi")
+	_check(not EconomyManager.daily_available(), "aynı gün ikinci kez alınamaz")
+	_equal(EconomyManager.claim_daily(), {}, "ikinci alma boş döner")
+	_equal(EconomyManager.daily_streak(), 1, "seri 1")
+
+	# Ertesi gün: seri ilerler, sıradaki güne geçer.
+	SaveManager.progress["gunluk"]["tarih"] = _yesterday(bugun)
+	_check(EconomyManager.daily_available(), "ertesi gün yeniden alınabilir")
+	_equal(EconomyManager.daily_day(), 2, "ertesi gün 2. güne geçer")
+	EconomyManager.claim_daily()
+	_equal(EconomyManager.daily_streak(), 2, "seri 2'ye çıktı")
+
+	# Gün atlanırsa seri ve döngü baştan başlar.
+	SaveManager.progress["gunluk"]["tarih"] = "2020-01-01"
+	_equal(EconomyManager.daily_day(), 1, "gün atlanınca döngü 1'e döner")
+	EconomyManager.claim_daily()
+	_equal(EconomyManager.daily_streak(), 1, "gün atlanınca seri sıfırlanır")
+
+	# Yedinci günden sonra döngü başa sarar.
+	SaveManager.progress["gunluk"] = {"tarih": _yesterday(bugun),
+		"gun": GameConfig.DAILY_REWARDS.size(), "seri": 7, "video": false}
+	_equal(EconomyManager.daily_day(), 1, "7. günden sonra döngü başa sarar")
+
+	# Ödüllü video ile ikiye katlama günde bir kez.
+	SaveManager.progress["gunluk"] = {"tarih": bugun, "gun": 1, "seri": 1, "video": false}
+	_check(EconomyManager.daily_can_double(), "alınmış ödül videoyla katlanabilir")
+	var altin_katlama := EconomyManager.gold()
+	EconomyManager.double_daily_with_ad()
+	_equal(EconomyManager.gold(),
+		altin_katlama + int(GameConfig.DAILY_REWARDS[0]["altin"]) * (GameConfig.DAILY_AD_MULTIPLIER - 1),
+		"katlama farkı kadar altın verdi")
+	_check(not EconomyManager.daily_can_double(), "katlama günde bir kez")
+
+	# Her günün ödülü tanımlı ve anlamlı olmalı.
+	_equal(GameConfig.DAILY_REWARDS.size(), 7, "yedi günlük döngü")
+	for entry: Dictionary in GameConfig.DAILY_REWARDS:
+		var has_reward: bool = entry.has("altin") or entry.has("elmas") or entry.has("destek")
+		_check(has_reward, "%d. günün ödülü var" % int(entry["gun"]))
+		if entry.has("destek"):
+			_check(GameConfig.BOOSTERS.has(entry["destek"]),
+				"%d. günün desteği tanımlı" % int(entry["gun"]))
+
+	# --- Kumbara -----------------------------------------------------------
+	SaveManager.progress["kumbara"] = 0
+	_equal(EconomyManager.piggy_amount(), 0, "kumbara boş başlar")
+	_equal(EconomyManager.break_piggy(), 0, "boş kumbara kırılamaz")
+
+	var eklenen := EconomyManager.fill_piggy_for_level(3, 2)
+	_equal(eklenen, GameConfig.PIGGY_PER_LEVEL + 3 * GameConfig.PIGGY_PER_STAR
+		+ 2 * GameConfig.PIGGY_PER_ANCIENT, "bölüm kazancı kumbaraya düştü")
+
+	# Kapasite aşılamaz.
+	SaveManager.progress["kumbara"] = GameConfig.PIGGY_CAPACITY - 3
+	_equal(EconomyManager.add_to_piggy(50), 3, "kapasiteye kadar eklenir")
+	_check(EconomyManager.piggy_full(), "kumbara dolu")
+	_equal(EconomyManager.add_to_piggy(10), 0, "dolu kumbaraya eklenmez")
+
+	# Kırınca biriken elmas oyuncuya geçer ve kumbara sıfırlanır.
+	var elmas_once := EconomyManager.gems()
+	var kirilan := EconomyManager.break_piggy()
+	_equal(kirilan, GameConfig.PIGGY_CAPACITY, "kumbaradaki her şey verildi")
+	_equal(EconomyManager.gems(), elmas_once + GameConfig.PIGGY_CAPACITY, "elmas eklendi")
+	_equal(EconomyManager.piggy_amount(), 0, "kumbara sıfırlandı")
+
+	# Kumbara ürünü tanımlı ve kilit açmıyor.
+	var urun: Dictionary = GameConfig.IAP_PRODUCTS.get("kumbara", {})
+	_check(not urun.is_empty(), "kumbara ürünü tanımlı")
+	_check(bool(urun.get("kumbara", false)), "kumbara ürünü işaretli")
+	_check(not urun.has("seviye"), "kumbara bölüm açmıyor")
+
+
+func _yesterday(iso: String) -> String:
+	var unix := Time.get_unix_time_from_datetime_string(iso + "T00:00:00") - 86400
+	return Time.get_date_string_from_unix_time(int(unix))
+
+
 ## Sözlük ve bölüm verisi küfür içermemeli; erken bölümlerde oyuncunun
 ## gerçekten bulabileceği yeterince kelime olmalı.
 ##
@@ -1061,7 +1162,8 @@ func _test_button_slicing() -> void:
 	var scenes := ["res://scenes/AnaMenu.tscn", "res://scenes/BolumHaritasi.tscn",
 		"res://scenes/SeviyeOnizleme.tscn", "res://scenes/Magaza.tscn",
 		"res://scenes/Ayarlar.tscn", "res://scenes/YukseltmeEkrani.tscn",
-		"res://scenes/SonucEkrani.tscn", "res://scenes/Oyun.tscn"]
+		"res://scenes/SonucEkrani.tscn", "res://scenes/GunlukOdul.tscn",
+		"res://scenes/Oyun.tscn"]
 	SceneRouter.pending_level_id = 1
 	SceneRouter.last_result = {"seviye": 1, "zafer": true, "yildiz": 3,
 		"can_orani": 1.0, "kelime": 5, "kadim": 0, "oldurulen": 3, "sure": 30.0}

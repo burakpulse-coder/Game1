@@ -34,6 +34,11 @@ static func default_progress() -> Dictionary:
 		"secili_destekler": [],     ## bölüm öncesi takılı destekler
 		"basarimlar": [],
 		"ipucu": {"tarih": "", "kalan": GameConfig.FREE_HINTS_PER_DAY},
+		## Günlük giriş serisi. "gun" 1..7 arasında döner; "tarih" son alınan
+		## günün tarihi, "video" o gün ödüllü videoyla ikiye katlandı mı.
+		"gunluk": {"tarih": "", "gun": 0, "seri": 0, "video": false},
+		## Kumbara: oynadıkça biriken elmas.
+		"kumbara": 0,
 		"istatistik": {
 			"bulunan_kelime": 0,
 			"kadim_kelime": 0,
@@ -298,6 +303,24 @@ func unlock_achievement(id: String) -> bool:
 ## --------------------------------------------------------------------------
 ## Günlük ücretsiz ipuçları
 ## --------------------------------------------------------------------------
+
+## --------------------------------------------------------------------------
+## Tarih yardımcıları
+## --------------------------------------------------------------------------
+
+func today_string() -> String:
+	return Time.get_date_string_from_system(true)
+
+
+## İki ISO tarih arasındaki tam gün farkı. Saat dilimi karmaşası olmasın diye
+## gün başlangıcı üzerinden hesaplanır.
+func days_between(from_iso: String, to_iso: String) -> int:
+	if from_iso == "" or to_iso == "":
+		return 9999
+	var a := Time.get_unix_time_from_datetime_string(from_iso + "T00:00:00")
+	var b := Time.get_unix_time_from_datetime_string(to_iso + "T00:00:00")
+	return int(round((b - a) / 86400.0))
+
 
 func _normalize_hints() -> void:
 	var today := Time.get_date_string_from_system(true)
