@@ -33,6 +33,7 @@ func _ready() -> void:
 	await _run_async("Gerçek dokunma girdisi", _test_touch_input)
 	await _run_async("Fare girdisi (masaüstü)", _test_mouse_input)
 	await _run_async("Arayüz çizim sırası", _test_ui_layering)
+	await _run_async("Düğme dokusu kırpılmıyor", _test_button_slicing)
 	await _run_async("Harf çarkı yerleşimi (telefon oranları)", _test_wheel_layout)
 	await _run_async("Yürüyüş animasyonu", _test_walk_animation)
 	await _run_async("Sprite yön çevirme", _test_sprite_flip)
@@ -1044,6 +1045,62 @@ func _test_word_quality() -> void:
 	var ortalama := oran_toplam / 15.0
 	_check(ortalama >= 0.50,
 		"ilk bölgede çözümlerin en az yarısı yaygın kelime (%%%.0f)" % (ortalama * 100.0))
+
+
+## Dokulu düğmelerin dokuz dilimi kutuya sığmalı.
+##
+## Ölçülmüş hata: elle çizilen düğme dokusu 426x128 GENİŞ bir hap ve dokuz
+## dilim payları sol/sağ 72'şer piksel. Duraklat düğmesi 91x88 idi; sabit
+## uçlar (144 piksel) 91 piksellik kutuya sığmayınca Godot onları üst üste
+## bindirip kırpıyor, yuvarlak uç düz bir çizgiyle kesiliyordu. Ekranda
+## "düğmeler üst üste binmiş" gibi görünüyordu.
+##
+## Bu test bütün ekranları açar, dokulu her düğmeyi bulur ve kutusunun sabit
+## uçlardan küçük olmadığını denetler.
+func _test_button_slicing() -> void:
+	var scenes := ["res://scenes/AnaMenu.tscn", "res://scenes/BolumHaritasi.tscn",
+		"res://scenes/SeviyeOnizleme.tscn", "res://scenes/Magaza.tscn",
+		"res://scenes/Ayarlar.tscn", "res://scenes/YukseltmeEkrani.tscn",
+		"res://scenes/SonucEkrani.tscn", "res://scenes/Oyun.tscn"]
+	SceneRouter.pending_level_id = 1
+	SceneRouter.last_result = {"seviye": 1, "zafer": true, "yildiz": 3,
+		"can_orani": 1.0, "kelime": 5, "kadim": 0, "oldurulen": 3, "sure": 30.0}
+
+	var dar := 0
+	var ornek := ""
+	var denetlenen := 0
+	for path in scenes:
+		var scene: Node = load(path).instantiate()
+		add_child(scene)
+		for i in 3:
+			await get_tree().process_frame
+		for node in _all_buttons(scene):
+			var button := node as Button
+			var style := button.get_theme_stylebox("normal") as StyleBoxTexture
+			if style == null:
+				continue
+			denetlenen += 1
+			var gereken := Vector2(style.texture_margin_left + style.texture_margin_right,
+				style.texture_margin_top + style.texture_margin_bottom)
+			if button.size.x + 0.5 < gereken.x or button.size.y + 0.5 < gereken.y:
+				dar += 1
+				if ornek == "":
+					ornek = "%s '%s' kutu=%s gereken=%s" % [
+						path.get_file(), button.text, button.size, gereken]
+		scene.queue_free()
+		await get_tree().process_frame
+
+	_check(denetlenen > 0, "dokulu düğme bulundu (%d)" % denetlenen)
+	_equal(dar, 0, "dokulu düğme dokuz dilimini taşıyor (%s)" % ornek)
+
+
+func _all_buttons(root: Node) -> Array:
+	var found: Array = []
+	for child in root.get_children():
+		if child is Button:
+			found.append(child)
+		found.append_array(_all_buttons(child))
+	return found
 
 
 ## Yol, her bölgede zeminden ayırt edilebilmeli.

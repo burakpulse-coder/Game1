@@ -71,13 +71,15 @@ func _build_top() -> void:
 	_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_top)
 
-	var row := UiKit.hbox(14)
+	# Duraklat ile kale çubuğu arasında nefes payı: 14 pikselde ikisi
+	# birbirine yapışık duruyordu.
+	var row := UiKit.hbox(24)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_top.add_child(row)
 
-	# Duraklat simgesi koyu lacivert; mor düğme zemininde okunmuyor, metin kalıyor.
-	var pause := UiKit.ghost_button("॥")
-	pause.custom_minimum_size = Vector2(88, 88)
+	# Kare düğme geniş hap dokusunu taşıyamaz: dokuz dilimin sabit uçları
+	# (72+72 piksel) 91 piksellik kutuya sığmayınca yuvarlak uç kırpılıyordu.
+	var pause := UiKit.round_button("॥", 88.0)
 	pause.pressed.connect(func(): pause_pressed.emit())
 	row.add_child(pause)
 

@@ -107,6 +107,13 @@ static func button(text: String, accent: Color = GOLD, size: int = FONT_BODY) ->
 	# yordamsal kabartma kutuya düşülür.
 	var skin := _button_skin(accent)
 	if skin != null:
+		# Dokuz dilimin sabit uçları kutuya sığmazsa Godot onları üst üste
+		# bindirip kırpıyor ve yuvarlak uç düz bir çizgiyle kesiliyor. Düğme
+		# en az uçlar kadar geniş olmalı; dar isteyen round_button kullanmalı.
+		node.custom_minimum_size.x = maxf(node.custom_minimum_size.x,
+			skin.texture_margin_left + skin.texture_margin_right)
+		node.custom_minimum_size.y = maxf(node.custom_minimum_size.y,
+			skin.texture_margin_top + skin.texture_margin_bottom)
 		node.add_theme_stylebox_override("normal", skin)
 		node.add_theme_stylebox_override("hover", _tinted(skin, Color(1.12, 1.12, 1.12)))
 		node.add_theme_stylebox_override("pressed", _pressed_style(skin))
@@ -212,6 +219,62 @@ static func set_button_icon(node: Button, icon_name: String, keep_text := true) 
 	node.add_theme_constant_override("h_separation", 12)
 	if not keep_text:
 		node.text = ""
+
+
+## Kare/dairesel simge düğmesi (duraklat gibi).
+##
+## Ölçülmüş hata: elle çizilen düğme dokusu 426x128 GENİŞ bir hap. Dokuz
+## dilim payları sol ve sağ için 72'şer piksel, yani sabit uçlar toplam 144
+## piksel yer istiyor. Duraklat düğmesi 91x88 idi; uçlar kutuya sığmayınca
+## Godot onları üst üste bindirip kırpıyor ve yuvarlak uç düz bir çizgiyle
+## kesiliyordu — ekranda "düğmeler üst üste binmiş" gibi görünüyordu.
+##
+## Geniş bir hap dokusu kare kutuya oturmaz; bu yüzden simge düğmeleri
+## dokuyu hiç kullanmaz, aynı paletten dairesel bir kutu çizer.
+static func round_button(text: String, diameter: float = TOUCH_MIN,
+		accent: Color = INK) -> Button:
+	var node := Button.new()
+	node.text = text
+	node.custom_minimum_size = Vector2(diameter, diameter)
+	node.focus_mode = Control.FOCUS_NONE
+	node.add_theme_font_size_override("font_size", int(diameter * 0.42))
+	node.add_theme_color_override("font_color", accent)
+	node.add_theme_color_override("font_hover_color", INK)
+	node.add_theme_color_override("font_pressed_color", INK)
+
+	var radius := int(diameter * 0.5)
+	var normal := StyleBoxFlat.new()
+	# Renkler hap dokusundan örneklendi: uç (0,8,44), gövde (57,49,109).
+	normal.bg_color = Color("#39316d")
+	normal.set_corner_radius_all(radius)
+	normal.border_width_top = 3
+	normal.border_width_bottom = 5
+	normal.border_width_left = 3
+	normal.border_width_right = 3
+	normal.border_color = Color("#0d1440")
+	normal.shadow_color = Color(0, 0, 0, 0.45)
+	normal.shadow_size = 8
+	normal.shadow_offset = Vector2(0, 4)
+	normal.content_margin_left = 0
+	normal.content_margin_right = 0
+	normal.content_margin_top = 0
+	normal.content_margin_bottom = 0
+
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = normal.bg_color.lerp(Color.WHITE, 0.14)
+	var pressed := normal.duplicate() as StyleBoxFlat
+	pressed.bg_color = normal.bg_color.lerp(Color.BLACK, 0.22)
+	pressed.border_width_top = 5
+	pressed.border_width_bottom = 3
+	pressed.shadow_size = 2
+	pressed.content_margin_top = PRESS_SINK * 0.5
+
+	node.add_theme_stylebox_override("normal", normal)
+	node.add_theme_stylebox_override("hover", hover)
+	node.add_theme_stylebox_override("pressed", pressed)
+	node.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	_add_press_feel(node)
+	return node
 
 
 static func ghost_button(text: String, accent: Color = INK_SOFT) -> Button:
@@ -321,8 +384,8 @@ static func top_bar(title_text: String, on_back: Callable, show_currency: bool =
 	bar.custom_minimum_size = Vector2(0, TOUCH_MIN)
 
 	if on_back.is_valid():
-		var back := ghost_button("‹")
-		back.custom_minimum_size = Vector2(TOUCH_MIN, TOUCH_MIN)
+		# Kare geri düğmesi geniş hap dokusunu taşıyamaz; dairesel kutu.
+		var back := round_button("‹", TOUCH_MIN)
 		back.add_theme_font_size_override("font_size", FONT_HEAD)
 		back.pressed.connect(on_back)
 		bar.add_child(back)
