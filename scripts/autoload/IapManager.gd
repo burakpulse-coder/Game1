@@ -3,7 +3,8 @@ extends Node
 ## Google Play Billing sarmalayıcısı.
 ##
 ## Eklenti yoksa mağaza ekranı ürünleri listeler ama satın alma "kullanılamıyor"
-## döner — oyun ilerlemesi hiçbir satın almaya bağlı değildir (pay-to-win yok).
+## döner — oyunun tamamı satın alma olmadan bitirilebilir. Ürünler elmas,
+## altın, destek ve reklam kaldırma verir; hiçbiri bölüm kilidi açmaz.
 
 signal purchase_completed(product_id: String)
 signal purchase_failed(product_id: String, reason: String)
@@ -121,6 +122,9 @@ func _grant(product_id: String) -> void:
 		EconomyManager.add_gems(int(product["elmas"]))
 	if product.has("altin"):
 		EconomyManager.add_gold(int(product["altin"]))
+	# Paketlerin içindeki destekler.
+	for booster_id in product.get("destekler", {}):
+		EconomyManager.grant_booster(str(booster_id), int(product["destekler"][booster_id]))
 	if product.get("tur", "") == "kalici":
 		SaveManager.add_purchase(product_id)
 	purchase_completed.emit(product_id)

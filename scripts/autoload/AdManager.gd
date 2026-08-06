@@ -20,6 +20,8 @@ const REMOVE_ADS_PRODUCT := "reklamsiz"
 const PLACEMENT_CONTINUE := "devam_et"
 const PLACEMENT_DAILY_CHEST := "gunluk_sandik"
 const PLACEMENT_EXTRA_HINT := "ekstra_ipucu"
+## Bölüm sonunda "video izle, destek kazan" teklifi.
+const PLACEMENT_BOOSTER := "destek_kazan"
 
 ## Yayına çıkarken Play Console'daki gerçek birim kimlikleriyle değiştirilir.
 ## Buradakiler Google'ın resmî test kimlikleridir.

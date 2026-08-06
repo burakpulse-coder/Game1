@@ -29,8 +29,9 @@ static func default_progress() -> Dictionary:
 		"seviyeler": {},            ## "3" -> {"yildiz": 2, "en_iyi_can": 0.71}
 		"yukseltmeler": {},         ## "kule_gucu" -> 2
 		"satin_alinanlar": [],      ## kalıcı IAP kimlikleri
-		"kozmetikler": ["kale_varsayilan", "kule_varsayilan"],
-		"secili_kozmetik": {"kale": "kale_varsayilan", "kule": "kule_varsayilan"},
+		## Destek envanteri: "hazir_kule" -> 2. Kozmetikler kaldırıldı.
+		"destekler": GameConfig.STARTING_BOOSTERS.duplicate(),
+		"secili_destekler": [],     ## bölüm öncesi takılı destekler
 		"basarimlar": [],
 		"ipucu": {"tarih": "", "kalan": GameConfig.FREE_HINTS_PER_DAY},
 		"istatistik": {
@@ -110,8 +111,26 @@ func _migrate(data: Dictionary, defaults: Dictionary) -> Dictionary:
 	for key in defaults:
 		if not data.has(key):
 			data[key] = defaults[key]
+	# Kozmetikler kaldırıldı. Eski kayıtlarda satın alınmış görünüm varsa
+	# karşılığı elmas olarak iade edilir — oyuncunun harcadığı boşa gitmesin.
+	if data.has("kozmetikler"):
+		var iade := 0
+		for id in data["kozmetikler"]:
+			iade += int(_ESKI_KOZMETIK_BEDELI.get(id, 0))
+		if iade > 0:
+			data["elmas"] = int(data.get("elmas", 0)) + iade
+			print("[SaveManager] Kozmetikler kaldırıldı, %d elmas iade edildi." % iade)
+		data.erase("kozmetikler")
+		data.erase("secili_kozmetik")
 	data["surum"] = SAVE_VERSION
 	return data
+
+
+## Kaldırılan kozmetiklerin elmas bedelleri (iade için).
+const _ESKI_KOZMETIK_BEDELI := {
+	"kale_altin": 180, "kale_obsidyen": 240,
+	"kule_zumrut": 200, "kule_kizil": 200,
+}
 
 
 func _read_settings() -> Dictionary:

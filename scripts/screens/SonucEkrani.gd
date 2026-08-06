@@ -95,6 +95,21 @@ func _actions(win: bool) -> Control:
 			column.add_child(UiKit.paragraph("Sonraki bölge için daha çok yıldız topla.",
 				UiKit.FONT_SMALL, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER))
 
+	# Ödemeyen oyuncu için destek kaynağı: bölüm sonunda bir video karşılığı
+	# bir destek. Rakiplerin tamamında bu var; olmadan destek sistemi yalnız
+	# ödeyenlere açık kalır ve mağaza baskıcı hissettirir.
+	if AdManager.rewarded_available() and not AdManager.ads_removed():
+		var booster_id := GameConfig.REWARDED_BOOSTER
+		var booster: Dictionary = GameConfig.BOOSTERS.get(booster_id, {})
+		var reward := UiKit.button("Video izle → 1x %s" % booster.get("ad", "destek"),
+			UiKit.SUCCESS)
+		reward.pressed.connect(func():
+			reward.disabled = true
+			AdManager.rewarded_finished.connect(
+				_on_booster_ad.bind(booster_id, reward), CONNECT_ONE_SHOT)
+			AdManager.show_rewarded(AdManager.PLACEMENT_BOOSTER))
+		column.add_child(reward)
+
 	var retry := UiKit.button("Tekrar Dene" if not win else "Tekrar Oyna", UiKit.BG_PANEL_SOFT)
 	retry.add_theme_color_override("font_color", UiKit.INK)
 	retry.pressed.connect(func(): SceneRouter.play_level(level_id))
@@ -117,3 +132,16 @@ func _actions(win: bool) -> Control:
 func _format_time(seconds: float) -> String:
 	var total := int(seconds)
 	return "%d:%02d" % [total / 60, total % 60]
+
+
+## Ödüllü video bitti: başarılıysa desteği ver.
+func _on_booster_ad(success: bool, placement: String, booster_id: String,
+		button: Button) -> void:
+	if placement != AdManager.PLACEMENT_BOOSTER:
+		return
+	if success:
+		EconomyManager.grant_booster(booster_id, 1)
+		button.text = "Kazandın!"
+	else:
+		button.text = "Video açılamadı"
+		button.disabled = false

@@ -13,6 +13,8 @@ signal pause_pressed
 signal hint_pressed
 signal shuffle_pressed
 signal ulti_pressed
+## Savaş içi destek düğmesine dokunuldu.
+signal booster_pressed(booster_id: String)
 
 const METER_MIN_WIDTH := 150.0
 const TOAST_SECONDS := 1.6
@@ -32,6 +34,7 @@ var _meters := {}
 var _toast: Label
 var _toast_root: Control
 var _toast_timer := 0.0
+var _booster_strip: VBoxContainer
 
 
 func _ready() -> void:
@@ -39,6 +42,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build_top()
 	_build_band()
+	_build_booster_strip()
 	_build_toast()
 	set_process(true)
 
@@ -168,6 +172,52 @@ func _build_band() -> void:
 	_ulti_button.disabled = true
 	_ulti_button.pressed.connect(func(): ulti_pressed.emit())
 	actions.add_child(_ulti_button)
+
+
+## Savaş içi destek düğmeleri: savaş alanının sağ kenarında dikey şerit.
+##
+## Kelime düğmeleri (İpucu / Karıştır / Kadim) zaten orta şeridi dolduruyor.
+## Kule savunma oyunlarının yerleşik kalıbı da bu: büyüler sahanın kenarında
+## durur, bulmaca arayüzüyle yarışmaz.
+func _build_booster_strip() -> void:
+	_booster_strip = UiKit.vbox(10)
+	_booster_strip.anchor_left = 1.0
+	_booster_strip.anchor_right = 1.0
+	_booster_strip.anchor_top = 0.16
+	_booster_strip.offset_left = -104.0
+	_booster_strip.offset_right = -16.0
+	_booster_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_booster_strip)
+
+
+## Elde bulunan savaş içi destekleri gösterir. Boş liste şeridi gizler.
+func set_battle_boosters(ids: Array) -> void:
+	if _booster_strip == null:
+		return
+	for child in _booster_strip.get_children():
+		child.queue_free()
+	_booster_strip.visible = not ids.is_empty()
+	for id in ids:
+		var booster_id := str(id)
+		var data: Dictionary = GameConfig.BOOSTERS.get(booster_id, {})
+		if data.is_empty():
+			continue
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(88, 88)
+		button.tooltip_text = str(data.get("aciklama", ""))
+		button.flat = true
+		button.focus_mode = Control.FOCUS_NONE
+		button.pressed.connect(func(): booster_pressed.emit(booster_id))
+		var icon := ArtIcon.booster(str(data.get("simge", "")), 84.0)
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		button.add_child(icon)
+		var count := UiKit.label("x%d" % EconomyManager.booster_count(booster_id),
+			22, UiKit.INK, HORIZONTAL_ALIGNMENT_RIGHT, false)
+		count.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+		count.offset_top = -26
+		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(count)
+		_booster_strip.add_child(button)
 
 
 func _make_meter(tower_type: String) -> Control:

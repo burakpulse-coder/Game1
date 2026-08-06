@@ -26,6 +26,7 @@ func _ready() -> void:
 	_run("Kategori verisi", _test_categories)
 	_run("Seviye verisi", _test_levels)
 	_run("Kelime kalitesi (küfür ve yaygınlık)", _test_word_quality)
+	_run("Destekler ve mağaza", _test_boosters)
 	_run("Ekonomi ve yükseltmeler", _test_economy)
 	_run("Kayıt sistemi", _test_save)
 	await _run_async("Savaş turu (uçtan uca)", _test_battle)
@@ -281,9 +282,14 @@ func _test_save() -> void:
 	SaveManager.record_level_result(1, 3, 0.9)
 	_equal(SaveManager.level_stars(1), 3, "daha yüksek skor yıldızı yükseltir")
 
+	# Kilit denetimi ortam ayarına bağlı kalmamalı: cihazda "Tüm Bölümler"
+	# test anahtarı açık kaldıysa bu testler sahte hata veriyordu.
+	var kilit_ayari: Variant = SaveManager.get_setting("tum_bolumler", false)
+	SaveManager.set_setting("tum_bolumler", false)
 	_check(SaveManager.is_level_unlocked(1), "ilk seviye hep açık")
 	_check(SaveManager.is_level_unlocked(2), "1. seviye geçilince 2. açılır")
 	_check(not SaveManager.is_level_unlocked(20), "uzak seviye kilitli")
+	SaveManager.set_setting("tum_bolumler", kilit_ayari)
 
 	SaveManager.save_progress()
 	var reloaded := SaveManager._read_progress()
@@ -666,7 +672,9 @@ func _test_walk_animation() -> void:
 
 	var enemy := Enemy.new()
 	battle.battlefield.add_child(enemy)
-	enemy.configure("goblin", battle.battlefield.track, 1.0)
+	# Battlefield çoklu yol tutuyor; ilk yolu ver (eskiden olmayan bir
+	# `track` alanı okunuyordu ve null geçiyordu).
+	enemy.configure("goblin", battle.battlefield.tracks[0], 1.0)
 	var seen := {}
 	for step in 40:
 		enemy._walk += 0.25
@@ -898,6 +906,86 @@ func _differs(img: Image, x: int, y: int) -> bool:
 	var background := Color(0.078, 0.086, 0.129)
 	return absf(c.r - background.r) + absf(c.g - background.g) \
 		+ absf(c.b - background.b) > 0.12
+
+
+## Destek sistemi: envanter, elmasla alım, bölüm öncesi takma sınırı ve
+## "ödeme kilit açmaz" güvencesi.
+func _test_boosters() -> void:
+	# Kozmetik satışı kaldırıldı; kayıt alanları da temizlenmiş olmalı.
+	_check(not SaveManager.default_progress().has("kozmetikler"),
+		"kozmetik kayıt alanı kaldırıldı")
+	_check(SaveManager.default_progress().has("destekler"),
+		"destek envanteri kayıtta var")
+
+	# Her desteğin türü, fiyatı ve açıklaması olmalı; eksik alan mağazada
+	# boş satır olarak görünür.
+	for id in GameConfig.BOOSTERS:
+		var data: Dictionary = GameConfig.BOOSTERS[id]
+		_check(["oncesi", "savas"].has(str(data.get("tur", ""))),
+			"%s destek türü geçerli" % id)
+		_check(int(data.get("elmas", 0)) > 0, "%s elmas fiyatı var" % id)
+		_check(str(data.get("ad", "")) != "" and str(data.get("aciklama", "")) != "",
+			"%s adı ve açıklaması var" % id)
+	_check(EconomyManager.boosters_of_kind("oncesi").size() >= 2, "bölüm öncesi destek var")
+	_check(EconomyManager.boosters_of_kind("savas").size() >= 2, "savaş içi destek var")
+
+	# Envanter: al, harca, bitince harcayamaz.
+	var onceki := EconomyManager.booster_count("zaman_buzu")
+	EconomyManager.grant_booster("zaman_buzu", 2)
+	_equal(EconomyManager.booster_count("zaman_buzu"), onceki + 2, "destek envantere eklendi")
+	_check(EconomyManager.consume_booster("zaman_buzu"), "destek harcandı")
+	_equal(EconomyManager.booster_count("zaman_buzu"), onceki + 1, "envanter bir azaldı")
+
+	# Elmasla alım: parası yetmezse envanter değişmemeli.
+	var gems_before := EconomyManager.gems()
+	EconomyManager.add_gems(-gems_before)
+	var count_before := EconomyManager.booster_count("yildirim")
+	_check(not EconomyManager.buy_booster("yildirim"), "elmas yetmezse alım başarısız")
+	_equal(EconomyManager.booster_count("yildirim"), count_before,
+		"başarısız alım envanteri değiştirmedi")
+	EconomyManager.add_gems(int(GameConfig.BOOSTERS["yildirim"]["elmas"]))
+	_check(EconomyManager.buy_booster("yildirim"), "elmas yetince alım başarılı")
+	_equal(EconomyManager.booster_count("yildirim"), count_before + 1, "alınan destek eklendi")
+
+	# Bölüm öncesi takma: sınırı aşamaz, savaş içi destek takılamaz.
+	SaveManager.progress["secili_destekler"] = []
+	for id in EconomyManager.boosters_of_kind("oncesi"):
+		EconomyManager.grant_booster(str(id), 1)
+	var takilan := 0
+	for id in EconomyManager.boosters_of_kind("oncesi"):
+		if EconomyManager.toggle_equipped_booster(str(id)):
+			takilan += 1
+	_equal(EconomyManager.equipped_boosters().size(), GameConfig.MAX_PRE_BOOSTERS,
+		"takılı destek sayısı sınırı aşmıyor")
+	_check(not EconomyManager.toggle_equipped_booster("zaman_buzu"),
+		"savaş içi destek bölüm öncesi takılamıyor")
+
+	# Savaş başlarken takılanlar envanterden düşer ve seçim temizlenir.
+	var takili := EconomyManager.equipped_boosters().duplicate()
+	var oncesi_sayilar := {}
+	for id in takili:
+		oncesi_sayilar[id] = EconomyManager.booster_count(str(id))
+	var alinan := EconomyManager.take_equipped_boosters()
+	_equal(alinan.size(), takili.size(), "takılı destekler savaşa aktarıldı")
+	for id in takili:
+		_equal(EconomyManager.booster_count(str(id)), int(oncesi_sayilar[id]) - 1,
+			"%s envanterden düştü" % id)
+	_check(EconomyManager.equipped_boosters().is_empty(), "seçim savaştan sonra temizlendi")
+
+	# En önemlisi: hiçbir ürün bölüm kilidi açmıyor ve kalıcı güç vermiyor.
+	# Destekler tüketilir; para birimi ve reklam kaldırma dışında bir şey
+	# satılmıyor.
+	for product_id in GameConfig.IAP_PRODUCTS:
+		var data: Dictionary = GameConfig.IAP_PRODUCTS[product_id]
+		_check(not data.has("seviye") and not data.has("bolge"),
+			"%s bölüm/bölge açmıyor" % product_id)
+		_check(not data.has("yukseltme"), "%s kalıcı yükseltme satmıyor" % product_id)
+		for booster_id in data.get("destekler", {}):
+			_check(GameConfig.BOOSTERS.has(booster_id),
+				"%s içindeki %s tanımlı bir destek" % [product_id, booster_id])
+	_check(GameConfig.IAP_PRODUCTS.has("reklamsiz"), "reklam kaldırma ürünü var")
+	_check(GameConfig.BOOSTERS.has(GameConfig.REWARDED_BOOSTER),
+		"ödüllü videoyla verilen destek tanımlı")
 
 
 ## Sözlük ve bölüm verisi küfür içermemeli; erken bölümlerde oyuncunun
@@ -1329,6 +1417,10 @@ func _max_z(node: Node, inherited: int = 0) -> int:
 ## düğüme bakılarak çözülüyor. Bu yüzden dokunma yolu ve kilit kuralları
 ## gerçek olayla sınanır.
 func _test_kingdom_map() -> void:
+	# Ortamdaki "Tüm Bölümler" test anahtarı açık kalırsa kilitli düğüm
+	# kalmıyor ve bu test sahte hata veriyordu.
+	var kilit_ayari: Variant = SaveManager.get_setting("tum_bolumler", false)
+	SaveManager.set_setting("tum_bolumler", false)
 	SaveManager.reset_progress()
 	# İlk üç bölümü geç ki hem açık hem kilitli düğüm bulunsun.
 	for level_id in [1, 2, 3]:
@@ -1373,6 +1465,7 @@ func _test_kingdom_map() -> void:
 	_equal(fogged, 0, "tüm bölümler açıkken sisli bölge kalmıyor")
 	SaveManager.set_setting("tum_bolumler", previous_setting)
 	map._rebuild()
+	SaveManager.set_setting("tum_bolumler", kilit_ayari)
 
 	# Düğümler dokunma yarıçapından daha yakın olmamalı, yoksa yanlış bölüm açılır.
 	var too_close := 0

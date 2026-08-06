@@ -20,7 +20,7 @@ var tower_type := ""
 var level := 1
 var config := {}
 var tint := Color.WHITE      ## kule tipinin rengi (menzil halkası, namlu parıltısı)
-var stone := Color.WHITE     ## gövde rengi (kozmetikten gelir)
+var stone := Color("#9a8f7f")  ## gövde rengi
 
 var _cooldown := 0.0
 var _battlefield: Node = null
@@ -43,7 +43,6 @@ func setup(type_id: String, battlefield: Node) -> void:
 	_battlefield = battlefield
 	level = 1
 	tint = Color(config.get("renk", "#ffffff"))
-	stone = EconomyManager.cosmetic_color("kule", Color("#9a8f7f"))
 	_cooldown = randf() * 0.3
 	_range_flash = 1.0
 	queue_redraw()

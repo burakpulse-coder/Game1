@@ -24,7 +24,6 @@ var _shake_offset := Vector2.ZERO
 
 func _ready() -> void:
 	z_index = 3
-	_stone = EconomyManager.cosmetic_color("kale", _stone)
 
 
 func setup(maximum: float) -> void:
@@ -87,12 +86,8 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
-## Seçili kale kozmetiğinin sprite adı. Kozmetik kimlikleri "kale_altin"
-## biçiminde; dosya adları ön ek olmadan.
 func _skin_id() -> String:
-	var equipped := EconomyManager.equipped_cosmetic("kale")
-	var name := equipped.trim_prefix("kale_")
-	return "tas" if name.is_empty() or name == "varsayilan" else name
+	return "tas"
 
 
 func _draw() -> void:

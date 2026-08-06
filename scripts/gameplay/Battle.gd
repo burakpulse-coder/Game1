@@ -58,6 +58,10 @@ var _pause_menu: Control = null
 var _elapsed := 0.0
 var _continue_used := false
 var _word_totals := {}      ## harf sayısı -> çarktaki toplam kelime
+var _boost_multiplier := 1.0   ## "Çifte Enerji" desteği açıkken 2.0
+var _boost_until := 0.0        ## çifte enerjinin bittiği an (saniye)
+var _battle_boosters: Array = []  ## savaş içi kullanılabilir destekler
+var _taken_boosters: Array = []   ## bölüm öncesi harcanan destekler
 
 
 func _ready() -> void:
@@ -128,6 +132,7 @@ func _build_layout() -> void:
 	hud.hint_pressed.connect(_on_hint)
 	hud.shuffle_pressed.connect(func(): wheel.shuffle())
 	hud.ulti_pressed.connect(_on_ulti)
+	hud.booster_pressed.connect(use_battle_booster)
 
 	waves.wave_started.connect(_on_wave_started)
 	waves.break_started.connect(func(seconds): hud.set_break(seconds))
@@ -145,7 +150,11 @@ func _start_level() -> void:
 	# Her bölüm kendi yolunu ve yuva yerleşimini alsın.
 	battlefield.layout_seed = level_id
 	battlefield.build(int(level.get("yol_sayisi", 1)), int(level.get("slot_sayisi", 4)))
-	battlefield.castle.setup(EconomyManager.castle_max_hp() * float(level.get("kale_can_carpani", 1.0)))
+	_taken_boosters = EconomyManager.take_equipped_boosters()
+	var can_carpani := float(level.get("kale_can_carpani", 1.0))
+	if _taken_boosters.has("kale_zirhi"):
+		can_carpani *= 1.0 + float(GameConfig.BOOSTERS["kale_zirhi"]["deger"])
+	battlefield.castle.setup(EconomyManager.castle_max_hp() * can_carpani)
 	battlefield.castle.health_changed.connect(hud.set_health)
 	battlefield.castle.destroyed.connect(_on_defeat)
 	battlefield.castle.healed.connect(_on_castle_healed)
@@ -161,12 +170,95 @@ func _start_level() -> void:
 	hud.set_ulti(0.0)
 	hud.set_hint_label(SaveManager.free_hints_left())
 
+	_apply_pre_boosters()
+	hud.set_battle_boosters(_battle_boosters)
+
 	var step := str(level.get("ogretici", ""))
 	if step != "" and not SaveManager.is_tutorial_done(step):
 		tutorial.begin(step, self)
 		tutorial.finished.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
 	else:
 		waves.start()
+
+
+## --------------------------------------------------------------------------
+## Destekler
+## --------------------------------------------------------------------------
+##
+## Bölüm öncesi destekler savaş başlarken uygulanır ve envanterden düşmüştür
+## (bkz. EconomyManager.take_equipped_boosters). Savaş içi destekler oyuncu
+## dokununca harcanır.
+
+func _apply_pre_boosters() -> void:
+	# "Kale Zırhı" kale kurulurken uygulandı; burada kalan ikisi var.
+	if _taken_boosters.has("hazir_kule"):
+		_grant_starting_tower()
+	if _taken_boosters.has("cifte_enerji"):
+		_boost_multiplier = 2.0
+		_boost_until = float(GameConfig.BOOSTERS["cifte_enerji"]["deger"])
+		hud.toast("Çifte Enerji: %d saniye" % roundi(_boost_until), UiKit.SUCCESS)
+
+	# Savaş içi destekler: elde olan varsa düğmeleri çıkar.
+	_battle_boosters.clear()
+	for id in EconomyManager.boosters_of_kind("savas"):
+		if EconomyManager.booster_count(str(id)) > 0:
+			_battle_boosters.append(id)
+
+
+## "Hazır Kule": yola en yakın boş yuvaya, bölümün ilk hedef kategorisinin
+## kulesini diker. En yakın yuva seçilir çünkü uzaktaki bir kule hiçbir işe
+## yaramaz.
+func _grant_starting_tower() -> void:
+	var hedefler: Array = level.get("hedef_kategoriler", [])
+	var kategori := str(hedefler[0]) if not hedefler.is_empty() else "hayvan"
+	var tip := str(WordEngine.tower_for_category(kategori))
+	if not GameConfig.TOWERS.has(tip):
+		tip = "okcu"
+
+	var en_yakin: TowerSlot = null
+	var en_kisa := INF
+	for slot in battlefield.slots:
+		if not slot.is_empty():
+			continue
+		var uzaklik := INF
+		for track in battlefield.tracks:
+			uzaklik = minf(uzaklik, track.distance_to_path(slot.position))
+		if uzaklik < en_kisa:
+			en_kisa = uzaklik
+			en_yakin = slot
+	if en_yakin != null and towers.build_type_on(en_yakin, tip, true):
+		hud.toast("Hazır Kule dikildi", UiKit.SUCCESS)
+
+
+## Savaş içi destek kullanımı. Envanterde yoksa hiçbir şey olmaz.
+func use_battle_booster(id: String) -> bool:
+	if _finished or _paused:
+		return false
+	var data: Dictionary = GameConfig.BOOSTERS.get(id, {})
+	if data.is_empty() or str(data.get("tur", "")) != "savas":
+		return false
+	if not EconomyManager.consume_booster(id):
+		hud.toast("%s kalmadı" % data.get("ad", id), UiKit.DANGER)
+		return false
+
+	match id:
+		"zaman_buzu":
+			var sure := float(data["deger"])
+			var donan := battlefield.freeze_enemies(sure)
+			hud.toast("Zaman Buzu! %d düşman dondu" % donan, Color("#5fb8e0"))
+		"yildirim":
+			var vurulan := battlefield.cast_ulti(float(data["deger"]))
+			hud.toast("Yıldırım! %d düşman vuruldu" % vurulan, Color("#ffe27a"))
+		"onarim":
+			var miktar := battlefield.castle.max_hp * float(data["deger"])
+			battlefield.castle.heal(miktar)
+			hud.toast("Onarım! +%d can" % roundi(miktar), UiKit.SUCCESS)
+	AudioManager.play_sfx("ulti")
+	Haptics.pulse(Haptics.MEDIUM)
+	if EconomyManager.booster_count(id) <= 0:
+		_battle_boosters.erase(id)
+	hud.set_battle_boosters(_battle_boosters)
+	return true
 
 
 ## Çarktan türetilebilen kelimeleri harf sayısına göre sayar. Oyuncu "burada
@@ -214,6 +306,10 @@ func _on_tutorial_finished(step: String) -> void:
 func _process(delta: float) -> void:
 	if not _finished and not _paused:
 		_elapsed += delta
+		# "Çifte Enerji" süreli: bittiğinde çarpan normale döner.
+		if _boost_multiplier > 1.0 and _elapsed >= _boost_until:
+			_boost_multiplier = 1.0
+			hud.toast("Çifte Enerji bitti", UiKit.INK_SOFT)
 	hud.set_break(waves.break_remaining())
 
 
@@ -257,12 +353,14 @@ func _on_word_submitted(raw: String) -> void:
 	battlefield.effects.rising(focus, 6 + int(result.length_multiplier * 3), color, 30.0)
 	battlefield.effects.ring(focus, 60.0 * result.length_multiplier, color, 0.45, 4.0)
 
+	# "Çifte Enerji" desteği süresi dolana kadar inşa puanını ikiye katlar.
+	var etki := result.length_multiplier * _boost_multiplier
 	if result.tower_type != "":
-		towers.add_category_word(result.tower_type, result.length_multiplier)
+		towers.add_category_word(result.tower_type, etki)
 		var meta: Dictionary = WordEngine.category_meta(result.category)
 		hud.toast("%s  →  %s" % [TurkishText.to_upper(result.word), meta.get("ad", "")], color)
 	else:
-		towers.add_general_energy(result.length_multiplier)
+		towers.add_general_energy(etki)
 		hud.toast("%s  →  Genel enerji" % TurkishText.to_upper(result.word), UiKit.INK)
 
 	if result.is_ancient:

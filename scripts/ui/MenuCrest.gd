@@ -3,8 +3,7 @@ extends Control
 const SpriteBank := preload("res://scripts/core/SpriteBank.gd")
 
 ## Ana menüdeki kale arması: oyunun ne olduğunu tek bakışta anlatır.
-## Savaş alanındaki kaleyle aynı çizimi kullanır (ProcArt.draw_castle), yani
-## kozmetik kale seçimi burada da görünür.
+## Savaş alanındaki kaleyle aynı görseli kullanır.
 
 const SWAY_SPEED := 1.1
 const CASTLE_WIDTH := 220.0
@@ -25,8 +24,7 @@ func _process(delta: float) -> void:
 
 
 func _skin_id() -> String:
-	var name := EconomyManager.equipped_cosmetic("kale").trim_prefix("kale_")
-	return "tas" if name.is_empty() or name == "varsayilan" else name
+	return "tas"
 
 
 func _draw() -> void:
@@ -34,7 +32,7 @@ func _draw() -> void:
 	if box <= 0.0:
 		return
 	var center := Vector2(size.x * 0.5, size.y * 0.62)
-	var stone := EconomyManager.cosmetic_color("kale", Color("#8e8e96"))
+	var stone := Color("#8e8e96")
 
 	# Arkada yumuşak bir ışık halesi — kale zeminden ayrışsın.
 	ProcArt.ellipse(self, center + Vector2(0, -size.y * 0.1),

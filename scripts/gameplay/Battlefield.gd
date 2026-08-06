@@ -408,6 +408,22 @@ func apply_damage(point: Vector2, amount: float, tower_type: String, splash: flo
 
 
 ## Ulti: ekrandaki tüm düşmanlara büyük hasar.
+## "Zaman Buzu" desteği: sahadaki bütün düşmanları belirtilen süre dondurur.
+## Enemy.slow(0.0, sure) zaten var; burada sahne geneline uygulanır.
+func freeze_enemies(seconds: float) -> int:
+	var count := 0
+	for node in _enemy_pool.active():
+		var enemy := node as Enemy
+		if not enemy.alive:
+			continue
+		enemy.slow(0.0, seconds)
+		count += 1
+	if count > 0:
+		effects.ring(Vector2(size.x * 0.5, size.y * 0.5), maxf(size.x, size.y) * 0.7,
+			Color("#8fd8f4"), 0.6, 10.0)
+	return count
+
+
 func cast_ulti(damage: float) -> int:
 	var hits := 0
 	var center := Vector2(size.x * 0.5, size.y * 0.5)

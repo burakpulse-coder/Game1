@@ -127,40 +127,106 @@ func try_spend_hint() -> bool:
 
 
 ## --------------------------------------------------------------------------
-## Kozmetikler
+## Destekler
+## --------------------------------------------------------------------------
+##
+## Kozmetik satışı kaldırıldı; yerine bölümü geçmeye yardım eden tüketilir
+## destekler geldi. Elmasla alınır, elmas oyun içinde de kazanılır — yani
+## ödeme kilit açmaz, hızlandırır.
+
+signal boosters_changed
+
+
+func booster_count(id: String) -> int:
+	return int(SaveManager.progress.get("destekler", {}).get(id, 0))
+
+
+func grant_booster(id: String, amount: int = 1) -> void:
+	if amount <= 0 or not GameConfig.BOOSTERS.has(id):
+		return
+	var envanter: Dictionary = SaveManager.progress.get("destekler", {})
+	envanter[id] = booster_count(id) + amount
+	SaveManager.progress["destekler"] = envanter
+	SaveManager.mark_dirty()
+	boosters_changed.emit()
+
+
+## Elmasla bir destek satın alır.
+func buy_booster(id: String, amount: int = 1) -> bool:
+	var data: Dictionary = GameConfig.BOOSTERS.get(id, {})
+	if data.is_empty() or amount <= 0:
+		return false
+	if not spend_gems(int(data["elmas"]) * amount):
+		return false
+	grant_booster(id, amount)
+	return true
+
+
+## Envanterden bir destek düşer. Yoksa false döner ve hiçbir şey değişmez.
+func consume_booster(id: String) -> bool:
+	if booster_count(id) <= 0:
+		return false
+	var envanter: Dictionary = SaveManager.progress.get("destekler", {})
+	envanter[id] = booster_count(id) - 1
+	SaveManager.progress["destekler"] = envanter
+	SaveManager.mark_dirty()
+	boosters_changed.emit()
+	return true
+
+
+func boosters_of_kind(kind: String) -> Array:
+	var found: Array = []
+	for id in GameConfig.BOOSTERS:
+		if str(GameConfig.BOOSTERS[id].get("tur", "")) == kind:
+			found.append(id)
+	return found
+
+
+## --------------------------------------------------------------------------
+## Bölüm öncesi takılan destekler
 ## --------------------------------------------------------------------------
 
-func owns_cosmetic(id: String) -> bool:
-	return SaveManager.progress.get("kozmetikler", []).has(id)
+func equipped_boosters() -> Array:
+	var secili: Array = SaveManager.progress.get("secili_destekler", [])
+	# Envanterde kalmayanlar düşer: satın alma ekranından çıkıp gelen oyuncu
+	# elinde olmayan bir desteği takılı görmesin.
+	var temiz: Array = []
+	for id in secili:
+		if booster_count(str(id)) > 0 and GameConfig.BOOSTERS.has(id):
+			temiz.append(id)
+	if temiz.size() != secili.size():
+		SaveManager.progress["secili_destekler"] = temiz
+	return temiz
 
 
-func buy_cosmetic(id: String) -> bool:
-	var data: Dictionary = GameConfig.COSMETICS.get(id, {})
-	if data.is_empty() or owns_cosmetic(id):
+func toggle_equipped_booster(id: String) -> bool:
+	var data: Dictionary = GameConfig.BOOSTERS.get(id, {})
+	if data.is_empty() or str(data.get("tur", "")) != "oncesi":
 		return false
-	if not spend_gems(int(data["elmas"])):
-		return false
-	SaveManager.progress["kozmetikler"].append(id)
+	var secili := equipped_boosters()
+	if secili.has(id):
+		secili.erase(id)
+	else:
+		if booster_count(id) <= 0:
+			purchase_failed.emit("Bu destekten kalmadı")
+			return false
+		if secili.size() >= GameConfig.MAX_PRE_BOOSTERS:
+			purchase_failed.emit("En fazla %d destek takabilirsin" % GameConfig.MAX_PRE_BOOSTERS)
+			return false
+		secili.append(id)
+	SaveManager.progress["secili_destekler"] = secili
 	SaveManager.mark_dirty()
+	boosters_changed.emit()
 	return true
 
 
-func equip_cosmetic(id: String) -> bool:
-	var data: Dictionary = GameConfig.COSMETICS.get(id, {})
-	if data.is_empty() or not owns_cosmetic(id):
-		return false
-	SaveManager.progress["secili_kozmetik"][data["hedef"]] = id
+## Savaş başlarken takılı destekleri envanterden düşer ve listesini döner.
+func take_equipped_boosters() -> Array:
+	var kullanilan: Array = []
+	for id in equipped_boosters():
+		if consume_booster(str(id)):
+			kullanilan.append(id)
+	SaveManager.progress["secili_destekler"] = []
 	SaveManager.mark_dirty()
-	return true
-
-
-func equipped_cosmetic(target: String) -> String:
-	return SaveManager.progress.get("secili_kozmetik", {}).get(target, "")
-
-
-func cosmetic_color(target: String, fallback: Color) -> Color:
-	var id := equipped_cosmetic(target)
-	var data: Dictionary = GameConfig.COSMETICS.get(id, {})
-	if data.has("renk"):
-		return Color(data["renk"])
-	return fallback
+	boosters_changed.emit()
+	return kullanilan

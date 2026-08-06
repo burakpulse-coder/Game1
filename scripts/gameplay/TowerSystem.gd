@@ -149,16 +149,18 @@ func build_on(slot: TowerSlot) -> bool:
 	return build_type_on(slot, chosen)
 
 
-func build_type_on(slot: TowerSlot, tower_type: String) -> bool:
+## `bedava` yalnızca "Hazır Kule" desteği için: puan aranmaz ve harcanmaz.
+func build_type_on(slot: TowerSlot, tower_type: String, bedava: bool = false) -> bool:
 	if battlefield == null or not slot.is_empty():
 		return false
-	if points_of(tower_type) < GameConfig.BUILD_POINT_THRESHOLD:
+	if not bedava and points_of(tower_type) < GameConfig.BUILD_POINT_THRESHOLD:
 		return false
 	var tower := battlefield.place_tower(slot, tower_type)
 	if tower == null:
 		return false
 	tower.set_combo_bonus(_combo_bonus)
-	_points[tower_type] = points_of(tower_type) - GameConfig.BUILD_POINT_THRESHOLD
+	if not bedava:
+		_points[tower_type] = points_of(tower_type) - GameConfig.BUILD_POINT_THRESHOLD
 	_ready_types.erase(tower_type)
 	tower_built.emit(tower, tower_type)
 	_refresh_ready()

@@ -307,22 +307,90 @@ const UPGRADES := {
 # --- Reklam / mağaza ----------------------------------------------------
 const INTERSTITIAL_EVERY_N_LEVELS := 3
 
-const IAP_PRODUCTS := {
-	"elmas_kucuk": {"ad": "Küçük Elmas Kesesi", "elmas": 100, "fiyat": "₺29,99", "tur": "tuketilir"},
-	"elmas_orta": {"ad": "Orta Elmas Sandığı", "elmas": 320, "fiyat": "₺79,99", "tur": "tuketilir"},
-	"elmas_buyuk": {"ad": "Büyük Elmas Hazinesi", "elmas": 900, "fiyat": "₺199,99", "tur": "tuketilir"},
-	"reklamsiz": {"ad": "Reklamları Kaldır", "elmas": 0, "fiyat": "₺59,99", "tur": "kalici"},
-	"baslangic": {"ad": "Başlangıç Paketi", "elmas": 250, "altin": 1500, "fiyat": "₺49,99", "tur": "kalici", "tek_seferlik": true},
+## --------------------------------------------------------------------------
+## Destekler (booster)
+## --------------------------------------------------------------------------
+##
+## Rakip analizinden çıkan sonuç: kozmetik satmak mobil bulmaca/savunma
+## oyunlarında karşılık bulmuyor. Wordscapes, Words of Wonders, Royal Match,
+## Toon Blast, Kingdom Rush, Bloons TD — hepsi aynı iki şeyi satıyor:
+## (1) bölümü geçmene yardım eden tüketilir destekler, (2) reklam kaldırma.
+##
+## Destekler bu oyunun ÖLÇÜLEN iki kaybetme sebebine göre tasarlandı
+## (bkz. docs/denge_bulgulari.md):
+##   a) İlk kule geç dikiliyor -> "Hazır Kule", "Çifte Enerji"
+##   b) Ortalarda dalga altında kalınıyor -> "Zaman Buzu", "Yıldırım", "Onarım"
+##
+## Hepsi elmasla alınır; elmas hem oyun içi kazanılır (bölüm ödülü, ödüllü
+## video) hem de parayla. Yani ödemeyen oyuncu da erişebilir — ödeme
+## hızlandırır, kilit açmaz.
+const BOOSTERS := {
+	# --- Bölüm öncesi: savaş başlamadan seçilir ---------------------------
+	"hazir_kule": {
+		"ad": "Hazır Kule",
+		"aciklama": "Bölüme bir kule dikilmiş başlarsın.",
+		"tur": "oncesi", "elmas": 12, "simge": "kule",
+	},
+	"kale_zirhi": {
+		"ad": "Kale Zırhı",
+		"aciklama": "Kalen %40 fazla canla başlar.",
+		"tur": "oncesi", "elmas": 10, "deger": 0.40, "simge": "kale",
+	},
+	"cifte_enerji": {
+		"ad": "Çifte Enerji",
+		"aciklama": "İlk 45 saniye kelimeler iki kat inşa puanı verir.",
+		"tur": "oncesi", "elmas": 14, "deger": 45.0, "simge": "elmas",
+	},
+	# --- Savaş içi: savaş sırasında dokunulur -----------------------------
+	"zaman_buzu": {
+		"ad": "Zaman Buzu",
+		"aciklama": "Bütün düşmanlar 5 saniye donar.",
+		"tur": "savas", "elmas": 8, "deger": 5.0, "simge": "buz",
+	},
+	"yildirim": {
+		"ad": "Yıldırım",
+		"aciklama": "Sahadaki bütün düşmanlara ağır hasar verir.",
+		"tur": "savas", "elmas": 12, "deger": 260.0, "simge": "yildirim",
+	},
+	"onarim": {
+		"ad": "Onarım",
+		"aciklama": "Kalenin canının %35'i geri gelir.",
+		"tur": "savas", "elmas": 10, "deger": 0.35, "simge": "kalp",
+	},
 }
 
-## Kozmetikler oyun gücünü etkilemez (pay-to-win yok).
-const COSMETICS := {
-	"kale_varsayilan": {"ad": "Taş Kale", "elmas": 0, "hedef": "kale", "renk": "#8e8e96"},
-	"kale_altin": {"ad": "Altın Kale", "elmas": 180, "hedef": "kale", "renk": "#d8b23c"},
-	"kale_obsidyen": {"ad": "Obsidyen Kale", "elmas": 240, "hedef": "kale", "renk": "#3a3548"},
-	"kule_varsayilan": {"ad": "Klasik Kuleler", "elmas": 0, "hedef": "kule", "renk": "#9a8f7f"},
-	"kule_zumrut": {"ad": "Zümrüt Kuleler", "elmas": 200, "hedef": "kule", "renk": "#3fa87a"},
-	"kule_kizil": {"ad": "Kızıl Kuleler", "elmas": 200, "hedef": "kule", "renk": "#b5483c"},
+## Bölüm öncesi aynı anda en fazla kaç destek takılabilir.
+## İkiden fazlası bölümü tamamen ödemeye çeviriyor.
+const MAX_PRE_BOOSTERS := 2
+
+## Yeni oyuncuya verilen destekler: mekaniği satın almadan öğrensin.
+const STARTING_BOOSTERS := {"hazir_kule": 1, "zaman_buzu": 1, "onarim": 1}
+
+## Ödüllü video karşılığı verilen destek.
+const REWARDED_BOOSTER := "zaman_buzu"
+
+
+## --------------------------------------------------------------------------
+## Gerçek para ürünleri
+## --------------------------------------------------------------------------
+##
+## Kozmetik ürünler kaldırıldı. Yerine rakiplerin standart dizilimi:
+## para birimi paketleri, reklam kaldırma (yanında elmas ile), tek seferlik
+## başlangıç paketi ve destek sandığı.
+const IAP_PRODUCTS := {
+	"elmas_kucuk": {"ad": "Küçük Elmas Kesesi", "elmas": 100, "fiyat": "₺29,99", "tur": "tuketilir"},
+	"elmas_orta": {"ad": "Orta Elmas Sandığı", "elmas": 320, "fiyat": "₺79,99", "tur": "tuketilir",
+		"rozet": "En çok tercih edilen"},
+	"elmas_buyuk": {"ad": "Büyük Elmas Hazinesi", "elmas": 900, "fiyat": "₺199,99", "tur": "tuketilir",
+		"rozet": "En avantajlı"},
+	"reklamsiz": {"ad": "Reklamları Kaldır", "elmas": 50, "fiyat": "₺59,99", "tur": "kalici",
+		"aciklama": "Bütün reklamlar kalkar. Ödüllü videolar isteğe bağlı kalmaya devam eder."},
+	"destek_sandigi": {"ad": "Destek Sandığı", "elmas": 0, "fiyat": "₺39,99", "tur": "tuketilir",
+		"destekler": {"hazir_kule": 3, "kale_zirhi": 3, "zaman_buzu": 3, "onarim": 3},
+		"aciklama": "12 destek — tek tek almaktan ucuz."},
+	"baslangic": {"ad": "Başlangıç Paketi", "elmas": 250, "altin": 1500, "fiyat": "₺49,99",
+		"tur": "kalici", "tek_seferlik": true, "rozet": "Tek seferlik",
+		"destekler": {"hazir_kule": 2, "cifte_enerji": 2, "yildirim": 2}},
 }
 
 
