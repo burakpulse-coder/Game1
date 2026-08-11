@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Kelime Kalesi"
 config/description="Türkçe kelime bulmaca + kule savunma hibriti."
-config/version="0.6.0"
+config/version="0.7.0"
 run/main_scene="res://scenes/Acilis.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://assets/sprites/icon.svg"
